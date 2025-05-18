@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://caddcore.net
+
+# Sitemaps
+Sitemap: https://caddcore.net/sitemap.xml

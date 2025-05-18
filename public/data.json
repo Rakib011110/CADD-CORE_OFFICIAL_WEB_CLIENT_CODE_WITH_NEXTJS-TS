@@ -1,0 +1,160 @@
+[
+  
+  {
+    "title": "প্রফেশনাল অটোক্যাড মাস্টারকোর্স (সিভিল ও আর্কিটেকচারাল)", 
+    "slug": "professional-autocad-mastercourse",
+    "categories": "architectural",
+    "duration": "৪ মাস",
+    "lessons": 40,
+    "photoUrl": "https://example.com/course-photo.jpg",
+    "projects": 10, 
+    "description": "মেকানিক্যাল ক্যাড ডিজাইনার হিসেবে যারা নিজেদের প্রতিষ্ঠিত করতে চান তাদের জন্য আমাদের এই কোর্স Professional Mechanical CAD Mastercourse. এই কোর্সটি কমপ্লিট করলে আপনি মেকানিক্যাল ড্রাফটিং এর উপর প্রফেশনাল লেভেলের দক্ষতা অর্জন করতে পারবেন। এর পাশাপাশি কিভাবে 3D মডেল তৈরী করা যায়, কিভাবে সেগুলো ব্যবহার করে অ্যাসেম্বলি তৈরী করা যায় এবং ডিজাইনগুলোকে কিভাবে আরও উপস্থাপনযোগ্য করা যায় সেগুলো আপনি এই কোর্স থেকে শিখতে পারবেন",
+    "schedule": {
+      "startingDate": "2025-04-07T00:00:00.000Z",
+      "mode": "Online",
+      "days": ["Saturday", "Monday", "Wednesday"],
+      "time": "07:00 PM - 09:00 PM"
+    }, 
+    
+    
+    "overview": { 
+      "overviewDescription": "স্বয়ং সম্পন্ন কারিকুলাম এবং অভিজ্ঞ শিক্ষক আপনাকে যেকোনো ক্ষেত্রে সফলতা এনে দিতে পারে। আর আমাদের মেকানিক্যাল ক্যাড মাস্টার কোর্সে ঠিক এমনই কারিকুলাম ও প্রশিক্ষক দ্বারা আপনাকে প্রশিক্ষণ দেয়ার ব্যাবস্থা রয়েছে। এই মাস্টার কোর্সে থাকবে প্রায় ৪০ টির ও বেশী ক্লাস। প্রত্যেকটি ক্লাস ২ থেকে ২.৫ ঘন্টা পর্যন্ত হবে। আমাদের ক্লাস হবে অত্যন্ত ইন্টারেক্টিভ , প্রত্যেকটি সেশনে থাকবে কুইজ/এসাইনমেন্ট এর ব্যবস্থা যার দ্বারা আপনি সহজেই নিজের অবস্থান যাচাই করতে পারবেন । শুধুই কি তাই স্পেশাল মাস্টার কোর্সের স্টুডেন্টদের জন্য থাকবে অনলাইন ডিজিটাল ল্যাব , যেখানে আপনি সরাসরি ইন্সট্রাক্টরের সাথে ক্লাসের বাইরেও সমস্যা সমাধান পাবেন।", 
+      "videoUrl": "https://www.youtube.com/embed/7raT46OsN8E?si=PgeJekUh2TOTsVHt"
+     
+    },
+    "courseIncludes": {
+      "duration": "৪ মাস",
+      "weeklyLiveClasses": 2,
+      "weeklyClassHours": 4
+    },
+    "topicsCovered": [
+      {
+        "topicTitle": "রেভিট বেসিক টু অ্যাডভান্স",
+        "topicDescription": "এই অংশে আপনি রেভিট সফটওয়্যার এর মৌলিক থেকে অ্যাডভান্সড লেভেলের কমান্ড ও টুলস ব্যবহারের বিস্তারিত শিখবেন। ছোট ছোট প্রজেক্টের মাধ্যমে হাতে-কলমে শেখানো হবে।"
+      },
+      {
+        "topicTitle": "রেসিডেন্সিয়াল অ্যাপার্টমেন্ট BIM মডেলিং প্রজেক্ট (According to BNBC)",
+        "topicDescription": "এই মডিউলে বাংলাদেশ ন্যাশনাল বিল্ডিং কোড (BNBC) অনুসারে একটি সম্পূর্ণ রেসিডেন্সিয়াল অ্যাপার্টমেন্টের BIM মডেল তৈরি করা হবে।"
+      },
+      {
+        "topicTitle": "স্ট্রাকচারাল ডিটেইলিং BIM মডেলিং প্রজেক্ট",
+        "topicDescription": "স্ট্রাকচারাল ডিটেইলিং সম্পর্কে বিস্তারিত আলোচনা করা হবে, যাতে আপনি একটি ভবনের ভিত্তি থেকে শুরু করে সম্পূর্ণ স্ট্রাকচারাল সিস্টেম ডিজাইন করতে পারেন।"
+      },
+      {
+        "topicTitle": "ইলেকট্রিক্যাল এন্ড প্লাম্বিং BIM মডেলিং প্রজেক্ট",
+        "topicDescription": "এই মডিউলে একটি ভবনের সম্পূর্ণ ইলেকট্রিক্যাল এবং প্লাম্বিং ডিজাইন ও মডেলিং শিখানো হবে।"
+      },
+      {
+        "topicTitle": "European/UK/Australian বিল্ডিং BIM মডেলিং প্রজেক্ট (According to IBC 2018)",
+        "topicDescription": "ইউরোপিয়ান, ইউকে এবং অস্ট্রেলিয়ান স্ট্যান্ডার্ড অনুসারে একটি বিল্ডিং ডিজাইন ও BIM মডেল তৈরি করা হবে।"
+      },
+      {
+        "topicTitle": "Container House BIM মডেলিং প্রজেক্ট (According to IBC 2018)",
+        "topicDescription": "কনটেইনার হাউস ডিজাইন সম্পর্কে বিস্তারিত শেখানো হবে, যা বর্তমানে অত্যন্ত জনপ্রিয় ডিজাইন পদ্ধতি।"
+      },
+      {
+        "topicTitle": "3D ফ্লোর প্লান প্রজেক্ট",
+        "topicDescription": "এই অংশে 3D ফ্লোর প্ল্যান তৈরির পদ্ধতি, বিভিন্ন স্টাইলের ফ্লোর প্ল্যান ডিজাইন শেখানো হবে।"
+      }
+    ],
+    "softwaresTaught": [
+      {
+        "softwareTitle": "Autodesk Revit",
+        "photoUrl": "https://example.com/revit-logo.png"
+      },
+      {
+        "softwareTitle": "Navisworks",
+        "photoUrl": "https://example.com/navisworks-logo.png"
+      },
+      {
+        "softwareTitle": "Dynamo",
+        "photoUrl": "https://example.com/dynamo-logo.png"
+      },
+      {
+        "softwareTitle": "Lumion",
+        "photoUrl": "https://example.com/lumion-logo.png"
+      },
+      {
+        "softwareTitle": "AutoCAD",
+        "photoUrl": "https://example.com/autocad-logo.png"
+      },
+      {
+        "softwareTitle": "SketchUp",
+        "photoUrl": "https://example.com/sketchup-logo.png"
+      }
+    ],
+    "expertPanel": {
+      "advisors": [
+        {
+          "name": "Hachnayen Ahmed",
+          "role": "Structural Engineer",
+          "company": "প্রফেশনাল সাপোর্ট ইঞ্জিনিয়ার্স",
+          "photoUrl": "https://example.com/hachnayen-ahmed.jpg"
+        },
+        {
+          "name": "Habib Basar",
+          "role": "BIM Modeler",
+          "photoUrl": "https://example.com/habib-basar.jpg"
+        }
+      ],
+      "teachers": [
+        {
+          "name": "Instructor 1",
+          "role": "Senior BIM Specialist",
+          "photoUrl": "https://example.com/instructor1.jpg"
+        },
+        {
+          "name": "Instructor 2",
+          "role": "Revit Expert",
+          "photoUrl": "https://example.com/instructor2.jpg"
+        }
+      ]
+    }, 
+
+"learningProject":[
+{
+  "title": "", 
+  "description": "",
+  "photoUrl": ""
+},
+{
+  "title": "", 
+  "description": "",
+  "photoUrl": ""
+},
+{
+  "title": "", 
+  "description": "",
+  "photoUrl": ""
+}
+],
+
+"freeTrainingSessions":[
+{
+"title": "", 
+"videoUrl": ""
+},
+{ 
+  "title": "", 
+"videoUrl": ""
+}
+
+],
+
+
+    "courseFee": 25000,
+    "faqs": [
+      {
+        "question": "এই কোর্সের ফ্রি ট্রেনিং সেশন কি থাকবে?",
+        "answer": "হ্যাঁ, এই কোর্স রিলেটেড বিভিন্ন প্রয়োজনীয় ফ্রি ট্রেনিং সেশন থাকবে।"
+      },
+      {
+        "question": "কোর্সটি কি সম্পূর্ণ অনলাইন হবে?",
+        "answer": "হ্যাঁ, সম্পূর্ণ কোর্সটি অনলাইন প্ল্যাটফর্মে পরিচালিত হবে।"
+      }
+    ]
+  }
+  
+ 
+  
+]
