@@ -18,6 +18,49 @@ export const metadata: Metadata = {
   title: "CADD CORE IT | Professional IT Training Institute in Bangladesh",
   description:
     "Join CADD CORE – Bangladesh’s leading training institute for AutoCAD, Civil Engineering, Architecture, and IT skills. Learn from industry experts through practical, job-ready courses. International certification, real-world projects, and career-focused education.",
+
+
+ keywords: [
+    "AutoCAD Training Bangladesh",
+    "autocad training course",
+    "Civil Engineering Courses Bangladesh",
+    "IT Training Institute Dhaka",
+    "Architecture Training Bangladesh",
+    "Professional IT Certification Bangladesh",
+    "Job-ready IT Skills Bangladesh",
+    "Engineering Software Training Bangladesh",
+    "International Certification Bangladesh",
+    "Best IT Institute Bangladesh",
+    "Practical IT Courses Bangladesh",
+    "CADD Training Bangladesh",
+    "Computer Training Center Bangladesh",
+    "Software Training Institute Bangladesh",
+    "CAD Design Courses Bangladesh",
+    "Engineering Career Bangladesh",
+    "Technical Training Bangladesh",
+    "Graphic Design Training Bangladesh",
+    "Web Development Course Bangladesh",
+    "Microsoft Office Training Bangladesh",
+    "Revit Training Bangladesh",
+    // New keywords added below
+    "AutoCAD training center in dhaka",
+    "autocad course in dhaka",
+    "Revit training course",
+    "autocad course in bd",
+    "autocad course with certificate",
+    "autocad courses for beginners in bd",
+    "autocad training course online",
+    "free autocad courses for beginners",
+    "online autocad courses for beginners",
+    "free online autocad course with certificate",
+    "autocad course fees",
+    "Advanced AutoCAD training center in dhaka",
+    "Advanced autocad course in dhaka",
+    "Advanced autocad training course",
+    "Advanced autocad full course",
+    "Advanced autocad course in bd"
+  ],
+
   openGraph: {
     title: "CADD CORE IT | Professional IT Training Institute in Bangladesh",
     description:

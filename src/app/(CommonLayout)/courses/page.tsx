@@ -3,22 +3,51 @@ import AllCoursesPopupBanner from "@/components/UI/AllCoursesOfferBanner/AllCour
 
 
 export const metadata = {
-  title: "Professional CAD & BIM Courses – CADD CORE",
+  title: "Professional AutoCAD Mastercourse (Civil & Architecture)",
   description:
     "Explore expert-led mastercourses in AutoCAD, BIM Modeling, Structural Design, and Mechanical CAD at CADD CORE. Get certified and job-ready in architecture, civil, and mechanical engineering fields.",
-  keywords: [
-    "AutoCAD Mastercourse",
+   keywords: [
+    // Core AutoCAD Courses
+    "AutoCAD training center in Dhaka",
+    "AutoCAD course in Dhaka",
+    "AutoCAD training course",
+    "AutoCAD course in BD",
+    "AutoCAD course with certificate",
+    "AutoCAD courses for beginners in BD",
+    "AutoCAD training course online",
+    "free AutoCAD courses for beginners",
+    "online AutoCAD courses for beginners",
+    "free online AutoCAD course with certificate",
+    "professional AutoCAD training center",
+
+    // Advanced AutoCAD Courses
+    "Advanced AutoCAD training center in Dhaka",
+    "Advanced AutoCAD course in Dhaka",
+    "Advanced AutoCAD training course",
+    "Advanced AutoCAD full course",
+    "Advanced AutoCAD course in BD",
+    "Advanced AutoCAD course with certificate",
+
+    // Additional SEO Keywords (Industry-Specific)
+    "Best AutoCAD institute in Bangladesh",
+    "AutoCAD certification course Dhaka",
+    "Learn AutoCAD in Bangladesh",
+    "AutoCAD 2D 3D training",
+    "Civil AutoCAD course",
+    "Architectural AutoCAD training",
+    "Mechanical AutoCAD course",
+    "AutoCAD for engineers",
+    "AutoCAD job-ready training",
+    "CADD CORE AutoCAD courses",
+
+    // Related Terms
     "BIM Modeling Course",
+    "Revit Architecture Training",
     "Structural Design Course",
-    "Mechanical CAD Training",
-    "Architectural CAD",
-    "Civil Engineering CAD",
-    "CADD CORE Courses",
-    "Professional CAD Courses",
-    "Revit BIM Certification Course",
-    "RCC Structural Design Course",
-    "CAD Training in Bangladesh Course"
+    "3D Modeling Classes",
+    "CAD Certification Bangladesh"
   ],
+  // Rest of your metadata (openGraph, authors, etc.) remains the same
   openGraph: {
     title: "Advance Your Career with CAD & BIM Mastercourses | CADD CORE",
     description:
