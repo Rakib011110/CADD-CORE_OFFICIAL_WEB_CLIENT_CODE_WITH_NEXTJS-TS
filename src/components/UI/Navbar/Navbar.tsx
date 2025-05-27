@@ -12,11 +12,9 @@ import Notifications from "@/components/Notifications/Notifications";
 const navLinks = [
   { name: "হোম", path: "/" },
   { name: "কোর্স সমূহ", path: "/courses" },
-   { name: "ATC® কোর্স সমূহ", path: "/autodesk-authorised-training-institute-courses" },
-
+  { name: "ATC® কোর্স সমূহ", path: "/autodesk-authorised-training-institute-courses" },
   { name: "ইন্ডাস্ট্রিয়াল এটাচমেন্ট", path: "/industrial-attachment-training" },
   { name: "স্টুডেন্ট কর্নার", path: "/student-corner" },
-  // { name: "লাইভ ইভেন্ট", path: "https://docs.google.com/forms/d/e/1FAIpQLScZysZu-d44Md-KbsIPXOX-wuoobxWbcBaXN04ITkgWYNR6Fw/viewform" },
 ];
 
 export default function Navbar() {
@@ -36,10 +34,8 @@ export default function Navbar() {
   const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
   const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
 
- 
-
   return (
-    <nav style={{ fontFamily: "banglaFont" }}  className="bg-gradient-to-r  from-red-500 to-red-400 px-6 py-4 flex items-center justify-between relative z-50">
+    <nav style={{ fontFamily: "banglaFont" }} className="bg-gradient-to-r from-red-600 to-red-500 px-6 py-4 flex items-center justify-between relative z-50">
       {/* Logo */}
       <Link href="/" className="w-36">
         <motion.div whileHover={{ scale: 1.05 }} className="cursor-pointer">
@@ -54,11 +50,7 @@ export default function Navbar() {
       <div className="hidden md:flex items-center space-x-6 text-white font-semibold">
         {navLinks.map(({ name, path }) => (
           <motion.div key={name} whileHover={{ scale: 1.05, y: -1 }}>
-            <Link
-              href={path}
-             
-              className="transition-all duration-300 hover:border-b-2 border-white pb-1"
-            >
+            <Link href={path} className="transition-all duration-300 hover:border-b-2 border-white pb-1">
               {name}
             </Link>
           </motion.div>
@@ -66,14 +58,9 @@ export default function Navbar() {
 
         {/* Dropdown */}
         <div className="relative">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            onClick={toggleDropdown}
-            className="flex items-center focus:outline-none"
-          >
-       <Link href={"/about-us"}> 
-       আমাদের সম্পর্কে
-       </Link> <ChevronDown size={16} className="ml-1" />
+          <motion.button whileHover={{ scale: 1.05 }} onClick={toggleDropdown} className="flex items-center focus:outline-none">
+            <Link href="/about-us">আমাদের সম্পর্কে</Link>
+            <ChevronDown size={16} className="ml-1" />
           </motion.button>
 
           <AnimatePresence>
@@ -85,22 +72,12 @@ export default function Navbar() {
                 transition={{ duration: 0.2 }}
                 className="absolute top-full mt-2 w-40 bg-white text-black shadow-md rounded-md z-50"
               >
-                <Link
-                  href="/team"
-                  className="block px-4 py-2 hover:bg-gray-200"
-                  onClick={() => setDropdownOpen(false)}
-                >
+                <Link href="/team" className="block px-4 py-2 hover:bg-gray-200" onClick={() => setDropdownOpen(false)}>
                   আমাদের টিম
                 </Link>
-                <Link
-                  href="/job"
-                  className="block px-4 py-2 hover:bg-gray-200"
-                  onClick={() => setDropdownOpen(false)}
-                >
+                <Link href="/job" className="block px-4 py-2 hover:bg-gray-200" onClick={() => setDropdownOpen(false)}>
                   Career
-                </Link> 
-
-                
+                </Link>
               </motion.div>
             )}
           </AnimatePresence>
@@ -110,13 +87,17 @@ export default function Navbar() {
       {/* Desktop Auth */}
       <div className="hidden md:flex items-center space-x-6 text-white font-semibold">
         {user ? (
-          <> 
-            <motion.div whileHover={{ scale: 1.05 }}>
-              <Notifications />
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.05 }}>
-              <Link href="/dashboard/manage-courses">ড্যাশবোর্ড</Link>
-            </motion.div>
+          <>
+            {user.emailVerified && (
+              <>
+                <motion.div whileHover={{ scale: 1.05 }}>
+                  <Notifications />
+                </motion.div>
+                <motion.div whileHover={{ scale: 1.05 }}>
+                  <Link href="/dashboard/manage-courses">ড্যাশবোর্ড</Link>
+                </motion.div>
+              </>
+            )}
             <motion.button
               whileHover={{ scale: 1.05 }}
               onClick={handleLogout}
@@ -128,11 +109,10 @@ export default function Navbar() {
         ) : (
           <motion.div whileHover={{ scale: 1.05 }}>
             <Link
-              href="https://docs.google.com/forms/d/e/1FAIpQLScZysZu-d44Md-KbsIPXOX-wuoobxWbcBaXN04ITkgWYNR6Fw/viewform"
-              target="_blank"
+              href="/login"
               className="bg-white text-red-500 font-bold px-4 py-2 rounded-lg shadow-md hover:bg-gray-100"
             >
-              লাইভ ইভেন্ট
+              সাইন ইন করুন
             </Link>
           </motion.div>
         )}
@@ -158,7 +138,6 @@ export default function Navbar() {
               <Link
                 key={name}
                 href={path}
-              
                 className="px-6 hover:underline"
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -168,13 +147,9 @@ export default function Navbar() {
 
             {/* Dropdown in Mobile */}
             <div className="px-6">
-              <button
-                onClick={toggleDropdown}
-                className="flex items-center w-full focus:outline-none"
-              >
-               <Link href={"/about-us"}> 
-       আমাদের সম্পর্কে
-       </Link> <ChevronDown size={16} className="ml-1" />
+              <button onClick={toggleDropdown} className="flex items-center w-full focus:outline-none">
+                <Link href="/about-us">আমাদের সম্পর্কে</Link>
+                <ChevronDown size={16} className="ml-1" />
               </button>
               <AnimatePresence>
                 {dropdownOpen && (
@@ -185,24 +160,10 @@ export default function Navbar() {
                     transition={{ duration: 0.2 }}
                     className="mt-2 ml-4 bg-white text-black rounded-md shadow-md"
                   >
-                    <Link
-                      href="/team"
-                      className="block px-4 py-2 hover:bg-gray-200"
-                      onClick={() => {
-                        setDropdownOpen(false);
-                        setMobileMenuOpen(false);
-                      }}
-                    >
+                    <Link href="/team" className="block px-4 py-2 hover:bg-gray-200" onClick={() => setDropdownOpen(false)}>
                       আমাদের টিম
                     </Link>
-                    <Link
-                      href="/job"
-                      className="block px-4 py-2 hover:bg-gray-200"
-                      onClick={() => {
-                        setDropdownOpen(false);
-                        setMobileMenuOpen(false);
-                      }}
-                    >
+                    <Link href="/job" className="block px-4 py-2 hover:bg-gray-200" onClick={() => setDropdownOpen(false)}>
                       Career
                     </Link>
                   </motion.div>
@@ -212,26 +173,37 @@ export default function Navbar() {
 
             {/* Mobile Auth */}
             {user ? (
-             <div>
-              {/* <div>
-                <Notifications />
-              </div> */}
-
-<button
-                onClick={handleLogout}
-                className="px-6 text-white bg-red-700 py-2 rounded-lg"
-              >
-                লগআউট
-              </button>
-
-             </div>
+              <div className="flex flex-col gap-2 px-6">
+                {user.emailVerified && (
+                  <Link
+                    href="/dashboard/manage-courses"
+                    className="text-white bg-green-600 py-2 rounded-lg text-center"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    ড্যাশবোর্ড
+                  </Link>
+                )}
+                <button
+                  onClick={handleLogout}
+                  className="text-white bg-red-700 py-2 rounded-lg"
+                >
+                  লগআউট
+                </button>
+              </div>
             ) : (
+              // <Link
+              //   href="https://forms.gle/XnZP35yKbjXGCtGz7"
+              //   target="_blank"
+              //   className="px-6 text-white bg-blue-500 py-2 rounded-lg"
+              // >
+              //   লাইভ ইভেন্ট
+              // </Link>
               <Link
-                href="https://forms.gle/XnZP35yKbjXGCtGz7"
+                href="/login"
                 target="_blank"
-                className="px-6 text-white bg-blue-500 py-2 rounded-lg"
-              >
-                লাইভ ইভেন্ট
+                className="px-2 text-white bg-blue-500 py-2 rounded-lg"
+              > 
+        লগিন করুন 
               </Link>
             )}
           </motion.div>

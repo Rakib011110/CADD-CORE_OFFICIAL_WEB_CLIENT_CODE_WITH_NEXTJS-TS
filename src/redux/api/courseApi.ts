@@ -47,6 +47,17 @@ endpoints: (builder)=>({
         }),
         invalidatesTags: ["Course"],
       }),
+      // ----------------------------- 
+
+
+  getCourseScheduleByCourseId: builder.query({
+    query: (courseId) => ({
+      url: `/courses/schedule/${courseId}`,
+      method: "GET",
+    }),
+    providesTags: ["Course"],
+  }),
+
 })
 
 

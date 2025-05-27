@@ -23,19 +23,15 @@ export const registerUser = async (userData: FieldValues) => {
 };
 
 export const loginUser = async (userData: FieldValues) => {
-  try {
-    const { data } = await axiosInstance.post("/auth/login", userData);
+  // don’t wrap in try/catch — let AxiosError bubble up with its response
+  const { data } = await axiosInstance.post("/auth/login", userData);
 
-    if (data.success) {
-      (await cookies()).set("accessToken", data?.data?.accessToken);
-      (await cookies()).set("refreshToken", data?.data?.refreshToken);
-    }
-    console.log(data);
-
-    return data;
-  } catch (error: any) {
-    throw new Error(error);
+  if (data.success) {
+    (await cookies()).set("accessToken", data.data.accessToken);
+    (await cookies()).set("refreshToken", data.data.refreshToken);
   }
+
+  return data;
 };
 
 export const logout =async () => {
@@ -58,6 +54,7 @@ export const getCurrentUser = async () => {
       mobileNumber: decodedToken.mobileNumber,
       role: decodedToken.role,
       status: decodedToken.status,
+      emailVerified: decodedToken.emailVerified , // Nullish coalescingAdd this line
       profilePhoto: decodedToken.profilePhoto,
     };
   }

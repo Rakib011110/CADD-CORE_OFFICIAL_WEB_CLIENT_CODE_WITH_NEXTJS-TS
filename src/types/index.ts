@@ -4,6 +4,7 @@ export interface IUser {
     role: USER_ROLE;
     email: string;
     status: string;
+    emailVerified: any
     mobileNumber: string;
     profilePhoto: string;
     createdAt?: string;
@@ -11,6 +12,16 @@ export interface IUser {
     __v?: number;
   } 
 
+export interface IPayment {
+  transactionId: string;
+  _id?: string;
+  user: any;
+  course: any;
+  amount: number;
+  status: 'pending' | 'completed' | 'failed';
+  createdAt?: Date;
+  updatedAt?: Date;
+}
 
   export type USER_ROLE = {
     ADMIN: 'ADMIN',

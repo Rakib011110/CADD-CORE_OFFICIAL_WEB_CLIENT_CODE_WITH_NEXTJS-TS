@@ -64,7 +64,10 @@ export default function AllCourses() {
               filteredCourses.map((course: any) => (
                 <CourseCard key={course._id} {...course} />
               ))
-            )}
+            )} 
+
+
+            
           </div>
         </div>
       </div>

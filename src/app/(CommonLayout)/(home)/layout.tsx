@@ -1,5 +1,4 @@
-
-import FloatingContactMenu from "@/components/UI/FloatingContactMenu/FloatingContactMenu";
+"use client";
 import { ReactNode } from "react";
 
 export default function HomeLayout({ children }: {children:ReactNode} ) {

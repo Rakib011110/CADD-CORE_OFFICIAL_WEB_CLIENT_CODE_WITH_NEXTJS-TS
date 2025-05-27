@@ -1,11 +1,11 @@
 
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-// aaa
+//  // baseUrl: "https://caddcore-web-server-code-pi.vercel.app/api", old APi 
 const baseApi = createApi({
   reducerPath: "baseApi",
   baseQuery: fetchBaseQuery({
     // baseUrl: "http://localhost:5000/api",
-    // baseUrl: "https://caddcore-web-server-code-pi.vercel.app/api", old APi 
+   
     baseUrl: "https://caddcoreapi-ten.vercel.app/api",
   }),     
   tagTypes: [
@@ -20,7 +20,8 @@ const baseApi = createApi({
     "CertificatesApplication", 
     "industrial",
     "Jobs",
-    "Applications"
+    "Applications", 
+    "Coupon"
   ],
   endpoints: () => ({})
 });

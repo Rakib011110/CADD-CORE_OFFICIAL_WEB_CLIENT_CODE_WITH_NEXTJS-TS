@@ -11,8 +11,8 @@ import LoadingSpinner from "@/components/UI/LoadingSpinner/LoadingSpinner";
 import CaddForm from "@/components/resubaleform/CaddForm";
 import CaddInput from "@/components/resubaleform/CaddInput";
 import { Button } from "@/components/UI/button";
+import { toast } from "sonner";
 
-// Ensure AnimationPlayer is client-only
 const AnimationPlayer = dynamic(
   () => import("@/components/UI/AnimationPlayer/AnimationPlayer"),
   { ssr: false }
@@ -32,7 +32,7 @@ export function LoginClient() {
   const [redirectTo, setRedirectTo] = useState("/dashboard/manage-courses");
   const hasMounted = useHasMounted();
 
-  const { mutate: handleUserLogin, isPending, isSuccess } = useUserLogin();
+  const { mutate: handleUserLogin, isPending } = useUserLogin();
 
   useEffect(() => {
     const param = searchParams?.get("redirect");
@@ -41,54 +41,54 @@ export function LoginClient() {
     }
   }, [searchParams]);
 
-  useEffect(() => {
-    if (isSuccess) {
-      router.push(redirectTo);
-    }
-  }, [isSuccess, redirectTo, router]);
-
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
-    handleUserLogin(data);
+    handleUserLogin(data, {
+      onSuccess: (response: any) => {
+        const role = response?.data?.role;
+        if (role === "ADMIN") {
+          router.push("/dashboard/manage-courses");
+        } else {
+          router.push("/user-profile");
+        }
+      },
+      onError: (error) => {
+        toast.error(error?.message || "Invalid email or password");
+      },
+    });
   };
 
-  // Render nothing until after mount to avoid SSR mismatches
-  if (!hasMounted) {
-    return null;
-  }
+  if (!hasMounted) return null;
 
   return (
     <section>
       {isPending && <LoadingSpinner />}
 
-      <div className="h-screen w-full bg-gradient-to-br from-blue-200 via-blue-300 to-blue-400 flex items-center justify-center">
-        <div className="flex flex-col lg:flex-row w-[90%] max-w-[900px] bg-white rounded-xl shadow-lg overflow-hidden">
-          <div className="hidden lg:flex w-full lg:w-1/2 bg-blue-100 items-center justify-center p-6">
-            <AnimationPlayer />
+      <div className="h-screen w-full bg-gradient-to-br from-red-50 via-red-50 to-rose-70 flex items-center justify-center p-4">
+        <div className="flex flex-col lg:flex-row w-full max-w-[1000px] bg-white/90 backdrop-blur-sm rounded-xl shadow-2xl overflow-hidden border border-white/20">
+          <div className="hidden lg:flex w-full lg:w-1/2 bg-gradient-to-br from-red-500 to-rose-600 items-center justify-center p-8">
+            <div className="text-white text-center">
+              <AnimationPlayer />
+              <h2 className="text-3xl font-bold mt-6">Join Our Community</h2>
+              <p className="mt-2 opacity-90">Unlock exclusive features and content</p>
+            </div>
           </div>
 
-          {/* Right Side: Login Form */}
-          <div className="w-full lg:w-1/2 p-8">
-            <h3 className="text-2xl sm:text-3xl font-extrabold text-gray-900 text-center mb-6">
-              Welcome to Cadd core
-            </h3>
-
-            <p className="text-gray-600 text-center mb-6 text-sm sm:text-base">
-              Sign in to continue
-            </p>
-
-
-
+          <div className="w-full lg:w-1/2 p-8 sm:p-10">
+            <div className="text-center mb-8">
+              <h3 className="text-3xl font-extrabold text-gray-900 bg-clip-text text-transparent bg-gradient-to-r from-red-600 to-rose-600 uppercase">
+                Welcome to Cadd Core
+              </h3>
+              <p className="text-gray-600 mt-2">Sign in to continue your journey</p>
+            </div>
 
             <CaddForm onSubmit={onSubmit}>
-              <div className="mb-6">
+              <div className="mb-6 space-y-4">
                 <CaddInput
                   label="Email"
                   name="email"
                   placeholder="Enter your email"
                   type="email"
                 />
-              </div>
-              <div className="mb-6">
                 <CaddInput
                   label="Password"
                   name="password"
@@ -96,35 +96,40 @@ export function LoginClient() {
                   type="password"
                 />
               </div>
+              
               <Button
-                className="w-full py-3 text-lg font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-shadow shadow-md hover:shadow-lg"
+                className="w-full py-3 text-lg font-semibold text-white bg-gradient-to-r from-red-600 to-rose-600 rounded-lg hover:from-red-700 hover:to-rose-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                 size="lg"
                 type="submit"
               >
-                Login
-              </Button> 
-
+                {isPending ? "Signing in..." : "Login"}
+              </Button>
+              
+              <div className="relative my-6">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-white/90 text-gray-500">No account yet?</span>
+                </div>
+              </div>
+              
+              <Link href="/register" passHref>
+                <Button
+                  variant="outline"
+                  className="w-full py-3 text-lg font-semibold text-rose-600 border-rose-600 rounded-lg hover:bg-rose-50 transition-all shadow-sm hover:shadow-md"
+                  size="lg"
+                >
+                  REGISTER NOW
+                </Button>
+              </Link>
+              
+              <div className="mt-4 text-center text-sm">
+                {/* <Link href="/forgot-password" className="text-rose-600 hover:text-rose-800 hover:underline">
+                  Forgot password?
+                </Link> */}
+              </div>
             </CaddForm>
-
-
-            {/* <div className="text-center mt-6 text-sm">
-              <span className="text-gray-600">Do not have an account?</span>{" "}
-              <Link
-                className="text-blue-600 font-semibold hover:underline"
-                href="/register-customer"
-              >
-                Register
-              </Link>
-            </div>
-            <div className="text-center mt-4 text-sm">
-              <span className="text-gray-600">Forgot Password?</span>{" "}
-              <Link
-                className="text-blue-600 font-semibold hover:underline"
-                href="/forgot-pass"
-              >
-                Reset
-              </Link>
-            </div> */}
           </div>
         </div>
       </div>

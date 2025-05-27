@@ -19,6 +19,9 @@ import WorkingProjects from "@/components/pages/CourseDetails/WorkingProject/Wor
 import OurCertificate from "@/components/pages/CourseDetails/Certificate/Ourcerticates";
 import CertificateVerification from "@/components/pages/StudentCornar/CertificateVerification/CertificateVerification";
 import useSmoothScroll from "@/hooks/useSmoothScroll";
+import CertificationPathway from "@/components/pages/CourseDetails/CertificationPathway/CertificationPathway";
+import Roadmap from "@/components/pages/CourseDetails/CertificationPathway/CertificationPathway";
+import CourseSchedule from "@/components/pages/CourseDetails/CourseSchedule/CourseSchedule";
 
 export default function CourseDetails() { 
   useSmoothScroll();
@@ -47,10 +50,26 @@ export default function CourseDetails() {
       <DetailsBannar course={course?.data}/> 
 
 <div style={{ fontFamily: "banglaFont" }}  className="text-justify font-sans">
-<BatchSchedule course={course?.data} />
+<BatchSchedule course={course?.data} /> 
+
+
+<div>
+<CourseSchedule course={course?.data} />
+
+</div>
+
+
       <div  className="" id="mastercourse-overview">
         <MastercourseOverview  course={course?.data}/>
-      </div> 
+      </div>  
+
+{/* 
+<div className="">
+  <Roadmap/>
+</div> */}
+
+
+
       <div id="course-content">
         
         <CourseContentList   course={course?.data}/>

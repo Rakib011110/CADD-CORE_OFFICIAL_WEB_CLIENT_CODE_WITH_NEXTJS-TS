@@ -14,6 +14,13 @@ export default {
   jwt_refresh_secret: process.env.JWT_REFRESH_SECRET,
   jwt_refresh_expires_in: process.env.JWT_REFRESH_EXPIRES_IN,
   admin_email: process.env.ADMIN_EMAIL,
+frontend_base_url: process.env.FRONTEND_BASE_URL,
+base_url: process.env.BASE_URL,
+
+
+
+
+
 //   admin_password: process.env.ADMIN_PASSWORD,
 //   admin_profile_photo: process.env.ADMIN_PROFILE_PHOTO,
 //   admin_mobile_number: process.env.ADMIN_MOBILE_NUMBER,

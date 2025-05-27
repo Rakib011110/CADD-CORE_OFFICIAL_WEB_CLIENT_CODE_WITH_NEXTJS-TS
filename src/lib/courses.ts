@@ -102,7 +102,8 @@ export type TCourse = {
   learningProject: TLearningProject[];
   freeTrainingSessions: TFreeTrainingSession[];
   courseFee: number;
-  faqs: TFAQ[];
+  faqs: TFAQ[]; 
+  
 };
 
 

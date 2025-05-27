@@ -1,23 +1,35 @@
 import baseApi from "../baseApi";
+import Cookies from "js-cookie";
 
 
 export const UserApi = baseApi.injectEndpoints({
 
 endpoints: (builder)=>({
 
+
+  
     getAllUsers: builder.query({
         query: () => ({
           url: `/users`,
           method: "GET",
-        //   headers: {
-        //     Authorization: `${Cookies.get("accesToken")}`,
-        //   },
+          // headers: {
+          //   Authorization: `${Cookies.get("accesToken")}`,
+          // },
         }),
         providesTags: ["User"],
       }), 
 
 
-      
+      getMe: builder.query({
+  query: () => ({
+    url: `/auth/me`,
+    method: "GET",
+    headers: {
+      Authorization: `${Cookies.get("accessToken")}`,
+    },
+  }),
+  providesTags: ["User"],
+}),
       
         createUsers: builder.mutation({
             query: (eventData) => ({
@@ -53,6 +65,7 @@ endpoints: (builder)=>({
 })
 export const {
     useGetAllUsersQuery,
+    useGetMeQuery,
   useCreateUsersMutation, 
   useUpdateusersMutation,  
   useDeleteusersMutation

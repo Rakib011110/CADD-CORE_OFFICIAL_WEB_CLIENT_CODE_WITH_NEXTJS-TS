@@ -1,8 +1,6 @@
 'use client';
 
-import { zodResolver } from '@hookform/resolvers/zod';
-import Link from 'next/link';
-import React, { useEffect } from 'react';
+import React, { useEffect, Suspense } from 'react';
 import { FieldValues, SubmitHandler, useForm, Controller, FormProvider } from 'react-hook-form';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useUserRegistration } from '@/hooks/auth.hook';
@@ -12,15 +10,7 @@ import CaddInput from '@/components/resubaleform/CaddInput';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 
-export type USER_ROLE = {
-  ADMIN: 'ADMIN';
-  USER: 'USER';
-  HR: 'HR';
-  MARKETING_TEAM: 'MARKETING_TEAM';
-  CUSTOMER_SERVICE_TEAM: 'CUSTOMER_SERVICE_TEAM';
-};
-
-const RegisterPage = () => {
+function SignUpContent() {
   const searchParams = useSearchParams();
   const redirect = searchParams?.get('redirect');
   const router = useRouter();
@@ -42,8 +32,6 @@ const RegisterPage = () => {
         duration: 5000,
         position: 'top-center',
       });
-
-      // Redirect to verify info page (optional)
       router.push('/email-verification-info');
     }
 
@@ -70,7 +58,7 @@ const RegisterPage = () => {
       profilePhoto: "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png",
     };
 
-    localStorage.setItem('emailForVerification', data.email); // For resend feature
+    localStorage.setItem('emailForVerification', data.email);
     handleUserRegistration(userData);
   };
 
@@ -111,6 +99,12 @@ const RegisterPage = () => {
       </motion.div>
     </div>
   );
-};
+}
 
-export default RegisterPage;
+export default function SignUpPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SignUpContent />
+    </Suspense>
+  );
+}

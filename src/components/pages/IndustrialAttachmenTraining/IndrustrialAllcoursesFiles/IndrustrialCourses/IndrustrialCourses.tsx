@@ -7,7 +7,8 @@ import IndustrialCourseCard from "../IndrustrialCourseCard/IndrustrialCourseCard
 
 export default function IndrustrialAllCourses() {
   const { data: coursesResponse, isLoading } = useGetAllIndrustrialCourseQuery({});
-  const coursesArray = coursesResponse?.data || [];
+  const coursesArray = coursesResponse?.data || []; 
+  console.log(coursesArray)
 
   return (
     <div className="bg-gradient-to-b from-gray-50 to-gray-100 py-16">

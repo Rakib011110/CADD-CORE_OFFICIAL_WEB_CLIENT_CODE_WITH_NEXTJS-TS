@@ -3,14 +3,45 @@ import { CheckCircle } from "lucide-react";
 import DetailsHeadNav from "../DetailsHeadNav/DetailsHeadNav";
 import { TCourse } from "@/lib/courses";
 import Link from "next/link";
+import { useUser } from "@/context/user.provider";
+import { useRouter } from "next/navigation";
+import { useInitiatePaymentMutation } from "@/redux/api/payment/paymentApi";
+import PaymentButton from "../../Payments/PayementButton";
+import EnrollModal from "../EnrollCourse/EnrollModal";
+import { useState } from "react";
+
 
 export default function DetailsBannar({ course }: { course: TCourse }) {
    
-  
+  const {user}= useUser() 
+  const router = useRouter();
+  const [initiatePayment, { isLoading }] = useInitiatePaymentMutation();
   // const formattedFee = new Intl.NumberFormat("en-IN").format(course?.courseFee || 0); 
+const [showModal, setShowModal] = useState(false);
 
+
+
+  
   const formattedFee= new Intl.NumberFormat("en-IN").format(course?.courseFee || 0)
 
+ const handleEnroll = async () => {
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+    try {
+      const res = await initiatePayment({
+        courseId: course._id,
+        amount: course.courseFee,
+        user,
+      }).unwrap();
+      // Redirect to SSLCommerz gateway
+      window.location.href = res.data.gatewayUrl;
+    } catch (err) {
+      console.error(err);
+      alert("Payment initiation failed. Please try again.");
+    }
+  };
 
 
   return (
@@ -85,7 +116,32 @@ export default function DetailsBannar({ course }: { course: TCourse }) {
 
                   <button className="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-md font-semibold">
                   কোর্স ফি {formattedFee} টাকা
-                  </button>
+                  </button> 
+
+                      <div className="payment-section">
+        {/* <PaymentButton 
+          courseId={course._id} 
+          amount={course.courseFee} 
+        />  */}
+
+
+
+<EnrollModal
+  open={showModal}
+  onClose={() => setShowModal(false)}
+  courseId={course._id}
+  courseTitle={course.title}
+  courseFee={course.courseFee}
+  startDate={course?.schedule.startingDate}
+  user={user}
+  // initiatePayment={initiatePayment}
+/>
+
+<button onClick={() => setShowModal(true)} className="bg-red-500 text-white px-5 py-2 rounded-md">
+  Enroll করুন
+</button>
+
+      </div>
                 </div>
               </div>
             </div>
