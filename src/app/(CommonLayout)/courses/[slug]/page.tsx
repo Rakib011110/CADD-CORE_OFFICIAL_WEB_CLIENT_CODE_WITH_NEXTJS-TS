@@ -54,7 +54,7 @@ export default function CourseDetails() {
 
 
 <div>
-<CourseSchedule course={course?.data} />
+{/* <CourseSchedule course={course?.data} /> */}
 
 </div>
 
