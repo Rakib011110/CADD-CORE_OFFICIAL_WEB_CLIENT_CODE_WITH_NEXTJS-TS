@@ -118,7 +118,7 @@ const [showModal, setShowModal] = useState(false);
                   কোর্স ফি {formattedFee} টাকা
                   </button> 
 
-                      <div className="payment-section">
+      <div className="payment-section">
         {/* <PaymentButton 
           courseId={course._id} 
           amount={course.courseFee} 
@@ -126,7 +126,7 @@ const [showModal, setShowModal] = useState(false);
 
 
 
-{/* <EnrollModal
+<EnrollModal
   open={showModal}
   onClose={() => setShowModal(false)}
   courseId={course._id}
@@ -135,11 +135,11 @@ const [showModal, setShowModal] = useState(false);
   startDate={course?.schedule.startingDate}
   user={user}
   // initiatePayment={initiatePayment}
-/> */}
+/>
 
-<button onClick={() => setShowModal(true)} className="bg-red-500 text-white px-5 py-2 rounded-md">
+{/* <button onClick={() => setShowModal(true)} className="bg-red-500 text-white px-5 py-2 rounded-md">
   Enroll করুন
-</button>
+</button> */}
 
       </div>
                 </div>
