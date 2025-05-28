@@ -7,7 +7,6 @@ import axios from 'axios';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import Link from 'next/link';
-import clientAxiosInstance from '@/lib/AxiosInstance/axiosClientInstance';
 
 function VerifyEmailContent() {
   const searchParams = useSearchParams();
@@ -17,9 +16,6 @@ function VerifyEmailContent() {
   const [error, setError] = useState('');
   const [isResending, setIsResending] = useState(false);
   const [email, setEmail] = useState('');
- useEffect(() => {
-    console.log("✅ API BASE URL:", process.env.NEXT_PUBLIC_API_BASE_URL);
-  }, []);
 
   useEffect(() => {
     const storedEmail = localStorage.getItem('emailForVerification');
@@ -33,7 +29,11 @@ function VerifyEmailContent() {
       }
 
       try {
-        const response = await  clientAxiosInstance.post("/auth/verify-email", { token });
+        const response = await axios.post(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/verify-email`,
+          { token },
+          { timeout: 10000 }
+        );
 
         if (response.status === 200) {
           setStatus('success');
