@@ -27,11 +27,17 @@ function VerifyEmailContent() {
       }
 
       try {
-        const response = await axios.post(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/verify-email`,
-          { token },
-          { timeout: 10000 }
-        );
+       const response = await axios.post(
+  `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/verify-email`,
+  { token },
+  {
+    withCredentials: true,  // <-- KEY for cross-site cookies
+    timeout: 10000,
+  } 
+
+
+  
+);
 
         if (response.status === 200) {
           setStatus('success');

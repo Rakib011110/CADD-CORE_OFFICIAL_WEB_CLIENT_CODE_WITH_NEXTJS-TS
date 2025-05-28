@@ -7,8 +7,8 @@ import { cookies } from "next/headers";
 
 
 export const axiosInstance = axios.create({
-  //old//  baseURL: "https://caddcore-web-server-code-pi.vercel.app/api",
-    baseURL: "https://caddcoreapi-ten.vercel.app/api",
+ 
+       baseURL: "https://caddcoreapi-ten.vercel.app/api",
     // baseURL: "http://localhost:5000/api",
   }); 
 

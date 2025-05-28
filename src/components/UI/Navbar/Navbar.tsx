@@ -113,7 +113,7 @@ export default function Navbar() {
               className="bg-white text-red-500 font-bold px-4 py-2 rounded-lg shadow-md hover:bg-gray-100"
             >
               সাইন ইন করুন
-            </Link> */} 
+            </Link>  */}
 
 
              <Link
