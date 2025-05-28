@@ -25,12 +25,15 @@ export default function CourseSchedule({ course }: { course: any }) {
       title: "Online Training",
       date: schedule.onlineStartDate,
       endDate: schedule.onlineFinishDate,
-      icon: "💻"
+      icon: "💻",
+      duration: calculateDuration(schedule.onlineStartDate, schedule.onlineFinishDate)
     },
     {
       title: "On Job Training",
       date: schedule.onJobTrainingStart,
-      icon: "👨‍💻"
+      endDate: schedule.onJobTrainingEnd,
+      icon: "👨‍💻",
+      duration: calculateDuration(schedule.onJobTrainingStart, schedule.onJobTrainingEnd)
     },
     {
       title: "Certification",
@@ -84,7 +87,7 @@ export default function CourseSchedule({ course }: { course: any }) {
                 transition={{ delay: index * 0.15, duration: 0.4 }}
                 className="relative border flex flex-col items-center text-center w-[130px] md:min-w-[130px] mx-auto p-3 rounded-xl bg-red-50"
               >
-                {/* Connecting Line (Only on larger screens) */}
+                {/* Connecting Line */}
                 {!isLast && (
                   <div className="hidden md:block absolute top-5 left-20 w-[calc(100%+1.5rem)] h-1 bg-red-500 z-10" />
                 )}
@@ -106,6 +109,13 @@ export default function CourseSchedule({ course }: { course: any }) {
 
                 {/* Title */}
                 <h3 className="mt-1 text-sm font-semibold text-gray-700">{milestone.title}</h3>
+
+                {/* Optional Duration */}
+                {milestone.duration && (
+                  <p className="text-[0.65rem] text-gray-500 mt-1 italic">
+                    {milestone.duration}
+                  </p>
+                )}
               </motion.div>
             );
           })}
@@ -113,44 +123,54 @@ export default function CourseSchedule({ course }: { course: any }) {
       </div>
 
       {/* Phase Status */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.4 }}
-        className="mt-8 p-4 bg-blue-50 rounded-lg border border-blue-200"
-      >
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div>
-            <p className="text-sm text-blue-600 mb-1">Current Phase</p>
-            <p className="font-medium">Online Training</p>
-            <p className="text-sm text-gray-600">
-              {calculateDuration(schedule.onlineStartDate, schedule.onlineFinishDate)}
-            </p>
-          </div>
-          <div className="text-left md:text-right">
-            <p className="text-sm text-gray-600 mb-1">Next Step</p>
-            <p className="font-medium">
-              {formatDualDate(schedule.onJobTrainingStart).english}
-            </p>
-          </div>
-        </div>
+     {/* Phase Durations Summary */}
+<motion.div
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.5, delay: 0.4 }}
+  className="mt-10 p-6 rounded-2xl bg-gradient-to-br from-blue-50 via-white to-red-50 border border-blue-100 shadow-xl"
+>
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-gray-800">
+    {/* Online Training */}
+    <div className="flex items-center gap-4 bg-white rounded-xl shadow-md p-4 border-l-4 border-blue-500">
+      <div className="text-2xl">🖥️</div>
+      <div>
+        <p className="text-sm font-semibold text-gray-700">Online Training</p>
+        <p className="text-gray-600">
+          {calculateDuration(schedule.onlineStartDate, schedule.onlineFinishDate)}
+        </p>
+      </div>
+    </div>
 
-        {/* Motivational Message */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.8, duration: 0.5 }}
-          className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-red-100 rounded-lg text-sm text-blue-900 shadow-inner"
-        >
-          🚀 <strong>Complete all phases</strong> to unlock your certificate and real-world experience. Make sure to stay active and submit your projects on time!
-        </motion.div>
-      </motion.div>
+    {/* On Job Training */}
+    <div className="flex items-center gap-4 bg-white rounded-xl shadow-md p-4 border-l-4 border-red-500">
+      <div className="text-2xl">👨‍💻</div>
+      <div>
+        <p className="text-sm font-semibold text-gray-700">On Job Training</p>
+        <p className="text-gray-600">30 Days</p>
+      </div>
+    </div>
+  </div>
+
+  {/* Motivational Message */}
+  <motion.div
+    initial={{ opacity: 0, scale: 0.9 }}
+    animate={{ opacity: 1, scale: 1 }}
+    transition={{ delay: 0.8, duration: 0.5 }}
+    className="mt-8 p-5 bg-gradient-to-r from-blue-100 to-red-100 rounded-xl text-blue-900 shadow-inner text-center"
+  >
+    🎯 <strong>Stay focused!</strong> Completing all training phases will unlock your certification and real-world job readiness. Keep pushing forward 🚀
+  </motion.div>
+</motion.div>
+
+
     </div>
   );
 }
 
 // Helper function to calculate duration between dates
 function calculateDuration(start: string, end: string): string {
+  if (!start || !end) return '';
   const startDate = new Date(start);
   const endDate = new Date(end);
   const diffTime = Math.abs(endDate.getTime() - startDate.getTime());

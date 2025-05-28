@@ -4,7 +4,7 @@ export default function MastercourseOverview({ course }: { course: TCourse }) {
   const videoUrl = course?.overview?.videoUrl;
 
   return (
-    <section    id="mastercourse-overview" className="bg-white py-10 px-4">
+    <section    id="mastercourse-overview" className="bg-white py-10 px-4 mt-10">
       <div className="max-w-6xl mx-auto space-y-12">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
           {/* Left Column: Heading + Paragraphs */}
@@ -21,7 +21,7 @@ export default function MastercourseOverview({ course }: { course: TCourse }) {
 
           {/* Right Column: Embedded Video */}
           {videoUrl ? (
-            <div className="w-full aspect-video rounded-md overflow-hidden">
+            <div className="w-full aspect-video rounded-md overflow-hidden border-4 border-red-500 " >
               <iframe
                 width="560"
                 height="315"

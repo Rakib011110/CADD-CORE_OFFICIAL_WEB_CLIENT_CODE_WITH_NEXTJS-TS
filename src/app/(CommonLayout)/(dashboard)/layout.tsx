@@ -29,6 +29,11 @@ const navigationSections = [
         color: "",
       },
       {
+        label: "📋 Manage Schedule",
+        href: "/dashboard/course-schedule-mange",
+        color: "",
+      },
+      {
         label: "➕ Create New Course",
         href: "/dashboard/create-course",
         color: "",

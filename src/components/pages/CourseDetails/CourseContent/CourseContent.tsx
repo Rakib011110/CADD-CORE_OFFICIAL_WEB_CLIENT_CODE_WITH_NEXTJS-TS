@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { CheckCircle, ChevronDown, ChevronUp } from "lucide-react";
 import { TCourse } from "@/lib/courses";
+import { AnimatePresence, motion } from "framer-motion";
 
 export default function CourseContentList({ course }: { course: TCourse }) {
   const [openItem, setOpenItem] = useState<string | null>(null);
@@ -22,41 +23,84 @@ export default function CourseContentList({ course }: { course: TCourse }) {
           এই কোর্সে যা যা থাকবে
         </h2>
 
-        <div className="space-y-4">
+         <div className="space-y-4">
           {course?.topicsCovered && course.topicsCovered.length > 0 ? (
-            course.topicsCovered.map((topic) => (
-              <div
+            course.topicsCovered.map((topic, index) => (
+              <motion.div
                 key={topic._id}
-                className="bg-white shadow-sm rounded-md p-4 cursor-pointer"
-                onClick={() => handleToggle(topic._id as any) }
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-gray-100"
               >
-                {/* Header: Check Icon + Title + Chevron */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle className="text-yellow-500 w-5 h-5" />
-                    <span className="text-gray-800 font-medium">
+                <div
+                  className="flex items-center justify-between px-6 py-5 cursor-pointer"
+                  onClick={() => handleToggle(topic._id as string)}
+                >
+                  {/* Icon + Title */}
+                  <div className="flex items-center gap-4">
+                    <motion.div
+                      whileHover={{ scale: 1.1 }}
+                      className="p-2 bg-red-50 rounded-full"
+                    >
+                      <CheckCircle className="text-red-500 w-6 h-6" />
+                    </motion.div>
+                    <h4 className="text-lg font-semibold text-gray-800">
                       {topic.topicTitle || "শিরোনাম পাওয়া যায়নি"}
-                    </span>
+                    </h4>
                   </div>
 
                   {/* Chevron Icon */}
-                  {openItem === topic._id ? (
-                    <ChevronUp className="text-gray-600 w-5 h-5" />
-                  ) : (
-                    <ChevronDown className="text-gray-600 w-5 h-5" />
-                  )}
+                  <motion.div
+                    animate={{
+                      rotate: openItem === topic._id ? 180 : 0,
+                    }}
+                    transition={{ duration: 0.3 }}
+                    className="p-1 rounded-full bg-gray-100"
+                  >
+                    {openItem === topic._id ? (
+                      <ChevronUp className="w-5 h-5 text-red-500" />
+                    ) : (
+                      <ChevronDown className="w-5 h-5 text-red-500" />
+                    )}
+                  </motion.div>
                 </div>
 
                 {/* Collapsible Content */}
-                {openItem === topic._id && (
-                  <div className="mt-3 text-gray-700 border-l-2 border-yellow-500 pl-3">
-                    {topic.topicDescription || "বর্ণনা পাওয়া যায়নি"}
-                  </div>
-                )}
-              </div>
+                <AnimatePresence>
+                  {openItem === topic._id && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="px-6 pb-5">
+                        <motion.p
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: 0.2 }}
+                          className="text-gray-600 border-l-4 border-red-400 pl-4 text-sm leading-relaxed"
+                        >
+                          {topic.topicDescription || "বর্ণনা পাওয়া যায়নি"}
+                        </motion.p>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
             ))
           ) : (
-            <p className="text-gray-500">কোনো তথ্য পাওয়া যায়নি।</p>
+            <motion.p
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+              className="text-center text-gray-500 py-8"
+            >
+              কোনো তথ্য পাওয়া যায়নি।
+            </motion.p>
           )}
         </div>
       </div>

@@ -46,7 +46,7 @@ export default function CourseDetails() {
   if (isError) return <p>Error fetching course details.</p>;
 
   return (
-    <div style={{ fontFamily: "banglaFont" }} className="font-serif">
+    <div style={{ fontFamily: "banglaFont" }} className="font-serif ">
       <DetailsBannar course={course?.data}/> 
 
 <div style={{ fontFamily: "banglaFont" }}  className="text-justify font-sans">
@@ -54,7 +54,7 @@ export default function CourseDetails() {
 
 
 <div>
-{/* <CourseSchedule course={course?.data} /> */}
+<CourseSchedule course={course?.data} />
 
 </div>
 
