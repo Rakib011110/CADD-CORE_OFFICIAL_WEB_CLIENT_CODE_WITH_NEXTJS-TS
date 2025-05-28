@@ -15,7 +15,7 @@ import ApplyJobForm from "@/components/pages/Jobs/ApplyJobForm/ApplyJobForm";
 import ApplyJobModal from "@/components/pages/Jobs/ApplyJobForm/ApplyJobForm";
 
 export default function JobDetailsPage() { 
-  const [showForm, setShowForm] = useState(false); 
+ 
   const [showModal, setShowModal] = useState(false);
 
 

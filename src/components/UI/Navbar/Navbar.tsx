@@ -108,21 +108,21 @@ export default function Navbar() {
           </>
         ) : (
           <motion.div whileHover={{ scale: 1.05 }}>
-            <Link
+            {/* <Link
               href="/login"
               className="bg-white text-red-500 font-bold px-4 py-2 rounded-lg shadow-md hover:bg-gray-100"
             >
               সাইন ইন করুন
-            </Link> 
+            </Link>  */}
 
 
-             {/* <Link
+             <Link
                 href="https://forms.gle/XnZP35yKbjXGCtGz7"
                 target="_blank"
                 className="px-6 text-red-500 bg--500 bg-white py-2 rounded-lg"
               >
                 লাইভ ইভেন্ট
-              </Link> */}
+              </Link>
           </motion.div>
         )}
       </div>

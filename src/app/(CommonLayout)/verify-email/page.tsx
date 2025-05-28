@@ -91,7 +91,7 @@ function VerifyEmailContent() {
       <div className="max-w-md w-full bg-white/90 backdrop-blur-sm p-8 rounded-xl shadow-lg border border-white/20 space-y-6">
         {/* Top message about verification process */}
         <div className="text-center mb-6">
-          <h2 className="text-2xl font-extrabold text-gray-900 bg-clip-text text-transparent bg-gradient-to-r from-red-600 to-rose-600">
+          <h2 className="text-2xl font-extrabold  bg-clip-text text-transparent bg-gradient-to-r from-red-600 to-rose-600">
             Email Verification
           </h2>
           {email && (
