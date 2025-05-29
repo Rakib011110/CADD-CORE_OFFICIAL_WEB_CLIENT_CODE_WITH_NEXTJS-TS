@@ -21,7 +21,7 @@ const baseApi = createApi({
     "industrial",
     "Jobs",
     "Applications", 
-    "Coupon"
+    "Coupon","InstallmentPlans"
   ],
   endpoints: () => ({})
 });
