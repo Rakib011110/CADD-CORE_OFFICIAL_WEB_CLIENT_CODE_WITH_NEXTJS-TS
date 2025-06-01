@@ -18,7 +18,7 @@ import {
   DialogDescription,
 } from "@/components/UI/dialog";
 
-export default function ComponentName() {
+export default function ClientReviews() {
   const [selectedTestimonial, setSelectedTestimonial] = useState<any | null>(null);
 
   const testimonials = [
