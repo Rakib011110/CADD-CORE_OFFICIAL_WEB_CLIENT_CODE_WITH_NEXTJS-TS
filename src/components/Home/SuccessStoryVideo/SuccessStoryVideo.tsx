@@ -371,11 +371,22 @@ export default function SuccessStoriesPageVideo() {
                 <div className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-2 shadow-lg"><Award className="h-6 w-6" /></div>
             </div><div><div className="flex mb-4">
                 {[...Array(5)].map((_, i) => (<motion.div key={i} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.6 + i * 0.1 }}><Star className="fill-yellow-400 text-yellow-400 w-6 h-6 mx-0.5" /></motion.div>))}
-            </div><motion.p className="text-xl md:text-2xl italic mb-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }}>
-                "বিআইএম প্রযুক্তি প্রয়োগ করে আমরা আমাদের কর্মপ্রবাহের দক্ষতা ৪০% বৃদ্ধি করেছি। এই প্ল্যাটফর্ম আমাদের সিভিল, স্ট্রাকচারাল এবং এমইপি টিমগুলিকে এমনভাবে সংযুক্ত করেছে যা আমরা কখনো ভাবিনি।"
-            </motion.p><motion.div className="space-y-1" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }}>
-                <p className="text-lg font-semibold">- ডেভিড উইলসন, বিআইএম ডিরেক্টর</p><p className="text-red-200">আরবানটেক সলিউশন্স | ২০২৩ উদ্ভাবন পুরস্কার বিজয়ী</p>
-            </motion.div></div></div></div>
+            </div>
+            
+            
+         <motion.p className="text-xl md:text-2xl italic mb-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }}>
+  "CAD কোর্সটি করার পর আমি AutoCAD-এ confident হয়ে উঠি এবং নিজের একটি portfolio তৈরি করি। কোর্সের practical assignment আর real-life project guideline গুলো আমাকে industry-ready করে তোলে। এখন আমি একটি leading architectural firm-এ কাজ করছি — এ কোর্সটা আমার career-এর turning point ছিল!"
+</motion.p>
+            
+           <motion.div className="space-y-1" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }}>
+  <p className="text-lg font-semibold">- সাবরিন হোসেন, Junior CAD Designer</p>
+  <p className="text-red-200">ArchiZone Ltd. | ২০২৩ Best Newcomer Award</p>
+</motion.div>
+            
+            </div>
+            
+            
+            </div></div>
         </motion.div>
         <motion.div /* ... CTA ... */ className="text-center my-16 relative" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7, duration: 0.5 }}>
             <div className="absolute -z-10 -inset-4"><div className="absolute top-0 left-1/4 w-32 h-32 bg-red-500 rounded-full filter blur-3xl opacity-20 animate-blob"></div><div className="absolute top-0 right-1/4 w-48 h-48 bg-red-600 rounded-full filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div><div className="absolute bottom-0 left-1/3 w-40 h-40 bg-red-700 rounded-full filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div></div>
