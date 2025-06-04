@@ -36,7 +36,7 @@ export default function IndrustrialTrainingDetailsBanner({ course }: { course: T
             {/* Banner Content */}
             <div className="relative z-30 max-w-5xl mx-auto  border-4 border-t-0 border-b-0 border-red-500">
               {/* White Card */}
-             <Image className=" h-auto " src={"https://res.cloudinary.com/dbkwiwoll/image/upload/v1745729684/Orange_And_White_Gradient_Workshop_Banner_2_hfxdd2.png"} width={1000} height={900} alt=""/>
+             <Image className=" h-auto " src={course.courseBanner} width={1000} height={900} alt=""/>
             </div>  
             <div className="backdrop-filter backdrop-blur-sm  rounded-md shadow-lg p-6 md:p-8">
                 {/* SubTitle */}
