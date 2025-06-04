@@ -1,4 +1,5 @@
 "use client"
+import Image from "next/image";
 import { Link } from "react-scroll";
 
 export default function Footer() {
@@ -60,7 +61,7 @@ export default function Footer() {
          <li><a href="https://www.facebook.com/groups/caddcore" className="hover:text-white">ইঞ্জিনিয়ারিং কমিউনিটি গ্রুপ</a></li>
          <li><a href="https://www.facebook.com/caddcorebd" className="hover:text-white">ফেসবুক পেজ</a></li>
 
-            <li><a href="#" className="hover:text-white">প্রাইভেসি পলিসি</a></li>
+            <li><a href="https://www.caddcore.net/privecy-policy" className="hover:text-white">প্রাইভেসি পলিসি</a></li>
             <li><a href="#" className="hover:text-white">রিফান্ড পলিসি</a></li>
           </ul>
         </div>
@@ -74,6 +75,15 @@ export default function Footer() {
             <a href="#" className="text-gray-400 hover:text-white text-xl">📘</a>
             <a href="#" className="text-gray-400 hover:text-white text-xl">🔗</a>
             <a href="#" className="text-gray-400 hover:text-white text-xl">💬</a>
+          </div> 
+
+          <div className="mt-">
+            <Image
+              src="https://res.cloudinary.com/dalpf8iip/image/upload/v1749027587/images__8_-removebg-preview_qfukeu.png"
+              width={140}
+              height={100}
+              alt="Caddcore Logo"
+            />
           </div>
         </div>
       </div>
