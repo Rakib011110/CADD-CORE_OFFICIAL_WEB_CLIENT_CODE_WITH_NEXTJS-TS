@@ -35,6 +35,9 @@ function SignUpContent() {
       router.push('/email-verification-info');
     }
 
+
+    
+
     if (
       !isPending &&
       isError &&

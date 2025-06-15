@@ -43,7 +43,17 @@ const navigationSections = [
         href: "/dashboard/add-seminar-time",
         color: "",
       },
-    ],
+      {
+        label: "💰 Installment Plan",
+        href: "/dashboard/payments/installment-plan",
+        color: "",
+      },
+      {
+        label: "📇 Manage Coupon",
+        href: "/dashboard/payments/manage-coupon",
+        color: "",
+      },
+    ], 
   },
   {
     title: "📚 Industrial Management",
