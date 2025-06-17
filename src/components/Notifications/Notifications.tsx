@@ -9,10 +9,14 @@ import {
   TooltipTrigger,
   TooltipProvider,
 } from "@/components/UI/tooltip";
+import { useUser } from "@/context/user.provider";
 
 export default function Notifications() {
   const { data: response } = useGetAllApplicationsQuery();
   const applications = response?.data || [];
+const user= useUser() 
+console.log(user)
+
 
   // Filter only applications with 'applied' status
   const appliedApplications = applications.filter(

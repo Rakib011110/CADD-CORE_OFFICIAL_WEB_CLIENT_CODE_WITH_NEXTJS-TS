@@ -75,7 +75,7 @@ export function LoginClient() {
 
           <div className="w-full lg:w-1/2 p-8 sm:p-10">
             <div className="text-center mb-8">
-              <h3 className="text-3xl font-extrabold text-gray-900 bg-clip-text text-transparent bg-gradient-to-r from-red-600 to-rose-600 uppercase">
+              <h3 className="text-3xl font-extrabold  bg-clip-text text-transparent bg-gradient-to-r from-red-600 to-rose-600 uppercase">
                 Welcome to Cadd Core
               </h3>
               <p className="text-gray-600 mt-2">Sign in to continue your journey</p>

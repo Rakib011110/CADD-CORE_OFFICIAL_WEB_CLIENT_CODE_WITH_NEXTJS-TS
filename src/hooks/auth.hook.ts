@@ -3,9 +3,10 @@ import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query"; 
 
 
-import { loginUser, registerUser } from "../services/AuthService";
+import { getCurrentUser, loginUser, registerUser } from "../services/AuthService";
 import { ReactElement, JSXElementConstructor, ReactNode, ReactPortal } from "react";
 import { AxiosError } from "axios";
+import { useUser } from "@/context/user.provider";
 
 export const useUserRegistration = () => {
   return useMutation<any, Error, FieldValues>({
@@ -20,19 +21,24 @@ export const useUserRegistration = () => {
   });
 };
 export const useUserLogin = () => {
+  const { setUser } = useUser();
+
   return useMutation<any, AxiosError, FieldValues>({
     mutationKey: ["USER_LOGIN"],
     mutationFn: loginUser,
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success("Login successful");
+
+      const currentUser = await getCurrentUser();
+      setUser(currentUser ?? null);
     },
     onError: (error) => {
-      // pull exactly what your backend sent in response.data.message
       const message =
-        (error.response?.data as any)?.message ||
+        (error.response?.data as any)?.error || // ✅ correct key
         error.message ||
         "Login failed. Please try again.";
       toast.error(message);
     },
-  });
+  });  
+
 };

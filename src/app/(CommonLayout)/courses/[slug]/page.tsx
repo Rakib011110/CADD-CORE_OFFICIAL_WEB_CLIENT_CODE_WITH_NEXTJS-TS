@@ -63,10 +63,10 @@ export default function CourseDetails() {
         <MastercourseOverview  course={course?.data}/>
       </div>  
 
-{/* 
+
 <div className="">
   <Roadmap/>
-</div> */}
+</div>
 
 
 

@@ -20,6 +20,10 @@ import { IUser } from "@/types";
     setIsLoading: Dispatch<SetStateAction<boolean>>;
   }
   
+
+
+
+  
   const UserProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<IUser | null>(null);
     const [isLoading, setIsLoading] = useState(true);

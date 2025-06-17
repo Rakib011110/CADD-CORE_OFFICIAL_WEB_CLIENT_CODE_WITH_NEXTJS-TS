@@ -7,6 +7,7 @@ import { Progress } from "@/components/UI/progress";
 import { Badge } from "@/components/UI/badge";
 import { Button } from "@/components/UI/button";
 import { useGetMyPaymentsQuery } from "@/redux/api/payment/paymentApi";
+import Link from "next/link";
 
 type Course = {
   _id: string;
@@ -294,7 +295,7 @@ export default function UserProfile() {
                 <div className="text-center py-8">
                   <p className="text-gray-500">No courses enrolled yet</p>
                   <Button variant="outline" className="mt-4">
-                    Browse Courses
+                   <Link href="/courses">Browse Courses</Link>
                   </Button>
                 </div>
               )}

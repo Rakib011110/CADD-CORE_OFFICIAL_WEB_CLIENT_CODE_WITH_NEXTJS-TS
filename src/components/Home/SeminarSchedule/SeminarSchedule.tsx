@@ -58,7 +58,7 @@ export default function SeminarSchedule() {
   const { data: seminars, isLoading } = useGetAllSeminarQuery({});
 // Date formatting helpers
 const formatDay = (dateString: string) => {
-  return new Date(dateString).getDate();
+  return new Date(dateString).toLocaleDateString('bn-BD', { day: 'numeric' });
 };
 
 const formatMonthYear = (dateString: string) => {

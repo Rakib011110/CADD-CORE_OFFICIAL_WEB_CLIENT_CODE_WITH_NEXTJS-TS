@@ -1,38 +1,10 @@
 import React from 'react';
-import { Card } from '../card';
-import { Book, Clock, Settings } from 'lucide-react';
+import { Card } from '../card'; // Your custom Card component
+import { Book, Clock, ArrowRight, Settings } from 'lucide-react';
 import Link from 'next/link';
-import { TCourse } from '@/lib/courses';
-import Image from 'next/image'; 
+import Image from 'next/image';
 import { motion } from 'framer-motion';
-export const metadata = {
-  title: "Courses - CADD CORE",
-  description: "Explore a wide range of professional courses including Civil, Mechanical, Electrical, Architectural, and BIM at CADD CORE.",
-  keywords: [
-    "CADD CORE Courses",
-    "Civil Courses",
-    "Mechanical Courses",
-    "Electrical Courses",
-    "Architectural Courses",
-    "BIM Courses",
-    "Professional Training",
-    "Technical Education"
-  ],
-  openGraph: {
-    title: "Courses - CADD CORE",
-    description: "Advance your career with industry-focused courses in Civil, Mechanical, Electrical, Architectural, and BIM disciplines at CADD CORE.",
-    // url: "https://yourdomain.com/courses", 
-    type: "website",
-    
-  },
- 
-  authors: [{ name: "CADD CORE" }],
-  creator: "CADD CORE",
-  publisher: "CADD CORE",
-};
-
-// Motion-enabled Card with group hover
-const MotionCard = motion(Card);
+import { TCourse } from '@/lib/courses';
 
 const CourseCard: React.FC<TCourse> = ({
   title,
@@ -44,81 +16,88 @@ const CourseCard: React.FC<TCourse> = ({
   softwaresTaught,
 }) => {
   return (
-    <MotionCard
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 20 }}
-      whileHover={{ scale: 1.03 }}
-      transition={{ duration: 0.4 }}
-      className="relative h-[320px] rounded-lg overflow-hidden shadow-lg group"
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+      className="group h-full"
     >
-      {/* Background Image */}
-      <motion.img
-        src={photoUrl}
-        alt={title}
-        className="absolute inset-0 w-full h-full object-cover"
-        initial={{ scale: 1.1 }}
-        whileHover={{ scale: 1 }}
-        transition={{ duration: 0.5 }}
-      />
-
-      {/* Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/60 to-transparent z-10" />
-
-      {/* Software Icons on Card Hover */}
-      <div className="absolute top-4 left-1/2 -translate-x-1/2 flex gap-2 z-30 opacity-0 transform -translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
-        {softwaresTaught?.slice(0, 4).map((software, idx) => (
-          <Image
-            key={idx}
-            src={software.photoUrl}
-            alt={software.softwareTitle || `software-${idx}`}
-            width={50}
-            height={50}
-            className="rounded-full bg-white p-1 shadow-md object-contain"
-          />
-        ))}
-      </div>
-
-      {/* Content */}
-      <div className="relative z-20 flex flex-col items-center justify-end h-full text-center text-white px-4 pb-6">
-        <motion.h3
-          className="text-xl font-bold mb-2"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.4 }}
-        >
-          {title}
-        </motion.h3>
-
-        <motion.div
-          className="flex items-center justify-between gap-4 text-sm opacity-90"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4, duration: 0.4 }}
-        >
-          <div className="flex items-center">
-            <Clock className="text-red-400" />
-            <span className="ml-1">{duration}</span>
+      <Link href={`/courses/${slug}`} className="block h-full">
+        {/* --- FIX IS HERE --- */}
+        {/* We've added "p-0" to remove any default padding from the Card component itself. */}
+        <Card className="p-0 flex flex-col h-full rounded-lg overflow-hidden bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-red-500 dark:hover:border-red-500 transition-colors duration-300 shadow-sm hover:shadow-lg">
+          
+          {/* 1. Image Section - This will now sit flush against the top of the card. */}
+          <div className="relative h-48 w-full overflow-hidden">
+            <Image
+              src={photoUrl}
+              alt={title}
+              fill
+              className="object-cover transition-transform duration-500 ease-in-out group-hover:scale-105"
+            />
           </div>
-          <div className="flex items-center">
-            <Book className="text-red-400" />
-            <span className="ml-1">{lessons}</span>
-          </div>
-          <div className="flex items-center">
-            <Settings className="text-red-400" />
-            <span className="ml-1">{projects}</span>
-          </div>
-        </motion.div>
 
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="mt-4 bg-red-500 text-white px-5 py-2 rounded-lg shadow-lg hover:bg-red-600 transition"
-        >
-          <Link href={`/courses/${slug}`}>বিস্তারিত দেখুন</Link>
-        </motion.button>
-      </div>
-    </MotionCard>
+          {/* 2. Content Section - We keep the padding here, where it's needed. */}
+          <div className="p-4 flex flex-col flex-grow">
+            {/* Course Title */}
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 min-h-[56px]">
+              {title}
+            </h3>
+
+            {/* Course Stats */}
+            <div className="flex  gap-2 text-sm text-gray-600 dark:text-gray-400 mb-4">
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-red-500" />
+                <span>{duration}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Book className="w-4 h-4 text-red-500" />
+                <span>{lessons} </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Settings className="w-4 h-4 text-red-500" />
+                <span>{projects} </span>
+              </div>
+            </div>
+            
+            <div className="flex-grow" />
+
+            {/* 3. Footer Section with Software and CTA */}
+            <div>
+              {softwaresTaught && softwaresTaught.length > 0 && (
+                <div className="mb-4">
+                  <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Tools You'll Learn</p>
+                  <div className="flex flex-wrap items-center gap-2 transition-transform duration-500 ease-in-out group-hover:scale-110">
+                    {softwaresTaught.slice(0, 5).map((software, idx) => (
+                      <Image
+                        key={idx}
+                        src={software.photoUrl}
+                        alt={software.softwareTitle || ''}
+                        width={600}
+                        height={600}
+                        className="rounded-full w-14 h-8 bg-gray-100 p-1 object-contain"
+                        title={software.softwareTitle}
+                      /> 
+
+
+                      
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div
+                className="font-semibold text-red-500 flex items-center gap-1.5 transition-all duration-300 group-hover:gap-2.5"
+              >
+                বিস্তারিত দেখুন
+                <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+              </div>
+            </div>
+          </div>
+        </Card>
+      </Link>
+    </motion.div>
   );
 };
 
