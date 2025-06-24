@@ -19,8 +19,7 @@ export const metadata: Metadata = {
   description:
     "Join CADD CORE – Bangladesh’s leading training institute for AutoCAD, Civil Engineering, Architecture, and IT skills. Learn from industry experts through practical, job-ready courses. International certification, real-world projects, and career-focused education.",
 
-
- keywords: [
+  keywords: [
     "AutoCAD Training Bangladesh",
     "autocad training course",
     "Civil Engineering Courses Bangladesh",
@@ -58,7 +57,7 @@ export const metadata: Metadata = {
     "Advanced autocad course in dhaka",
     "Advanced autocad training course",
     "Advanced autocad full course",
-    "Advanced autocad course in bd"
+    "Advanced autocad course in bd",
   ],
 
   openGraph: {
@@ -84,7 +83,9 @@ export const metadata: Metadata = {
     description:
       "CADD CORE offers hands-on training in AutoCAD, Civil Engineering, Architecture, and IT with expert certification and job-focused learning.",
     site: "@caddcore",
-    images: ["https://res.cloudinary.com/dbkwiwoll/image/upload/v1747304781/CADDCORE-Profile-Background_hcnox7.jpg"],
+    images: [
+      "https://res.cloudinary.com/dbkwiwoll/image/upload/v1747304781/CADDCORE-Profile-Background_hcnox7.jpg",
+    ],
   },
   metadataBase: new URL("https://www.caddcore.net"),
 };
@@ -92,18 +93,17 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" >
-    <head>
-      <link
-        href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali&display=swap"
-        rel="stylesheet"
-      />
-    </head>
-    <body  className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-      <Providers >
-        {children}
-      </Providers>
-    </body>
-  </html>
+    <html lang="en">
+      <head>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <Providers>{children}</Providers>
+      </body>
+    </html>
   );
 }
