@@ -22,6 +22,7 @@ import useSmoothScroll from "@/hooks/useSmoothScroll";
 import CertificationPathway from "@/components/pages/CourseDetails/CertificationPathway/CertificationPathway";
 import Roadmap from "@/components/pages/CourseDetails/CertificationPathway/CertificationPathway";
 import CourseSchedule from "@/components/pages/CourseDetails/CourseSchedule/CourseSchedule";
+import RevitSection from "@/components/pages/CourseDetails/RevitSectionProps/RevitSectionProps";
 
 export default function CourseDetails() { 
   useSmoothScroll();
@@ -79,6 +80,10 @@ export default function CourseDetails() {
 <div>
   <WorkingProjects course={course?.data}/>
 </div>
+
+
+{/* <RevitSection/> */}
+
 
 </div>
 
