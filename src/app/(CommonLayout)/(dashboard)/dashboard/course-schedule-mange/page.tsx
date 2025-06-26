@@ -1,16 +1,17 @@
-"use client"
+"use client";
 import { useState } from "react";
 import {
   useGetAllSchedulesQuery,
-  useCreateScheduleMutation,
   useUpdateScheduleMutation,
   useDeleteScheduleMutation,
 } from "@/redux/api/courseScheduleApi";
-import { useGetAllCourseQuery } from "@/redux/api/courseApi";
+// No need for useGetAllCourseQuery if we only display course title, not select it
+// import { useGetAllCourseQuery } from "@/redux/api/courseApi"; // Removed as per new requirements
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/UI/table";
 import { Button } from "@/components/UI/button";
-import { Input } from "@/components/UI/input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/UI/dialog";
+// Dialog, Input components removed as form is removed
+// import { Input } from "@/components/UI/input";
+// import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/UI/dialog";
 
 // Helper for formatting date
 const formatDate = (dateStr: string) => {
@@ -19,255 +20,159 @@ const formatDate = (dateStr: string) => {
   return d.toISOString().slice(0, 10);
 };
 
+// Define types for schedule item for better type safety
+interface ScheduleItem {
+  _id: string;
+  course: { _id: string; title: string } | string; // Can be object or just ID string
+  batchNo: string;
+  onlineStartDate: string;
+  onlineFinishDate: string;
+  onJobTrainingStart: string;
+  certificationDate: string;
+  freelancingSessionDate: string;
+  internshipStartDate: string;
+  experienceCertificateDate: string;
+  startDate: string;
+  endDate: string;
+  time: string;
+  days: string;
+  mode: string;
+}
+
+// Only allow editing for date and batchNo fields
+type EditableField =
+  | "batchNo"
+  | "onlineStartDate"
+  | "onlineFinishDate"
+  | "onJobTrainingStart"
+  | "certificationDate"
+  | "freelancingSessionDate"
+  | "internshipStartDate"
+  | "experienceCertificateDate";
+
 export default function CourseScheduleManage() {
-  const { data: scheduleData, isLoading } = useGetAllSchedulesQuery({});
-  console.log("Schedule Data:", scheduleData);
-  const { data: courseData, isLoading: courseLoading } = useGetAllCourseQuery({});
-  const [createSchedule] = useCreateScheduleMutation();
+  const { data: scheduleData, isLoading, isError, error } = useGetAllSchedulesQuery({});
   const [updateSchedule] = useUpdateScheduleMutation();
   const [deleteSchedule] = useDeleteScheduleMutation();
 
-  const [modalOpen, setModalOpen] = useState(false);
-  const [editMode, setEditMode] = useState(false);
-  const [selected, setSelected] = useState<any>(null);
-  const [form, setForm] = useState<any>({
-    course: "",
-    batchNo: "",
-    onlineStartDate: "",
-    onlineFinishDate: "",
-    onJobTrainingStart: "",
-    certificationDate: "",
-    freelancingSessionDate: "",
-    internshipStartDate: "",
-    experienceCertificateDate: "",
-    startDate: "",
-    endDate: "",
-    time: "",
-    days: "",
-    mode: "",
-  });
-
-  // Only allow editing for date and batchNo fields
-  type EditableField =
-    | "batchNo"
-    | "onlineStartDate"
-    | "onlineFinishDate"
-    | "onJobTrainingStart"
-    | "certificationDate"
-    | "freelancingSessionDate"
-    | "internshipStartDate"
-    | "experienceCertificateDate";
-
-  const [editingCell, setEditingCell] = useState<{rowId: string; field: EditableField} | null>(null);
+  const [editingCell, setEditingCell] = useState<{ rowId: string; field: EditableField } | null>(null);
   const [cellValue, setCellValue] = useState<string>("");
-  const [updatingCell, setUpdatingCell] = useState<{rowId: string; field: EditableField} | null>(null);
+  const [updatingCell, setUpdatingCell] = useState<{ rowId: string; field: EditableField } | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const handleOpen = (item?: any) => {
-    if (item) {
-      setEditMode(true);
-      setSelected(item);
-      setForm({
-        course: item.course?._id || item.course,
-        batchNo: item.batchNo || "",
-        onlineStartDate: formatDate(item.onlineStartDate),
-        onlineFinishDate: formatDate(item.onlineFinishDate),
-        onJobTrainingStart: formatDate(item.onJobTrainingStart),
-        certificationDate: formatDate(item.certificationDate),
-        freelancingSessionDate: formatDate(item.freelancingSessionDate),
-        internshipStartDate: formatDate(item.internshipStartDate),
-        experienceCertificateDate: formatDate(item.experienceCertificateDate),
-        startDate: item.startDate || "",
-        endDate: item.endDate || "",
-        time: item.time || "",
-        days: item.days || "",
-        mode: item.mode || "",
-      });
-    } else {
-      setEditMode(false);
-      setSelected(null);
-      setForm({
-        course: "",
-        batchNo: "",
-        onlineStartDate: "",
-        onlineFinishDate: "",
-        onJobTrainingStart: "",
-        certificationDate: "",
-        freelancingSessionDate: "",
-        internshipStartDate: "",
-        experienceCertificateDate: "",
-        startDate: "",
-        endDate: "",
-        time: "",
-        days: "",
-        mode: "",
-      });
-    }
-    setModalOpen(true);
-  };
 
-  const handleClose = () => {
-    setModalOpen(false);
-    setEditMode(false);
-    setSelected(null);
-    setForm({
-      course: "",
-      batchNo: "",
-      onlineStartDate: "",
-      onlineFinishDate: "",
-      onJobTrainingStart: "",
-      certificationDate: "",
-      freelancingSessionDate: "",
-      internshipStartDate: "",
-      experienceCertificateDate: "",
-      startDate: "",
-      endDate: "",
-      time: "",
-      days: "",
-      mode: "",
-    });
-  };
   // Spreadsheet-like cell edit handlers
-  const handleCellEdit = (rowId: string, field: EditableField, value: string) => {
+  const handleCellEdit = (rowId: string, field: EditableField, currentValue: string) => {
     setEditingCell({ rowId, field });
-    setCellValue(value || "");
+    setCellValue(currentValue);
   };
 
   const handleCellChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCellValue(e.target.value);
   };
 
-  const handleCellBlur = async (row: any, field: EditableField) => {
-    if (cellValue !== (row[field] || "")) {
+  const handleCellBlur = async (row: ScheduleItem, field: EditableField) => {
+    // Only update if value has changed and it's a valid edit
+    if (editingCell && editingCell.rowId === row._id && editingCell.field === field && cellValue !== (row[field] as string)) {
       setUpdatingCell({ rowId: row._id, field });
-      let payload: Record<string, any> = { id: row._id };
-      payload[field] = cellValue;
-      await updateSchedule(payload);
-      setUpdatingCell(null);
+      try {
+        let payload: Record<string, any> = { id: row._id };
+        payload[field] = cellValue;
+        await updateSchedule(payload).unwrap(); // Use unwrap to handle success/failure
+      } catch (err) {
+        console.error("Failed to update schedule:", err);
+        // Optionally show a toast notification for error
+      } finally {
+        setUpdatingCell(null);
+      }
     }
     setEditingCell(null);
   };
 
-  const handleCellKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, row: any, field: EditableField) => {
+  const handleCellKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, row: ScheduleItem, field: EditableField) => {
     if (e.key === "Enter") {
-      (e.target as HTMLInputElement).blur();
+      (e.target as HTMLInputElement).blur(); // Trigger blur to save
     } else if (e.key === "Escape") {
-      setEditingCell(null);
+      setEditingCell(null); // Cancel editing
+      // Optionally reset cellValue to original if needed
     }
-  };
-
-  const handleChange = (e: any) => {
-    setForm((prev: any) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-
-  const handleSubmit = async (e: any) => {
-    e.preventDefault();
-    if (editMode && selected) {
-      await updateSchedule({ id: selected._id, ...form });
-    } else {
-      await createSchedule(form);
-    }
-    handleClose();
   };
 
   const handleDelete = async (id: string) => {
-    if (window.confirm("Are you sure you want to delete this schedule?")) {
-      await deleteSchedule(id);
+    if (window.confirm("Are you sure you want to delete this schedule? This action cannot be undone.")) {
+      setDeletingId(id);
+      try {
+        await deleteSchedule(id).unwrap();
+        // Optionally show a toast for success
+      } catch (err) {
+        console.error("Failed to delete schedule:", err);
+        // Optionally show a toast notification for error
+      } finally {
+        setDeletingId(null);
+      }
     }
   };
 
-  return (
-    <div className="max-w-5xl mx-auto p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Course Schedules</h2>
-        <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={() => handleOpen()}>Add Schedule</Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>{editMode ? "Edit Schedule" : "Add Schedule"}</DialogTitle>
-            </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block mb-1">Course</label>
-                <select
-                  name="course"
-                  value={form.course}
-                  onChange={handleChange}
-                  className="w-full border rounded p-2"
-                  required
-                >
-                  <option value="">Select a course</option>
-                  {courseData?.data?.map((c: any) => (
-                    <option key={c._id} value={c._id}>{c.title}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block mb-1">Start Date</label>
-                  <Input type="date" name="startDate" value={form.startDate} onChange={handleChange} required />
-                </div>
-                <div>
-                  <label className="block mb-1">End Date</label>
-                  <Input type="date" name="endDate" value={form.endDate} onChange={handleChange} required />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block mb-1">Time</label>
-                  <Input type="text" name="time" value={form.time} onChange={handleChange} placeholder="e.g. 6pm-8pm" required />
-                </div>
-                <div>
-                  <label className="block mb-1">Days</label>
-                  <Input type="text" name="days" value={form.days} onChange={handleChange} placeholder="e.g. Mon, Wed, Fri" required />
-                </div>
-              </div>
-              <div>
-                <label className="block mb-1">Mode</label>
-                <Input type="text" name="mode" value={form.mode} onChange={handleChange} placeholder="Online/Offline" required />
-              </div>
-              <div className="flex justify-end gap-2 pt-2">
-                <Button type="button" variant="outline" onClick={handleClose}>Cancel</Button>
-                <Button type="submit">{editMode ? "Update" : "Create"}</Button>
-              </div>
-            </form>
-          </DialogContent>
-        </Dialog>
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64 text-lg text-gray-600">
+        Loading schedules...
       </div>
+    );
+  }
 
-      <div className="bg-white rounded shadow p-4 overflow-x-auto">
-        <Table className="min-w-[1200px]">
-          <TableHeader>
+  if (isError) {
+    return (
+      <div className="flex justify-center items-center h-64 text-red-600 text-lg">
+        Error loading schedules. Please try again.
+      </div>
+    );
+  }
+
+  const schedules: ScheduleItem[] = scheduleData?.data || [];
+
+  return (
+    <div className="max-w-7xl mx-auto p-6 bg-white rounded-lg shadow-xl">
+      <h2 className="text-3xl font-extrabold text-gray-900 mb-8 text-center border-b-2 pb-4">
+        Manage Course Schedules
+      </h2>
+
+      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
+        <Table className="w-full text-sm text-left text-gray-500">
+          <TableHeader className="bg-gray-50 text-xs text-gray-700 uppercase tracking-wider">
             <TableRow>
-              <TableHead className="min-w-[180px]">Course</TableHead>
-              <TableHead className="min-w-[100px]">Batch No</TableHead>
-              <TableHead className="min-w-[130px]">Online Start</TableHead>
-              <TableHead className="min-w-[130px]">Online Finish</TableHead>
-              <TableHead className="min-w-[150px]">On-Job Training Start</TableHead>
-              <TableHead className="min-w-[130px]">Certification Date</TableHead>
-              <TableHead className="min-w-[150px]">Freelancing Session</TableHead>
-              <TableHead className="min-w-[130px]">Internship Start</TableHead>
-              <TableHead className="min-w-[170px]">Experience Certificate</TableHead>
-              <TableHead className="min-w-[120px]">Actions</TableHead>
+              <TableHead className="py-3 px-6 min-w-[180px]">Course Title</TableHead>
+              <TableHead className="py-3 px-6 min-w-[100px]">Batch No</TableHead>
+              <TableHead className="py-3 px-6 min-w-[130px]">Online Start</TableHead>
+              <TableHead className="py-3 px-6 min-w-[130px]">Online Finish</TableHead>
+              <TableHead className="py-3 px-6 min-w-[150px]">On-Job Training Start</TableHead>
+              <TableHead className="py-3 px-6 min-w-[130px]">Certification Date</TableHead>
+              <TableHead className="py-3 px-6 min-w-[150px]">Freelancing Session</TableHead>
+              <TableHead className="py-3 px-6 min-w-[130px]">Internship Start</TableHead>
+              <TableHead className="py-3 px-6 min-w-[170px]">Experience Certificate</TableHead>
+              <TableHead className="py-3 px-6 min-w-[80px] text-center">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {isLoading ? (
+            {schedules.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={10} className="text-center">Loading...</TableCell>
+                <TableCell colSpan={10} className="text-center py-8 text-gray-500 text-lg">
+                  No course schedules found.
+                </TableCell>
               </TableRow>
-            ) : scheduleData?.data?.length ? (
-              scheduleData.data.map((item: any) => (
-                <TableRow key={item._id} className="hover:bg-gray-50">
+            ) : (
+              schedules.map((item: ScheduleItem) => (
+                <TableRow key={item._id} className="border-b hover:bg-gray-50 transition-colors duration-150 ease-in-out">
                   {/* Course cell: just show title, not editable */}
-                  <TableCell>
-                    <span className="truncate block text-gray-900 font-medium">
-                      {item.course?.title || item.course}
-                    </span>
+                  <TableCell className="py-3 px-6 font-medium text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis max-w-[180px]">
+                    {typeof item.course === 'object' ? item.course.title : item.course}
                   </TableCell>
-                  {/* Batch No */}
-                  <TableCell onClick={() => handleCellEdit(item._id, "batchNo", item.batchNo)} className="cursor-pointer">
+
+                  {/* Batch No - Editable */}
+                  <TableCell
+                    onClick={() => handleCellEdit(item._id, "batchNo", item.batchNo)}
+                    className="py-3 px-6 cursor-pointer relative group"
+                  >
                     {editingCell?.rowId === item._id && editingCell?.field === "batchNo" ? (
                       <input
                         type="text"
@@ -276,19 +181,31 @@ export default function CourseScheduleManage() {
                         onBlur={() => handleCellBlur(item, "batchNo")}
                         onKeyDown={e => handleCellKeyDown(e, item, "batchNo")}
                         autoFocus
-                        className="w-full border rounded p-1"
+                        className="w-full h-8 px-2 border border-blue-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-400"
                       />
                     ) : (
-                      <span className="block">
+                      <span className="block min-w-[80px] hover:bg-gray-100 rounded-sm p-1 -m-1 transition-colors relative">
                         {item.batchNo}
                         {updatingCell?.rowId === item._id && updatingCell?.field === "batchNo" && (
-                          <span className="ml-2 text-xs text-blue-500 animate-pulse">Saving...</span>
+                          <span className="absolute top-1/2 right-1 -translate-y-1/2 text-xs text-blue-500 animate-pulse">
+                            <svg className="animate-spin h-4 w-4 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                          </span>
                         )}
+                        <span className="absolute inset-0 flex items-center justify-center bg-transparent group-hover:bg-blue-100 group-hover:bg-opacity-50 opacity-0 group-hover:opacity-100 text-blue-600 text-xs font-semibold rounded-sm transition-opacity duration-150">
+                            Edit
+                        </span>
                       </span>
                     )}
                   </TableCell>
-                  {/* Online Start Date */}
-                  <TableCell onClick={() => handleCellEdit(item._id, "onlineStartDate", formatDate(item.onlineStartDate))} className="cursor-pointer">
+
+                  {/* Online Start Date - Editable */}
+                  <TableCell
+                    onClick={() => handleCellEdit(item._id, "onlineStartDate", formatDate(item.onlineStartDate))}
+                    className="py-3 px-6 cursor-pointer relative group"
+                  >
                     {editingCell?.rowId === item._id && editingCell?.field === "onlineStartDate" ? (
                       <input
                         type="date"
@@ -297,19 +214,31 @@ export default function CourseScheduleManage() {
                         onBlur={() => handleCellBlur(item, "onlineStartDate")}
                         onKeyDown={e => handleCellKeyDown(e, item, "onlineStartDate")}
                         autoFocus
-                        className="w-full border rounded p-1"
+                        className="w-full h-8 px-2 border border-blue-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-400"
                       />
                     ) : (
-                      <span className="block">
+                      <span className="block min-w-[100px] hover:bg-gray-100 rounded-sm p-1 -m-1 transition-colors relative">
                         {formatDate(item.onlineStartDate)}
                         {updatingCell?.rowId === item._id && updatingCell?.field === "onlineStartDate" && (
-                          <span className="ml-2 text-xs text-blue-500 animate-pulse">Saving...</span>
+                          <span className="absolute top-1/2 right-1 -translate-y-1/2 text-xs text-blue-500 animate-pulse">
+                            <svg className="animate-spin h-4 w-4 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                          </span>
                         )}
+                        <span className="absolute inset-0 flex items-center justify-center bg-transparent group-hover:bg-blue-100 group-hover:bg-opacity-50 opacity-0 group-hover:opacity-100 text-blue-600 text-xs font-semibold rounded-sm transition-opacity duration-150">
+                            Edit
+                        </span>
                       </span>
                     )}
                   </TableCell>
-                  {/* Online Finish Date */}
-                  <TableCell onClick={() => handleCellEdit(item._id, "onlineFinishDate", formatDate(item.onlineFinishDate))} className="cursor-pointer">
+
+                  {/* Online Finish Date - Editable */}
+                  <TableCell
+                    onClick={() => handleCellEdit(item._id, "onlineFinishDate", formatDate(item.onlineFinishDate))}
+                    className="py-3 px-6 cursor-pointer relative group"
+                  >
                     {editingCell?.rowId === item._id && editingCell?.field === "onlineFinishDate" ? (
                       <input
                         type="date"
@@ -318,19 +247,31 @@ export default function CourseScheduleManage() {
                         onBlur={() => handleCellBlur(item, "onlineFinishDate")}
                         onKeyDown={e => handleCellKeyDown(e, item, "onlineFinishDate")}
                         autoFocus
-                        className="w-full border rounded p-1"
+                        className="w-full h-8 px-2 border border-blue-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-400"
                       />
                     ) : (
-                      <span className="block">
+                      <span className="block min-w-[100px] hover:bg-gray-100 rounded-sm p-1 -m-1 transition-colors relative">
                         {formatDate(item.onlineFinishDate)}
                         {updatingCell?.rowId === item._id && updatingCell?.field === "onlineFinishDate" && (
-                          <span className="ml-2 text-xs text-blue-500 animate-pulse">Saving...</span>
+                          <span className="absolute top-1/2 right-1 -translate-y-1/2 text-xs text-blue-500 animate-pulse">
+                            <svg className="animate-spin h-4 w-4 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                          </span>
                         )}
+                        <span className="absolute inset-0 flex items-center justify-center bg-transparent group-hover:bg-blue-100 group-hover:bg-opacity-50 opacity-0 group-hover:opacity-100 text-blue-600 text-xs font-semibold rounded-sm transition-opacity duration-150">
+                            Edit
+                        </span>
                       </span>
                     )}
                   </TableCell>
-                  {/* On-Job Training Start */}
-                  <TableCell onClick={() => handleCellEdit(item._id, "onJobTrainingStart", formatDate(item.onJobTrainingStart))} className="cursor-pointer">
+
+                  {/* On-Job Training Start - Editable */}
+                  <TableCell
+                    onClick={() => handleCellEdit(item._id, "onJobTrainingStart", formatDate(item.onJobTrainingStart))}
+                    className="py-3 px-6 cursor-pointer relative group"
+                  >
                     {editingCell?.rowId === item._id && editingCell?.field === "onJobTrainingStart" ? (
                       <input
                         type="date"
@@ -339,20 +280,32 @@ export default function CourseScheduleManage() {
                         onBlur={() => handleCellBlur(item, "onJobTrainingStart")}
                         onKeyDown={e => handleCellKeyDown(e, item, "onJobTrainingStart")}
                         autoFocus
-                        className="w-full border rounded p-1"
+                        className="w-full h-8 px-2 border border-blue-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-400"
                       />
                     ) : (
-                      <span className="block">
+                      <span className="block min-w-[120px] hover:bg-gray-100 rounded-sm p-1 -m-1 transition-colors relative">
                         {formatDate(item.onJobTrainingStart)}
                         {updatingCell?.rowId === item._id && updatingCell?.field === "onJobTrainingStart" && (
-                          <span className="ml-2 text-xs text-blue-500 animate-pulse">Saving...</span>
+                          <span className="absolute top-1/2 right-1 -translate-y-1/2 text-xs text-blue-500 animate-pulse">
+                            <svg className="animate-spin h-4 w-4 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                          </span>
                         )}
+                        <span className="absolute inset-0 flex items-center justify-center bg-transparent group-hover:bg-blue-100 group-hover:bg-opacity-50 opacity-0 group-hover:opacity-100 text-blue-600 text-xs font-semibold rounded-sm transition-opacity duration-150">
+                            Edit
+                        </span>
                       </span>
                     )}
                   </TableCell>
-                  {/* Certification Date */}
-                  <TableCell onClick={() => handleCellEdit(item._id, "certificationDate", formatDate(item.certificationDate))} className="cursor-pointer">
-                    {editingCell && editingCell.rowId === item._id && editingCell.field === "certificationDate" ? (
+
+                  {/* Certification Date - Editable */}
+                  <TableCell
+                    onClick={() => handleCellEdit(item._id, "certificationDate", formatDate(item.certificationDate))}
+                    className="py-3 px-6 cursor-pointer relative group"
+                  >
+                    {editingCell?.rowId === item._id && editingCell?.field === "certificationDate" ? (
                       <input
                         type="date"
                         value={cellValue}
@@ -360,20 +313,32 @@ export default function CourseScheduleManage() {
                         onBlur={() => handleCellBlur(item, "certificationDate")}
                         onKeyDown={e => handleCellKeyDown(e, item, "certificationDate")}
                         autoFocus
-                        className="w-full border rounded p-1"
+                        className="w-full h-8 px-2 border border-blue-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-400"
                       />
                     ) : (
-                      <span className="block">
+                      <span className="block min-w-[100px] hover:bg-gray-100 rounded-sm p-1 -m-1 transition-colors relative">
                         {formatDate(item.certificationDate)}
                         {updatingCell?.rowId === item._id && updatingCell?.field === "certificationDate" && (
-                          <span className="ml-2 text-xs text-blue-500 animate-pulse">Saving...</span>
+                          <span className="absolute top-1/2 right-1 -translate-y-1/2 text-xs text-blue-500 animate-pulse">
+                            <svg className="animate-spin h-4 w-4 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                          </span>
                         )}
+                        <span className="absolute inset-0 flex items-center justify-center bg-transparent group-hover:bg-blue-100 group-hover:bg-opacity-50 opacity-0 group-hover:opacity-100 text-blue-600 text-xs font-semibold rounded-sm transition-opacity duration-150">
+                            Edit
+                        </span>
                       </span>
                     )}
                   </TableCell>
-                  {/* Freelancing Session Date */}
-                  <TableCell onClick={() => handleCellEdit(item._id, "freelancingSessionDate", formatDate(item.freelancingSessionDate))} className="cursor-pointer">
-                    {editingCell && editingCell.rowId === item._id && editingCell.field === "freelancingSessionDate" ? (
+
+                  {/* Freelancing Session Date - Editable */}
+                  <TableCell
+                    onClick={() => handleCellEdit(item._id, "freelancingSessionDate", formatDate(item.freelancingSessionDate))}
+                    className="py-3 px-6 cursor-pointer relative group"
+                  >
+                    {editingCell?.rowId === item._id && editingCell?.field === "freelancingSessionDate" ? (
                       <input
                         type="date"
                         value={cellValue}
@@ -381,19 +346,31 @@ export default function CourseScheduleManage() {
                         onBlur={() => handleCellBlur(item, "freelancingSessionDate")}
                         onKeyDown={e => handleCellKeyDown(e, item, "freelancingSessionDate")}
                         autoFocus
-                        className="w-full border rounded p-1"
+                        className="w-full h-8 px-2 border border-blue-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-400"
                       />
                     ) : (
-                      <span className="block">
+                      <span className="block min-w-[120px] hover:bg-gray-100 rounded-sm p-1 -m-1 transition-colors relative">
                         {formatDate(item.freelancingSessionDate)}
                         {updatingCell?.rowId === item._id && updatingCell?.field === "freelancingSessionDate" && (
-                          <span className="ml-2 text-xs text-blue-500 animate-pulse">Saving...</span>
+                          <span className="absolute top-1/2 right-1 -translate-y-1/2 text-xs text-blue-500 animate-pulse">
+                            <svg className="animate-spin h-4 w-4 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                          </span>
                         )}
+                        <span className="absolute inset-0 flex items-center justify-center bg-transparent group-hover:bg-blue-100 group-hover:bg-opacity-50 opacity-0 group-hover:opacity-100 text-blue-600 text-xs font-semibold rounded-sm transition-opacity duration-150">
+                            Edit
+                        </span>
                       </span>
                     )}
                   </TableCell>
-                  {/* Internship Start Date */}
-                  <TableCell onClick={() => handleCellEdit(item._id, "internshipStartDate", formatDate(item.internshipStartDate))} className="cursor-pointer">
+
+                  {/* Internship Start Date - Editable */}
+                  <TableCell
+                    onClick={() => handleCellEdit(item._id, "internshipStartDate", formatDate(item.internshipStartDate))}
+                    className="py-3 px-6 cursor-pointer relative group"
+                  >
                     {editingCell?.rowId === item._id && editingCell?.field === "internshipStartDate" ? (
                       <input
                         type="date"
@@ -402,19 +379,31 @@ export default function CourseScheduleManage() {
                         onBlur={() => handleCellBlur(item, "internshipStartDate")}
                         onKeyDown={e => handleCellKeyDown(e, item, "internshipStartDate")}
                         autoFocus
-                        className="w-full border rounded p-1"
+                        className="w-full h-8 px-2 border border-blue-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-400"
                       />
                     ) : (
-                      <span className="block">
+                      <span className="block min-w-[100px] hover:bg-gray-100 rounded-sm p-1 -m-1 transition-colors relative">
                         {formatDate(item.internshipStartDate)}
                         {updatingCell?.rowId === item._id && updatingCell?.field === "internshipStartDate" && (
-                          <span className="ml-2 text-xs text-blue-500 animate-pulse">Saving...</span>
+                          <span className="absolute top-1/2 right-1 -translate-y-1/2 text-xs text-blue-500 animate-pulse">
+                            <svg className="animate-spin h-4 w-4 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                          </span>
                         )}
+                        <span className="absolute inset-0 flex items-center justify-center bg-transparent group-hover:bg-blue-100 group-hover:bg-opacity-50 opacity-0 group-hover:opacity-100 text-blue-600 text-xs font-semibold rounded-sm transition-opacity duration-150">
+                            Edit
+                        </span>
                       </span>
                     )}
                   </TableCell>
-                  {/* Experience Certificate Date */}
-                  <TableCell onClick={() => handleCellEdit(item._id, "experienceCertificateDate", formatDate(item.experienceCertificateDate))} className="cursor-pointer">
+
+                  {/* Experience Certificate Date - Editable */}
+                  <TableCell
+                    onClick={() => handleCellEdit(item._id, "experienceCertificateDate", formatDate(item.experienceCertificateDate))}
+                    className="py-3 px-6 cursor-pointer relative group"
+                  >
                     {editingCell?.rowId === item._id && editingCell?.field === "experienceCertificateDate" ? (
                       <input
                         type="date"
@@ -423,32 +412,61 @@ export default function CourseScheduleManage() {
                         onBlur={() => handleCellBlur(item, "experienceCertificateDate")}
                         onKeyDown={e => handleCellKeyDown(e, item, "experienceCertificateDate")}
                         autoFocus
-                        className="w-full border rounded p-1"
+                        className="w-full h-8 px-2 border border-blue-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-400"
                       />
                     ) : (
-                      <span className="block">
+                      <span className="block min-w-[140px] hover:bg-gray-100 rounded-sm p-1 -m-1 transition-colors relative">
                         {formatDate(item.experienceCertificateDate)}
                         {updatingCell?.rowId === item._id && updatingCell?.field === "experienceCertificateDate" && (
-                          <span className="ml-2 text-xs text-blue-500 animate-pulse">Saving...</span>
+                          <span className="absolute top-1/2 right-1 -translate-y-1/2 text-xs text-blue-500 animate-pulse">
+                            <svg className="animate-spin h-4 w-4 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                          </span>
                         )}
+                        <span className="absolute inset-0 flex items-center justify-center bg-transparent group-hover:bg-blue-100 group-hover:bg-opacity-50 opacity-0 group-hover:opacity-100 text-blue-600 text-xs font-semibold rounded-sm transition-opacity duration-150">
+                            Edit
+                        </span>
                       </span>
                     )}
                   </TableCell>
+
                   {/* Actions */}
-                  <TableCell>
-                    {/* <Button size="sm" variant="outline" onClick={() => handleOpen(item)} className="mr-2">Edit</Button> */}
-                    <Button size="sm" variant="destructive" onClick={() => handleDelete(item._id)}>Delete</Button>
+                  <TableCell className="py-3 px-6 text-center">
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => handleDelete(item._id)}
+                      disabled={deletingId === item._id}
+                      className="flex items-center justify-center gap-1"
+                    >
+                      {deletingId === item._id ? (
+                        <>
+                          <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          Deleting...
+                        </>
+                      ) : (
+                        <>
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 011-1h4a1 1 0 110 2H8a1 1 0 01-1-1zm2 5a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1z" clipRule="evenodd" />
+                          </svg>
+                          Delete
+                        </>
+                      )}
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={10} className="text-center">No schedules found.</TableCell>
-              </TableRow>
             )}
           </TableBody>
         </Table>
-        <div className="text-xs text-gray-400 mt-2">Click any cell to edit. Press Enter or click outside to save. Esc to cancel.</div>
+        <div className="p-4 bg-gray-50 text-center text-sm text-gray-500">
+          Click on a cell (Batch No or any Date field) to edit its value. Press <kbd className="bg-gray-200 px-1 py-0.5 rounded text-gray-700">Enter</kbd> or click away to save. Press <kbd className="bg-gray-200 px-1 py-0.5 rounded text-gray-700">Esc</kbd> to cancel editing.
+        </div>
       </div>
     </div>
   );

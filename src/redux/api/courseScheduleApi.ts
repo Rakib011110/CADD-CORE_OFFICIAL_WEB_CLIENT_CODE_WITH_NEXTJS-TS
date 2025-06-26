@@ -5,10 +5,12 @@ const courseScheduleApi = baseApi.injectEndpoints({
     // Get all schedules
     getAllSchedules: builder.query({
       query: () => '/course-schedule',
+      providesTags: ["CourseSchedule"],
     }),
     // Get a single schedule by ID
     getSchedule: builder.query({
       query: (id) => `/course-schedule/${id}`,
+      providesTags: ["CourseSchedule"],
     }),
     // Create a new schedule
     createSchedule: builder.mutation({
@@ -17,6 +19,7 @@ const courseScheduleApi = baseApi.injectEndpoints({
         method: 'POST',
         body: data,
       }),
+      invalidatesTags: ["CourseSchedule"],
     }),
     // Update a schedule
     updateSchedule: builder.mutation({
@@ -25,6 +28,7 @@ const courseScheduleApi = baseApi.injectEndpoints({
         method: 'PUT',
         body: data,
       }),
+       invalidatesTags: ["CourseSchedule"],
     }),
     // Delete a schedule
     deleteSchedule: builder.mutation({
@@ -32,6 +36,7 @@ const courseScheduleApi = baseApi.injectEndpoints({
         url: `/course-schedule/${id}`,
         method: 'DELETE',
       }),
+      invalidatesTags: ["CourseSchedule"],
     }),
   }),
 });

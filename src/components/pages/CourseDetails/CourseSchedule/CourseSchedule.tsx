@@ -68,7 +68,10 @@ export default function CourseSchedule({ course }: { course: any }) {
       >
         <h3 className="text-sm font-semibold text-gray-500">Current Batch</h3>
         <h2 className="text-2xl font-bold text-gray-900">
-          {course.title} <span className="text-blue-600">#{schedule.batchNo}</span>
+          {course.title} 
+          {/* <span className="text-blue-600">
+            
+            #{schedule.batchNo}</span> */}
         </h2>
       </motion.div>
 
@@ -130,7 +133,7 @@ export default function CourseSchedule({ course }: { course: any }) {
   transition={{ duration: 0.5, delay: 0.4 }}
   className="mt-10 p-6 rounded-2xl bg-gradient-to-br from-blue-50 via-white to-red-50 border border-blue-100 shadow-xl"
 >
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-gray-800">
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm text-gray-800">
     {/* Online Training */}
     <div className="flex items-center gap-4 bg-white rounded-xl shadow-md p-4 border-l-4 border-blue-500">
       <div className="text-2xl">🖥️</div>
@@ -148,6 +151,14 @@ export default function CourseSchedule({ course }: { course: any }) {
       <div>
         <p className="text-sm font-semibold text-gray-700">On Job Training</p>
         <p className="text-gray-600">30 Days</p>
+      </div>
+    </div>
+    {/* On Internship Training */}
+    <div className="flex items-center gap-4 bg-white rounded-xl shadow-md p-4 border-l-4 border-blue-500">
+      <div className="text-2xl">👨‍💻</div>
+      <div>
+        <p className="text-sm font-semibold text-gray-700"> Internship </p>
+        <p className="text-gray-600">90 Days</p>
       </div>
     </div>
   </div>

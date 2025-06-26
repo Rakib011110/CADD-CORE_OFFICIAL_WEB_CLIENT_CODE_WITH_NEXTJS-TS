@@ -9,9 +9,7 @@ import MastercourseOverview from "@/components/pages/CourseDetails/MastercourseO
 import SupportAndTraining from "@/components/pages/CourseDetails/SupportAndTraining/SupportAndTraining";
 import LoadingSpinner from "@/components/UI/LoadingSpinner/LoadingSpinner";
 import { useGetCourseBySlugQuery } from "@/redux/api/courseApi";
-
 import { useParams } from "next/navigation";
-
 import ExpertPanel from "@/components/pages/CourseDetails/ExpertPanel/ExpartPanel";
 import FreeTrainingSessions from "@/components/pages/CourseDetails/FreeTrainingSessions/FreeTrainingSessions";
 import Certificate from "@/components/pages/CourseDetails/Certificate/Certificate";
@@ -19,17 +17,16 @@ import WorkingProjects from "@/components/pages/CourseDetails/WorkingProject/Wor
 import OurCertificate from "@/components/pages/CourseDetails/Certificate/Ourcerticates";
 import CertificateVerification from "@/components/pages/StudentCornar/CertificateVerification/CertificateVerification";
 import useSmoothScroll from "@/hooks/useSmoothScroll";
-import CertificationPathway from "@/components/pages/CourseDetails/CertificationPathway/CertificationPathway";
 import Roadmap from "@/components/pages/CourseDetails/CertificationPathway/CertificationPathway";
 import CourseSchedule from "@/components/pages/CourseDetails/CourseSchedule/CourseSchedule";
-import RevitSection from "@/components/pages/CourseDetails/RevitSectionProps/RevitSectionProps";
+import RevitSection from "@/components/pages/CourseDetails/RevitSectionProps/RevitSectionProps"; // Corrected import path based on your snippet
+
 
 export default function CourseDetails() {
   useSmoothScroll();
 
   const params = useParams();
-  // console.log(params)
-  const slug = params?.slug;
+  const slug = params?.slug; // The slug from the URL
 
   const {
     data: course,
@@ -47,6 +44,10 @@ export default function CourseDetails() {
     );
 
   if (isError) return <p>Error fetching course details.</p>;
+
+  // Define the specific slug for conditional rendering
+  const requiredSlug = 'professional-architectural-bim-modeling-mastercourse';
+  const showRevitSection = slug === requiredSlug;
 
   return (
     <div style={{ fontFamily: "banglaFont" }} className="font-serif ">
@@ -77,7 +78,8 @@ export default function CourseDetails() {
             <WorkingProjects course={course?.data} />
           </div>
 
-          <RevitSection />
+          {/* Conditional rendering for RevitSection */}
+          {showRevitSection && <RevitSection />}
         </div>
 
         <SoftwareTaught course={course?.data} />

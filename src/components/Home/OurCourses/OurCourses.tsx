@@ -26,7 +26,7 @@ if (isLoading) {
     <section>
 
 <div className="max-w-6xl mx-auto ">
-      <h2 className="text-3xl font-bold text-center mb-6">
+      <h2 className="text-3xl font-bold text-center mt-4 mb-6">
         আমাদের জনপ্রিয় কোর্স সমূহ
       </h2>
       <div className="flex justify-center mb-6">
