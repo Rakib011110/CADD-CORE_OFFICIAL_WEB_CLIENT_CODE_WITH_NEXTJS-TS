@@ -21,7 +21,6 @@ import Roadmap from "@/components/pages/CourseDetails/CertificationPathway/Certi
 import CourseSchedule from "@/components/pages/CourseDetails/CourseSchedule/CourseSchedule";
 import RevitSection from "@/components/pages/CourseDetails/RevitSectionProps/RevitSectionProps"; // Corrected import path based on your snippet
 
-
 export default function CourseDetails() {
   useSmoothScroll();
 
@@ -46,8 +45,12 @@ export default function CourseDetails() {
   if (isError) return <p>Error fetching course details.</p>;
 
   // Define the specific slug for conditional rendering
-  const requiredSlug = 'professional-architectural-bim-modeling-mastercourse';
+  const requiredSlug = "professional-architectural-bim-modeling-mastercourse";
   const showRevitSection = slug === requiredSlug;
+  // Define the specific slug for conditional rendering
+  const RCCrequiredSlug =
+    "rcc-building-structural-analysis-design-mastercourse";
+  const RccshowRevitSection = slug === RCCrequiredSlug;
 
   return (
     <div style={{ fontFamily: "banglaFont" }} className="font-serif ">
@@ -66,9 +69,7 @@ export default function CourseDetails() {
           <MastercourseOverview course={course?.data} />
         </div>
 
-        <div className="">
-          <Roadmap />
-        </div>
+        <div className="">{RccshowRevitSection && <Roadmap />}</div>
 
         <div id="course-content">
           <CourseContentList course={course?.data} />
