@@ -1,5 +1,10 @@
-export type Category = 'Civil' | 'Architectural' | 'Mechanical' | 'Electrical' | 'Bim';
-
+export type Category =
+  | "Civil"
+  | "Architectural"
+  | "Mechanical"
+  | "Electrical"
+  | "Bim"
+  | "Project Management";
 
 export type TSchedule = {
   startingDate: string;
@@ -64,30 +69,27 @@ export type TFAQ = {
   answer: string;
 };
 
+export type TInternationaldemoCertificate = {
+  certificateTitle: string;
+  certificateOverview: string;
+  photoUrl: string;
+};
+export type TIdemoCertificate = {
+  title: string;
 
-export type TInternationaldemoCertificate ={
-  certificateTitle: string,
-  certificateOverview: string,
-  photoUrl: string
-
-}
-export type TIdemoCertificate ={
- title: string,
- 
-  photoUrl: string
-
-}
+  photoUrl: string;
+};
 
 export type TCourse = {
   title: string;
-  _id: string
+  _id: string;
   slug: any;
   categories: Category;
-  courseBanner: string, 
-  batch: string; 
-  
-  InternationaldemoCertificate: TInternationaldemoCertificate[]
- demoCertificate: TIdemoCertificate[]
+  courseBanner: string;
+  batch: string;
+
+  InternationaldemoCertificate: TInternationaldemoCertificate[];
+  demoCertificate: TIdemoCertificate[];
   duration: string;
   lessons: string;
   photoUrl: string;
@@ -102,8 +104,5 @@ export type TCourse = {
   learningProject: TLearningProject[];
   freeTrainingSessions: TFreeTrainingSession[];
   courseFee: number;
-  faqs: TFAQ[]; 
-  
+  faqs: TFAQ[];
 };
-
-
