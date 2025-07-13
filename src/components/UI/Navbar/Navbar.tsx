@@ -126,7 +126,7 @@ export default function Navbar() {
           <motion.div whileHover={{ scale: 1.05 }}>
             <Link
               href="/login"
-              className="bg-white text-red-500 font-bold px-4 py-2 rounded-lg shadow-md hover:bg-gray-100">
+              className="bg-white text-[#F01A24] font-bold px-4 py-2 rounded-lg shadow-md hover:bg-gray-100">
               সাইন ইন করুন
             </Link>
 
