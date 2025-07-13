@@ -12,8 +12,14 @@ import Notifications from "@/components/Notifications/Notifications";
 const navLinks = [
   { name: "হোম", path: "/" },
   { name: "কোর্স সমূহ", path: "/courses" },
-  { name: "ATC® কোর্স সমূহ", path: "/autodesk-authorised-training-institute-courses" },
-  { name: "ইন্ডাস্ট্রিয়াল এটাচমেন্ট", path: "/industrial-attachment-training" },
+  {
+    name: "ATC® কোর্স সমূহ",
+    path: "/autodesk-authorised-training-institute-courses",
+  },
+  {
+    name: "ইন্ডাস্ট্রিয়াল এটাচমেন্ট",
+    path: "/industrial-attachment-training",
+  },
   { name: "স্টুডেন্ট কর্নার", path: "/student-corner" },
 ];
 
@@ -35,7 +41,7 @@ export default function Navbar() {
   const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
 
   return (
-    <nav style={{ fontFamily: "banglaFont" }} className="bg-gradient-to-r from-[#F01A24] to-[#F01A24] px-6 py-4 flex items-center justify-between relative z-50">
+    <nav style={{ fontFamily: "banglaFont" }} className="bg-gradient-to-r from-red-600 to-red-500 px-6 py-4 flex items-center justify-between relative z-50">
       {/* Logo */}
       <Link href="/" className="w-36">
         <motion.div whileHover={{ scale: 1.05 }} className="cursor-pointer">
@@ -50,7 +56,9 @@ export default function Navbar() {
       <div className="hidden md:flex items-center space-x-6 text-white font-semibold">
         {navLinks.map(({ name, path }) => (
           <motion.div key={name} whileHover={{ scale: 1.05, y: -1 }}>
-            <Link href={path} className="transition-all duration-300 hover:border-b-2 border-white pb-1">
+            <Link
+              href={path}
+              className="transition-all duration-300 hover:border-b-2 border-white pb-1">
               {name}
             </Link>
           </motion.div>
@@ -58,7 +66,10 @@ export default function Navbar() {
 
         {/* Dropdown */}
         <div className="relative">
-          <motion.button whileHover={{ scale: 1.05 }} onClick={toggleDropdown} className="flex items-center focus:outline-none">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            onClick={toggleDropdown}
+            className="flex items-center focus:outline-none">
             <Link href="/about-us">আমাদের সম্পর্কে</Link>
             <ChevronDown size={16} className="ml-1" />
           </motion.button>
@@ -70,12 +81,17 @@ export default function Navbar() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.2 }}
-                className="absolute top-full mt-2 w-40 bg-white text-black shadow-md rounded-md z-50"
-              >
-                <Link href="/team" className="block px-4 py-2 hover:bg-gray-200" onClick={() => setDropdownOpen(false)}>
+                className="absolute top-full mt-2 w-40 bg-white text-black shadow-md rounded-md z-50">
+                <Link
+                  href="/team"
+                  className="block px-4 py-2 hover:bg-gray-200"
+                  onClick={() => setDropdownOpen(false)}>
                   আমাদের টিম
                 </Link>
-                <Link href="/job" className="block px-4 py-2 hover:bg-gray-200" onClick={() => setDropdownOpen(false)}>
+                <Link
+                  href="/job"
+                  className="block px-4 py-2 hover:bg-gray-200"
+                  onClick={() => setDropdownOpen(false)}>
                   Career
                 </Link>
               </motion.div>
@@ -101,7 +117,7 @@ export default function Navbar() {
             <motion.button
               whileHover={{ scale: 1.05 }}
               onClick={handleLogout}
-              className="bg-white text-[#F01A24] font-bold px-4 py-2 rounded-lg shadow-md hover:bg-gray-100"
+              className="bg-white text-red-500 font-bold px-4 py-2 rounded-lg shadow-md hover:bg-gray-100"
             >
               লগআউট
             </motion.button>
@@ -110,13 +126,11 @@ export default function Navbar() {
           <motion.div whileHover={{ scale: 1.05 }}>
             <Link
               href="/login"
-              className="bg-white text-red-500 font-bold px-4 py-2 rounded-lg shadow-md hover:bg-gray-100"
-            >
+              className="bg-white text-red-500 font-bold px-4 py-2 rounded-lg shadow-md hover:bg-gray-100">
               সাইন ইন করুন
-            </Link> 
+            </Link>
 
-
-             {/* <Link
+            {/* <Link
                 href="https://forms.gle/XnZP35yKbjXGCtGz7"
                 target="_blank"
                 className="px-6 text-red-500 bg--500 bg-white py-2 rounded-lg"
@@ -141,22 +155,23 @@ export default function Navbar() {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="absolute top-full left-0 w-full bg-[#F01A24] text-white flex flex-col space-y-4 py-4 md:hidden overflow-hidden z-40"
+            className="absolute top-full left-0 w-full bg-red-500 text-white flex flex-col space-y-4 py-4 md:hidden overflow-hidden z-40"
           >
             {navLinks.map(({ name, path }) => (
               <Link
                 key={name}
                 href={path}
                 className="px-6 hover:underline"
-                onClick={() => setMobileMenuOpen(false)}
-              >
+                onClick={() => setMobileMenuOpen(false)}>
                 {name}
               </Link>
             ))}
 
             {/* Dropdown in Mobile */}
             <div className="px-6">
-              <button onClick={toggleDropdown} className="flex items-center w-full focus:outline-none">
+              <button
+                onClick={toggleDropdown}
+                className="flex items-center w-full focus:outline-none">
                 <Link href="/about-us">আমাদের সম্পর্কে</Link>
                 <ChevronDown size={16} className="ml-1" />
               </button>
@@ -167,12 +182,17 @@ export default function Navbar() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -5 }}
                     transition={{ duration: 0.2 }}
-                    className="mt-2 ml-4 bg-white text-black rounded-md shadow-md"
-                  >
-                    <Link href="/team" className="block px-4 py-2 hover:bg-gray-200" onClick={() => setDropdownOpen(false)}>
+                    className="mt-2 ml-4 bg-white text-black rounded-md shadow-md">
+                    <Link
+                      href="/team"
+                      className="block px-4 py-2 hover:bg-gray-200"
+                      onClick={() => setDropdownOpen(false)}>
                       আমাদের টিম
                     </Link>
-                    <Link href="/job" className="block px-4 py-2 hover:bg-gray-200" onClick={() => setDropdownOpen(false)}>
+                    <Link
+                      href="/job"
+                      className="block px-4 py-2 hover:bg-gray-200"
+                      onClick={() => setDropdownOpen(false)}>
                       Career
                     </Link>
                   </motion.div>
@@ -187,14 +207,13 @@ export default function Navbar() {
                   <Link
                     href="/dashboard/manage-courses"
                     className="text-white bg-green-600 py-2 rounded-lg text-center"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
+                    onClick={() => setMobileMenuOpen(false)}>
                     ড্যাশবোর্ড
                   </Link>
                 )}
                 <button
                   onClick={handleLogout}
-                  className="text-white bg-[#F01A24] py-2 rounded-lg"
+                  className="text-white bg-red-700 py-2 rounded-lg"
                 >
                   লগআউট
                 </button>
@@ -203,17 +222,17 @@ export default function Navbar() {
               <Link
                 href="https://forms.gle/XnZP35yKbjXGCtGz7"
                 target="_blank"
-                className="px-6 text-white bg-[#F01A24] py-2 rounded-lg"
+                className="px-6 text-white bg-blue-500 py-2 rounded-lg"
               >
                 লাইভ ইভেন্ট
               </Link>
-        //       <Link
-        //         href="/login"
-        //         target="_blank"
-        //         className="px-2 text-white bg-blue-500 py-2 rounded-lg"
-        //       > 
-        // লগিন করুন 
-        //       </Link>
+              //       <Link
+              //         href="/login"
+              //         target="_blank"
+              //         className="px-2 text-white bg-blue-500 py-2 rounded-lg"
+              //       >
+              // লগিন করুন
+              //       </Link>
             )}
           </motion.div>
         )}
