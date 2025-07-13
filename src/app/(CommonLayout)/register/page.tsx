@@ -9,6 +9,7 @@ import { Button } from '@/components/UI/button';
 import CaddInput from '@/components/resubaleform/CaddInput';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
+import Link from 'next/link';
 
 function SignUpContent() {
   const searchParams = useSearchParams();
@@ -66,41 +67,80 @@ function SignUpContent() {
   };
 
   return (
-    <div className="bg-gradient-to-r from-indigo-100 via-purple-100 to-pink-100 min-h-screen flex justify-center items-center px-4">
-      <motion.div
-        initial={{ opacity: 0, y: 60 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="shadow-2xl rounded-2xl p-8 bg-white w-full max-w-md"
-      >
-        <h3 className="text-3xl font-extrabold text-center text-indigo-700 mb-4">
-          CADD CORE – Knowledge to Design❤️
-        </h3>
-        <p className="text-center text-gray-600 mb-8">
-          Create your account and get started!
-        </p>
-
-        <CaddForm onSubmit={handleSubmit(onSubmit)}>
-          <FormProvider {...methods}>
-            <div className="grid grid-cols-1 gap-5">
-              <CaddInput label="Name" name="name" placeholder="Enter your name" size="sm" />
-              <CaddInput label="Email" name="email" placeholder="Enter your email" size="sm" />
-              <CaddInput label="Mobile Number" name="mobileNumber" placeholder="Enter your mobile number" size="sm" />
-              <CaddInput label="Password" name="password" placeholder="Enter your password" size="sm" type="password" />
-
-              <Button
-                className="mt-4 w-full rounded-md bg-indigo-600 text-white font-semibold text-lg py-2 hover:bg-indigo-700 transition-all shadow-md hover:shadow-lg focus:outline-none"
-                size="lg"
-                type="submit"
-                disabled={isPending}
-              >
-                {isPending ? "Registering..." : "Register"}
-              </Button>
-            </div>
-          </FormProvider>
-        </CaddForm>
-      </motion.div>
+  <div className="bg-gradient-to-b from-gray-50 to-gray-100 min-h-screen flex justify-center items-center px-4 py-12">
+  <motion.div
+    initial={{ opacity: 0, y: 60 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.8 }}
+    className="shadow-xl rounded-xl p-8 bg-white w-full max-w-md border border-gray-200"
+  >
+    <div className="text-center mb-8">
+      <h3 className="text-3xl font-bold text-gray-900 mb-2">
+        CADD CORE – <span className="text-[#F01A24]">Knowledge to Design</span>
+      </h3>
+      <div className="w-16 h-1 bg-[#F01A24] mx-auto mb-4 rounded-full"></div>
+      <p className="text-gray-600">
+        Create your account and get started!
+      </p>
     </div>
+
+    <CaddForm onSubmit={handleSubmit(onSubmit)}>
+      <FormProvider {...methods}>
+        <div className="space-y-4">
+          <CaddInput 
+            label="Name" 
+            name="name" 
+            placeholder="Enter your name" 
+            size="sm" 
+          />
+          <CaddInput 
+            label="Email" 
+            name="email" 
+            placeholder="Enter your email" 
+            size="sm" 
+          />
+          <CaddInput 
+            label="Mobile Number" 
+            name="mobileNumber" 
+            placeholder="Enter your mobile number" 
+            size="sm" 
+          />
+          <CaddInput 
+            label="Password" 
+            name="password" 
+            placeholder="Enter your password" 
+            size="sm" 
+            type="password" 
+          />
+
+          <Button
+            className="mt-6 w-full rounded-lg bg-[#F01A24] hover:bg-[#D4141E] text-white font-semibold py-3 transition-colors duration-300 shadow-md hover:shadow-lg"
+            size="lg"
+            type="submit"
+            disabled={isPending}
+          >
+            {isPending ? (
+              <span className="flex items-center justify-center">
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Registering...
+              </span>
+            ) : "Register"}
+          </Button>
+        </div>
+      </FormProvider>
+    </CaddForm>
+
+    <div className="mt-6 text-center text-sm text-gray-500">
+      Already have an account?{' '}
+      <Link href="/login" className="font-medium text-[#F01A24] hover:text-[#D4141E]">
+        Sign in
+      </Link>
+    </div>
+  </motion.div>
+</div>
   );
 }
 
