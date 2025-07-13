@@ -81,8 +81,8 @@ if (isLoading) {
         </CarouselContent>
 
       
-        <CarouselPrevious className="bg-red-600 text-white" />
-        <CarouselNext  className="bg-red-600 text-white"/>
+        <CarouselPrevious className="bg-gray-950 text-white" />
+        <CarouselNext  className="bg-gray-950 text-white"/>
       </Carousel>
 
   

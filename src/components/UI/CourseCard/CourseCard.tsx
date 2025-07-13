@@ -26,7 +26,7 @@ const CourseCard: React.FC<TCourse> = ({
       <Link href={`/courses/${slug}`} className="block h-full">
         {/* --- FIX IS HERE --- */}
         {/* We've added "p-0" to remove any default padding from the Card component itself. */}
-        <Card className="p-0 flex flex-col h-full rounded-lg overflow-hidden bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-red-500 dark:hover:border-red-500 transition-colors duration-300 shadow-sm hover:shadow-lg">
+        <Card className="p-0 flex flex-col h-full rounded-lg overflow-hidden bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-gray-950 dark:hover:border-red-500 transition-colors duration-300 shadow-sm hover:shadow-lg">
           
           {/* 1. Image Section - This will now sit flush against the top of the card. */}
           <div className="relative h-48 w-full overflow-hidden">

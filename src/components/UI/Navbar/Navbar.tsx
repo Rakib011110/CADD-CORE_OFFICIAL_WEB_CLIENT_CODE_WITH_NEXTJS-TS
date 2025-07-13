@@ -35,7 +35,7 @@ export default function Navbar() {
   const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
 
   return (
-    <nav style={{ fontFamily: "banglaFont" }} className="bg-gradient-to-r from-red-600 to-red-500 px-6 py-4 flex items-center justify-between relative z-50">
+    <nav style={{ fontFamily: "banglaFont" }} className="bg-gradient-to-r from-[#F01A24] to-[#F01A24] px-6 py-4 flex items-center justify-between relative z-50">
       {/* Logo */}
       <Link href="/" className="w-36">
         <motion.div whileHover={{ scale: 1.05 }} className="cursor-pointer">
@@ -101,7 +101,7 @@ export default function Navbar() {
             <motion.button
               whileHover={{ scale: 1.05 }}
               onClick={handleLogout}
-              className="bg-white text-red-500 font-bold px-4 py-2 rounded-lg shadow-md hover:bg-gray-100"
+              className="bg-white text-[#F01A24] font-bold px-4 py-2 rounded-lg shadow-md hover:bg-gray-100"
             >
               লগআউট
             </motion.button>
@@ -141,7 +141,7 @@ export default function Navbar() {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="absolute top-full left-0 w-full bg-red-500 text-white flex flex-col space-y-4 py-4 md:hidden overflow-hidden z-40"
+            className="absolute top-full left-0 w-full bg-[#F01A24] text-white flex flex-col space-y-4 py-4 md:hidden overflow-hidden z-40"
           >
             {navLinks.map(({ name, path }) => (
               <Link
@@ -194,7 +194,7 @@ export default function Navbar() {
                 )}
                 <button
                   onClick={handleLogout}
-                  className="text-white bg-red-700 py-2 rounded-lg"
+                  className="text-white bg-[#F01A24] py-2 rounded-lg"
                 >
                   লগআউট
                 </button>
@@ -203,7 +203,7 @@ export default function Navbar() {
               <Link
                 href="https://forms.gle/XnZP35yKbjXGCtGz7"
                 target="_blank"
-                className="px-6 text-white bg-blue-500 py-2 rounded-lg"
+                className="px-6 text-white bg-[#F01A24] py-2 rounded-lg"
               >
                 লাইভ ইভেন্ট
               </Link>

@@ -105,7 +105,7 @@ const formatMonthYear = (dateString: string) => {
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6 p-6 items-center">
               {/* Date Badge */}
               <div className="md:col-span-2">
-                <div className="bg-red-50 p-3 rounded-lg text-center border border-red-100">
+                <div className="bg-gray-50 p-3 rounded-lg text-center border border-red-100">
                   <div className="text-red-600 font-bold text-lg">
                     {formatDay(seminar.date)}   {formatMonthYear(seminar.date)}
                   </div>
@@ -143,7 +143,7 @@ const formatMonthYear = (dateString: string) => {
               
               {/* Countdown */}
               <div className="md:col-span-3">
-                <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                <div className="bg-gray-50 p-3 rounded-lg border  border-gray-200">
                   <div className="text-xs font-medium text-gray-500 mb-1">শুরু হতে বাকি</div>
                   <Countdown 
                     date={seminar.date} 
@@ -153,11 +153,11 @@ const formatMonthYear = (dateString: string) => {
               </div>
               
               {/* Join Button */}
-              <div className="md:col-span-2 flex justify-end">
+              <div className="md:col-span-2 flex justify-center">
                 <motion.button
                   whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
-                  className="bg-red-600 hover:bg-red-700 text-white py-2.5 px-5 rounded-lg font-medium 
+                  className="bg-[#F01A24] hover:bg-gray-900 text-white py-2.5 px-5 rounded-lg font-medium 
                     flex items-center space-x-2 transition-colors duration-200 shadow-sm"
                 >
                   <Link href="https://docs.google.com/forms/d/e/1FAIpQLScZysZu-d44Md-KbsIPXOX-wuoobxWbcBaXN04ITkgWYNR6Fw/viewform">যোগ দিন</Link>

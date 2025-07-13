@@ -40,7 +40,7 @@ const Countdown: React.FC<CountdownProps> = ({ date, time }) => {
   }, [date, time]);
 
   return (
-    <div className="inline-block bg-gradient-to-r bg-red-600 from-red-500 via-pink-600  text-white px-3 py-1 rounded-full text-xs  font-semibold shadow-md">
+    <div className="inline-block bg-gray-950  text-white px-3 py-1 rounded-full text-xs  font-semibold shadow-md">
       {timeLeft}
     </div>
   );

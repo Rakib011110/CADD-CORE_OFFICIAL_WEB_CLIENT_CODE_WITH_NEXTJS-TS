@@ -80,6 +80,9 @@ const [submissionData, { isLoading }]= useCreateInstructorHireMutation()
     }
   };
 
+
+
+  
   async function onSubmit(values: z.infer<typeof InstructorformSchema>) {
     setIsSubmitting(true);
 
@@ -152,7 +155,7 @@ const [submissionData, { isLoading }]= useCreateInstructorHireMutation()
       className="max-w-6xl mx-auto px-4 py-12"
     >
       <motion.div variants={itemVariants} className="text-center mb-12">
-        <h1 className="text-3xl font-bold ">শিক্ষাদানে আপনার পথ শুরু হোক CADD CORE-এ</h1> 
+        <h1 className="text-3xl font-bold ">শিক্ষাদানে আপনার পথ শুরু হোক <span className='text-[#F01A24]'>CADD CORE-এ</span></h1> 
         <span className="inline-block w-28 h-1 mb-4 bg-red-500 rounded"></span>
         <p className="text-lg text-muted-foreground">
           আপনার জ্ঞান শেয়ার করুন, ভবিষ্যতের ইঞ্জিনিয়ার তৈরিতে অংশ নিন
@@ -162,14 +165,14 @@ const [submissionData, { isLoading }]= useCreateInstructorHireMutation()
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Form Section */}
         <motion.div variants={itemVariants} className="bg-background rounded-lg p-6 shadow-sm border border-red-100">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <Form {...form} >
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6  ">
               <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-red-800">পুরো নাম</FormLabel>
+                    <FormLabel className="text-[#F01A24] font-semibold">পুরো নাম</FormLabel>
                     <FormControl>
                       <Input placeholder="আপনার নাম লিখুন" {...field} />
                     </FormControl>
@@ -183,7 +186,7 @@ const [submissionData, { isLoading }]= useCreateInstructorHireMutation()
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-red-800">ইমেইল</FormLabel>
+                    <FormLabel className="text-[#F01A24]  font-semibold">ইমেইল</FormLabel>
                     <FormControl>
                       <Input placeholder="আপনার ইমেইল" {...field} />
                     </FormControl>
@@ -196,7 +199,7 @@ const [submissionData, { isLoading }]= useCreateInstructorHireMutation()
                 name="phone"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-red-800">ফোন</FormLabel>
+                    <FormLabel className="text-[#F01A24] font-semibold">ফোন</FormLabel>
                     <FormControl>
                       <Input placeholder="আপনার নাম্বার" {...field} />
                     </FormControl>
@@ -210,7 +213,7 @@ const [submissionData, { isLoading }]= useCreateInstructorHireMutation()
                 name="expertise"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-red-800">এক্সপার্টিস এরিয়া</FormLabel>
+                    <FormLabel className="text-[#F01A24] font-semibold">এক্সপার্টিস এরিয়া</FormLabel>
                     <FormControl>
                       <Input placeholder="যেমনঃ AutoCAD, Revit, SolidWorks" {...field} />
                     </FormControl>
@@ -224,7 +227,7 @@ const [submissionData, { isLoading }]= useCreateInstructorHireMutation()
                 name="experience"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-red-800">টিচিং এক্সপেরিয়েন্স</FormLabel>
+                    <FormLabel className="text-[#F01A24] font-semibold">টিচিং এক্সপেরিয়েন্স</FormLabel>
                     <FormControl>
                       <select
                         className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
@@ -246,7 +249,7 @@ const [submissionData, { isLoading }]= useCreateInstructorHireMutation()
                 name="message"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-red-800">CADD CORE এ জয়েন করতে চান কেন?</FormLabel>
+                    <FormLabel className="text-[#F01A24] font-semibold">CADD CORE এ জয়েন করতে চান কেন?</FormLabel>
                     <FormControl>
                       <Textarea
                         placeholder="শর্টলি লিখুন কেন আপনি ভালো ইনস্ট্রাক্টর হবেন"
@@ -264,7 +267,7 @@ const [submissionData, { isLoading }]= useCreateInstructorHireMutation()
                 name="cv"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-red-800">আপনার সিভি আপলোড করুন</FormLabel>
+                    <FormLabel className="text-[#F01A24] font-semibold">আপনার সিভি আপলোড করুন</FormLabel>
                     <FormControl>
                       <div className="space-y-2">
                         <Input 
@@ -313,7 +316,7 @@ const [submissionData, { isLoading }]= useCreateInstructorHireMutation()
             whileHover={{ y: -5 }}
             className="bg-gradient-to-r from-red-50 to-red-100 rounded-lg p-6 border border-red-200"
           >
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-red-800">
+            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-[#F01A24] font-semibold">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-red-600">
                 <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
                 <line x1="8" y1="21" x2="16" y2="21"></line>
@@ -321,7 +324,7 @@ const [submissionData, { isLoading }]= useCreateInstructorHireMutation()
               </svg>
               CADD CORE-এ আপনাকে স্বাগতম!
             </h2>
-            <p className="text-sm text-muted-foreground text-justify">
+            <p className="text-sm  text-gray-700 text-justify">
             জ্ঞান ও দক্ষতার আলো ছড়িয়ে দিতে প্রস্তুত তো? <br />
 CADD CORE-এ আপনি শুধু শেখাবেন না—আপনিও প্রতিদিন শিখবেন, রিসার্চ করবেন  এবং গড়বেন শত শত শিক্ষার্থীর ভবিষ্যৎ।
 
@@ -334,13 +337,13 @@ CADD CORE-এর সাথে আজই যাত্রা শুরু কর�
 
           <motion.div 
             variants={itemVariants}     
-            className="rounded-lg p-3 text-center border border-red-500 overflow-hidden"
+            className="rounded-lg  text-center border border-[#F01A24] overflow-hidden"
             whileHover={{ scale: 1.02 }}
           >
             <Image 
               width={900} 
               height={400} 
-              className='max-w-md mx-auto rounded-lg' 
+              className='max-w-full mx-auto rounded-lg' 
               alt='CADD CORE Instructor' 
               src={"https://res.cloudinary.com/dbkwiwoll/image/upload/v1746620095/Blue_and_White_Minimalist_Website_Development_Service_Linkedln_Post_1_kyuqqq.png"}
             />
