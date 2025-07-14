@@ -1,4 +1,5 @@
 export type TCourse = {
+  _id?: any;
   title: string;
   slug: string;
   categories: string;

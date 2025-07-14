@@ -18,9 +18,10 @@ import {
   useDeleteCourseMutation,
   useUpdateCourseMutation,
 } from '@/redux/api/courseApi';
-import UpdateCourse from '@/components/pages/Courses/UpdateCourses';
-import { Pencil, Trash2 } from 'lucide-react';
 import UpdateIndustrialCourses from '../industrial-training/update-industrial-courses/UpdaeIndrustrialCourses';
+import { Pencil, Trash2 } from 'lucide-react';
+import { TCourse } from '@/lib/types/TCourses'; // Ensure TCourse is imported
+import UpdateMastersCourses from '@/components/pages/Courses/UpdateMastersCorses/UpdateIndustrialCourses';
 
 export default function ManageCourses() {
   const { data: courses, isLoading } = useGetAllCourseQuery({});
@@ -28,16 +29,16 @@ export default function ManageCourses() {
   const [deleteCourse] = useDeleteCourseMutation();
 
   const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
-  const [formData, setFormData] = useState<any>(null);
-  const [originalData, setOriginalData] = useState<any>(null);
+  const [formData, setFormData] = useState<TCourse | null>(null);
+  const [originalData, setOriginalData] = useState<TCourse | null>(null);
 
-  const handleEdit = (course: any) => {
-    setSelectedCourseId(course._id || null);
+  const handleEdit = (course: TCourse) => {
+    setSelectedCourseId(course._id || null); // Assuming _id exists on your course object
     setFormData(course);
     setOriginalData(course);
   };
 
-  const handleUpdate = async (updatedFields: Partial<any>) => {
+  const handleUpdate = async (updatedFields: Partial<TCourse>) => {
     try {
       if (selectedCourseId && formData) {
         await updateCourse({ id: selectedCourseId, courseData: updatedFields }).unwrap();
@@ -99,10 +100,9 @@ export default function ManageCourses() {
 
   return (
     <div className="p-6">
-     <div className=''>
-
-     <h1 className="text-2xl font-bold mb-4 ">Manage Courses</h1>
-     </div>
+      <div className=''>
+        <h1 className="text-2xl font-bold mb-4 ">Manage Courses</h1>
+      </div>
 
       <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-md">
         <Table className="w-full">
@@ -123,7 +123,7 @@ export default function ManageCourses() {
                   <Image
                     src={
                       course.photoUrl ||
-                      'https://www.freeiconspng.com/thumbs/no-image-icon/no-image-icon-6.png'
+                      'https://placehold.co/100x100/EBF4FF/333333?text=No+Image'
                     }
                     alt={course.title}
                     width={50}
@@ -146,7 +146,7 @@ export default function ManageCourses() {
                   <Button
                     onClick={() => handleEdit(course)}
                     variant="ghost"
-                    className="text-blue-500 hover:bg-blue-100"
+                    className="text-blue-500 hover:bg-blue-100 p-2 rounded-full"
                   >
                     <Pencil size={18} />
                   </Button>
@@ -154,7 +154,7 @@ export default function ManageCourses() {
                   <Button
                     onClick={() => handleDelete(course._id || course.slug)}
                     variant="ghost"
-                    className="text-red-500 hover:bg-red-100"
+                    className="text-red-500 hover:bg-red-100 p-2 rounded-full"
                   >
                     <Trash2 size={18} />
                   </Button>
@@ -166,7 +166,7 @@ export default function ManageCourses() {
       </div>
 
       {selectedCourseId && formData && originalData && (
-        <UpdateIndustrialCourses
+        <UpdateMastersCourses
           formData={formData}
           originalData={originalData}
           setFormData={setFormData}
