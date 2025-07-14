@@ -49,7 +49,7 @@ export default function CourseDetails() {
   const showRevitSection = slug === requiredSlug;
   // Define the specific slug for conditional rendering
   const RCCrequiredSlug =
-    "rcc-building-structural-analysis-design-mastercourse";
+    "professional-autocad-mastercourse";
   const RccshowRevitSection = slug === RCCrequiredSlug;
 
   return (
