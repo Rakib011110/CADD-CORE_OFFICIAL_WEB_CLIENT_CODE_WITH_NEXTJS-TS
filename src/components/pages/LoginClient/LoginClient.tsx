@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import { FieldValues, SubmitHandler } from "react-hook-form";
 import { useRouter, useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
+import { Eye, EyeOff } from "lucide-react"; // --- 1. Imported icons
 
 import { useUserLogin } from "@/hooks/auth.hook";
 import LoadingSpinner from "@/components/UI/LoadingSpinner/LoadingSpinner";
@@ -30,6 +31,7 @@ export function LoginClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [redirectTo, setRedirectTo] = useState("/dashboard/manage-courses");
+  const [showPassword, setShowPassword] = useState(false); // --- 2. Added state for password visibility
   const hasMounted = useHasMounted();
 
   const { mutate: handleUserLogin, isPending } = useUserLogin();
@@ -69,7 +71,9 @@ export function LoginClient() {
             <div className="text-white text-center">
               <AnimationPlayer />
               <h2 className="text-3xl font-bold mt-6">Join Our Community</h2>
-              <p className="mt-2 opacity-90">Unlock exclusive features and content</p>
+              <p className="mt-2 opacity-90">
+                Unlock exclusive features and content
+              </p>
             </div>
           </div>
 
@@ -78,7 +82,9 @@ export function LoginClient() {
               <h3 className="text-3xl font-extrabold  bg-clip-text text-transparent bg-gradient-to-r from-red-600 to-rose-600 uppercase">
                 Welcome to Cadd Core
               </h3>
-              <p className="text-gray-600 mt-2">Sign in to continue your journey</p>
+              <p className="text-gray-600 mt-2">
+                Sign in to continue your journey
+              </p>
             </div>
 
             <CaddForm onSubmit={onSubmit}>
@@ -89,14 +95,30 @@ export function LoginClient() {
                   placeholder="Enter your email"
                   type="email"
                 />
-                <CaddInput
-                  label="Password"
-                  name="password"
-                  placeholder="Enter your password"
-                  type="password"
-                />
+
+                {/* --- 3. Wrapped password input to add the icon --- */}
+                <div className="relative">
+                  <CaddInput
+                    label="Password"
+                    name="password"
+                    placeholder="Enter your password"
+                    type={showPassword ? "text" : "password"}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-9 flex items-center text-gray-500 cursor-pointer"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5" />
+                    ) : (
+                      <Eye className="h-5 w-5" />
+                    )}
+                  </button>
+                </div>
               </div>
-              
+
               <Button
                 className="w-full py-3 text-lg font-semibold text-white bg-gradient-to-r from-red-600 to-rose-600 rounded-lg hover:from-red-700 hover:to-rose-700 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                 size="lg"
@@ -104,16 +126,18 @@ export function LoginClient() {
               >
                 {isPending ? "Signing in..." : "Login"}
               </Button>
-              
+
               <div className="relative my-6">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-gray-300"></div>
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-white/90 text-gray-500">No account yet?</span>
+                  <span className="px-2 bg-white/90 text-gray-500">
+                    No account yet?
+                  </span>
                 </div>
               </div>
-              
+
               <Link href="/register" passHref>
                 <Button
                   variant="outline"
@@ -123,7 +147,7 @@ export function LoginClient() {
                   REGISTER NOW
                 </Button>
               </Link>
-              
+
               <div className="mt-4 text-center text-sm">
                 {/* <Link href="/forgot-password" className="text-rose-600 hover:text-rose-800 hover:underline">
                   Forgot password?

@@ -1,6 +1,5 @@
 "use server";
 
-
 import { cookies } from "next/headers";
 import { jwtDecode } from "jwt-decode";
 import { FieldValues } from 'react-hook-form';
@@ -14,27 +13,51 @@ export const registerUser = async (userData: FieldValues) => {
       (await cookies()).set("accessToken", data?.data?.accessToken);
       (await cookies()).set("refreshToken", data?.data?.refreshToken);
     }
-    // console.log(data);
 
     return data;
   } catch (error: any) {
-    throw new Error(error);
+    // Extract the error message from the response
+    const errorMessage = error.response?.data?.message || 
+                        error.response?.data?.error || 
+                        error.message || 
+                        "Registration failed. Please try again.";
+    
+    // Return an error object that can be safely passed to client
+    return {
+      success: false,
+      error: errorMessage,
+      statusCode: error.response?.status || 500
+    };
   }
 };
 
 export const loginUser = async (userData: FieldValues) => {
-  // don’t wrap in try/catch — let AxiosError bubble up with its response
-  const { data } = await axiosInstance.post("/auth/login", userData);
+  try {
+    const { data } = await axiosInstance.post("/auth/login", userData);
 
-  if (data.success) {
-    (await cookies()).set("accessToken", data.data.accessToken);
-    (await cookies()).set("refreshToken", data.data.refreshToken);
+    if (data.success) {
+      (await cookies()).set("accessToken", data.data.accessToken);
+      (await cookies()).set("refreshToken", data.data.refreshToken);
+    }
+
+    return data;
+  } catch (error: any) {
+    // Extract the error message from the response
+    const errorMessage = error.response?.data?.message || 
+                        error.response?.data?.error || 
+                        error.message || 
+                        "Login failed. Please try again.";
+    
+    // Return an error object that can be safely passed to client
+    return {
+      success: false,
+      error: errorMessage,
+      statusCode: error.response?.status || 500
+    };
   }
-
-  return data;
 };
 
-export const logout =async () => {
+export const logout = async () => {
   (await cookies()).delete("accessToken");
   (await cookies()).delete("refreshToken");
 };
@@ -54,7 +77,7 @@ export const getCurrentUser = async () => {
       mobileNumber: decodedToken.mobileNumber,
       role: decodedToken.role,
       status: decodedToken.status,
-      emailVerified: decodedToken.emailVerified , // Nullish coalescingAdd this line
+      emailVerified: decodedToken.emailVerified,
       profilePhoto: decodedToken.profilePhoto,
     };
   }

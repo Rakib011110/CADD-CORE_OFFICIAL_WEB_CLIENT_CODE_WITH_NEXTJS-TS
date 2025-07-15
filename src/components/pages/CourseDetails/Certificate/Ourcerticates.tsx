@@ -15,7 +15,7 @@ const OurCertificate = ({ course }: { course: TCourse }) => {
         <h2 className="text-3xl font-bold text-center text-gray-800 uppercase border-b-4 border-red-600 pb-2 mb-6">
           কোর্স কমপ্লিশন এবং অটোডেস্ক সার্টিফিকেট
         </h2>
-
+s
         <p className="text-center text-gray-700 max-w-3xl mx-auto mb-10">
           আমাদের কোর্স সম্পন্ন করার পর আপনি পাবেন অটোডেস্ক কর্তৃক প্রদত্ত সার্টিফিকেট।  
           এছাড়াও, আমাদের নিজস্ব সার্টিফিকেট প্রদান করা হয় যা আপনার দক্ষতা এবং অর্জিত জ্ঞানকে স্বীকৃতি দেয়।

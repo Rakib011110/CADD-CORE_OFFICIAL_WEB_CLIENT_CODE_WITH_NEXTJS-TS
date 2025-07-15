@@ -137,9 +137,9 @@ const [showModal, setShowModal] = useState(false);
   // initiatePayment={initiatePayment}
 />
 
-{/* <button onClick={() => setShowModal(true)} className="bg-red-500 text-white px-5 py-2 rounded-md">
+<button onClick={() => setShowModal(true)} className="bg-red-500 text-white px-5 py-2 rounded-md">
   Enroll করুন
-</button> */}
+</button>
 
       </div>
                 </div>
