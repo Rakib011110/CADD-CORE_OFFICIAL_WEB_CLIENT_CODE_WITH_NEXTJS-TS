@@ -21,6 +21,27 @@ const navigationSections = [
     ],
   },
   {
+    title: "📚 Payment Management",
+    links: [
+       {
+        label: "💳 Payment Management",
+        href: "/dashboard/payments/payment-management",
+        color: "",
+      },
+      {
+        label: "📊 Payment History",
+        href: "/dashboard/payments/payment-history",
+        color: "",
+      },
+      {
+        label: "📇 Manage Coupon",
+        href: "/dashboard/payments/manage-coupon",
+        color: "",
+      },
+     
+    ],
+  },
+  {
     title: "📚 Course Management",
     links: [
       {
@@ -48,11 +69,7 @@ const navigationSections = [
         href: "/dashboard/payments/installment-plan",
         color: "",
       },
-      {
-        label: "📇 Manage Coupon",
-        href: "/dashboard/payments/manage-coupon",
-        color: "",
-      },
+     
     ], 
   },
   {
@@ -247,7 +264,7 @@ export default function AdminLayout({ children }: {children: React.ReactNode}) {
 
         {/* Main Content */}
 
-        <main className="flex-1 p-4" onClick={() => setSidebarOpen(false)}>
+        <main className="flex-1 p-4 max-w-6xl mx-auto" onClick={() => setSidebarOpen(false)}>
           {children}
         </main>
       </div>

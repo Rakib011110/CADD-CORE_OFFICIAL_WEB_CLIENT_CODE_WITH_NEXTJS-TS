@@ -98,7 +98,7 @@ function SignUpContent() {
             name="email" 
             placeholder="Enter your email" 
             size="sm" 
-          />
+          /> 
           <CaddInput 
             label="Mobile Number" 
             name="mobileNumber" 

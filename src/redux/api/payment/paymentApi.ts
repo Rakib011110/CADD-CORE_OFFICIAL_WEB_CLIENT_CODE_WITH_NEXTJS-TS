@@ -48,6 +48,31 @@ const paymentApi = baseApi.injectEndpoints({
     getMyPayments: builder.query({
       query: (userId: string) => `/payments/my-payments/${userId}`,
     }),
+
+    // 🔧 Admin: Get payments with simple pagination
+    getPaymentsWithFilters: builder.query({
+      query: ({ page = 1, limit = 10 }) => 
+        `/payments/admin/payments?page=${page}&limit=${limit}`,
+    }),
+
+    // 🔧 Admin: Mark payment as checked
+    markPaymentAsChecked: builder.mutation({
+      query: (transactionId: string) => ({
+        url: `/payments/admin/mark-checked/${transactionId}`,
+        method: 'PUT',
+      }),
+    }),
+
+    // 🔧 Admin: Get user payment history (simple)
+    getUserPaymentHistory: builder.query({
+      query: ({ userId, page = 1, limit = 10 }) => 
+        `/payments/admin/user-history/${userId}?page=${page}&limit=${limit}`,
+    }),
+
+    // 🔧 Admin: Get payment statistics (simple)
+    getPaymentStatistics: builder.query({
+      query: () => `/payments/admin/statistics`,
+    }),
   }),
 });
 
@@ -58,7 +83,13 @@ export const {
   useGetAllPaymentsQuery,
   useGetPaymentByIdQuery,
   useGetMyPaymentsQuery,
-  useCreatePaymentMutation
+  useCreatePaymentMutation,
+  // Admin hooks
+  useGetPaymentsWithFiltersQuery,
+  useMarkPaymentAsCheckedMutation,
+  useGetUserPaymentHistoryQuery,
+  useGetPaymentStatisticsQuery,
 } = paymentApi;
+
 
 export default paymentApi;

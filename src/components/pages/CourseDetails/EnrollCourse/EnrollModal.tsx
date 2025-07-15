@@ -18,10 +18,11 @@ import {
   XCircle,
   Info,
 } from "lucide-react";
-import { useCreatePaymentMutation } from "@/redux/api/payment/paymentApi";
 import { useValidateCouponMutation } from "@/redux/api/payment/couponApi";
 import { toast } from "sonner";
 import { useGetInstallmentPlansQuery } from "@/redux/api/payment/useInstallmentPlansApi";
+import { usePayment } from "@/hooks/usePayment";
+import { useCreatePaymentMutation } from "@/redux/api/payment/paymentApi";
 
 interface EnrollModalProps {
   open: boolean;
@@ -81,8 +82,17 @@ export default function EnrollModal({
   const [numberOfSubsequentInstallments, setNumberOfSubsequentInstallments] = useState(0);
   const [installmentPlanDiscountAmount, setInstallmentPlanDiscountAmount] = useState(0);
 
-  const [createPayment, { isLoading: isProcessingPayment }] =
-    useCreatePaymentMutation();
+  // Use the new payment hook
+  const { processPayment, isProcessing } = usePayment({
+    onSuccess: (transactionId) => {
+      console.log('✅ Payment initiated successfully:', transactionId);
+      onClose();
+    },
+    onError: (error) => {
+      console.error('❌ Payment failed:', error);
+    }
+  });
+
   const [validateCoupon, { isLoading: isValidatingCoupon }] =
     useValidateCouponMutation();
 
@@ -204,6 +214,8 @@ export default function EnrollModal({
       setActualCouponDiscount(0); // ত্রুটি হলে ক্যালকুলেটেড ডিসকাউন্ট রিসেট
     }
   };
+
+  const [createPayment] = useCreatePaymentMutation();
 
   const handlePayment = async () => {
     if (!user) {
@@ -464,11 +476,11 @@ export default function EnrollModal({
           {/* Payment Button */}
           <Button
             onClick={handlePayment}
-            disabled={isProcessingPayment || (finalPayableAmount <= 0 && courseFee > 0) || isLoadingInstallmentPlans || (finalPayableAmount < 0)}
+            disabled={isProcessing || (finalPayableAmount <= 0 && courseFee > 0) || isLoadingInstallmentPlans || (finalPayableAmount < 0)}
             className="w-full py-3 text-base sm:text-lg font-semibold bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white shadow-md hover:shadow-lg transition-all duration-300"
           >
             <CreditCard className="h-5 w-5 mr-2" />
-            {isProcessingPayment
+            {isProcessing
               ? "পেমেন্ট প্রসেস হচ্ছে..."
               : selectedPlanDetails && selectedPlanDetails.installments > 1
               ? `${firstInstallmentAmount.toFixed(0)}৳ প্রথম কিস্তি পরিশোধ করুন`

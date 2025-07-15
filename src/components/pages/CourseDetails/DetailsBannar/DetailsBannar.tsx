@@ -9,6 +9,7 @@ import { useInitiatePaymentMutation } from "@/redux/api/payment/paymentApi";
 import PaymentButton from "../../Payments/PayementButton";
 import EnrollModal from "../EnrollCourse/EnrollModal";
 import { useState } from "react";
+import SslcommerzPayment from "../SslcommerzPayment/SslcommerzPayment";
 
 
 export default function DetailsBannar({ course }: { course: TCourse }) {
@@ -119,14 +120,10 @@ const [showModal, setShowModal] = useState(false);
                   </button> 
 
       <div className="payment-section">
-        {/* <PaymentButton 
-          courseId={course._id} 
-          amount={course.courseFee} 
-        />  */}
+      
 
 
-
-<EnrollModal
+<SslcommerzPayment
   open={showModal}
   onClose={() => setShowModal(false)}
   courseId={course._id}
