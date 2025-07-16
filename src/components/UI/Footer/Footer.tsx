@@ -15,21 +15,21 @@ export default function Footer() {
         <div>
           <h2 className="text-lg font-bold mb-4">যোগাযোগ</h2>
           <p className="text-gray-300">ঠিকানা</p>
-          <p className="text-gray-400 text-sm">
+          <p className="text-gray-200 text-sm">
             ১৪৯/এ,বায়তুশ শরফ কমপ্লেক্স(২য় তলা), এয়ারপোর্ট রোড,ফার্মগেট, ঢাকা-১২১৫
           </p>
           <p className="mt-2 text-gray-300">মোবাইল</p>
-          <p className="text-gray-400 text-sm">
+          <p className="text-gray-200 text-sm">
             +880 1611-223631 | +880 1611-223637
           </p>
           <p className="mt-2 text-gray-300">ইমেইল</p>
-          <p className="text-gray-400 text-sm">caddcorebd@gmail.com</p>
+          <p className="text-gray-200 text-sm">caddcorebd@gmail.com</p>
         </div>
 
         {/* Quick Links */}
         <div>
           <h2 className="text-lg font-bold mb-4">কুইক লিংক</h2>
-          <ul className="text-gray-400 space-y-2  text-sm">
+          <ul className="text-gray-200 space-y-2  text-sm">
             {links.map(({ id, link, label }) => (
               <li key={id}>
                 <Link
@@ -57,7 +57,7 @@ export default function Footer() {
         {/* Others */}
         <div>
           <h2 className="text-lg font-bold mb-4">অন্যান্য</h2>
-          <ul className="text-gray-400 space-y-2 text-sm">
+          <ul className="text-gray-200 space-y-2 text-sm">
          <li><a href="https://www.facebook.com/groups/caddcore" className="hover:text-white">ইঞ্জিনিয়ারিং কমিউনিটি গ্রুপ</a></li>
          <li><a href="https://www.facebook.com/caddcorebd" className="hover:text-white">ফেসবুক পেজ</a></li>
 
@@ -65,16 +65,16 @@ export default function Footer() {
             <li><a href="#" className="hover:text-white">রিফান্ড পলিসি</a></li>
           </ul>
         </div>
-
+            
         {/* Support Center */}
         <div>
           <h2 className="text-lg font-bold mb-4">সাপোর্ট সেন্টার</h2>
           <p className="text-red-400 font-bold text-xl">+880 9613-202060</p>
-          <p className="text-gray-400 text-sm mt-2">সকাল ৯ টা - সন্ধ্যা ৭ টা</p>
+          <p className="text-gray-200 text-sm mt-2">সকাল ৯ টা - সন্ধ্যা ৭ টা</p>
           <div className="flex space-x-4 mt-4">
-            <a href="#" className="text-gray-400 hover:text-white text-xl">📘</a>
-            <a href="#" className="text-gray-400 hover:text-white text-xl">🔗</a>
-            <a href="#" className="text-gray-400 hover:text-white text-xl">💬</a>
+            <a href="#" className="text-gray-200 hover:text-white text-xl">📘</a>
+            <a href="#" className="text-gray-200 hover:text-white text-xl">🔗</a>
+            <a href="#" className="text-gray-200 hover:text-white text-xl">💬</a>
           </div> 
 
           <div className="mt-">

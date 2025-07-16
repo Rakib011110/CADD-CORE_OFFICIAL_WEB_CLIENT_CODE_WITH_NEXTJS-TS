@@ -6,10 +6,13 @@ export default function SoftwareTaught({ course }: { course: TCourse }) {
     <div id="software-taught" className="bg-gray-50">
       <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-10">
         {/* Section Header */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-12 mt-10" >
           <h2 className="text-4xl font-extrabold text-gray-900 tracking-tight">
             যে সকল সফটওয়্যার শেখানো হবে
-          </h2>
+          </h2> 
+
+
+          
           <div className="mt-4 flex justify-center">
             <span className="inline-block w-24 h-1.5 bg-gradient-to-r from-red-500 to-amber-500 rounded-full"></span>
           </div>

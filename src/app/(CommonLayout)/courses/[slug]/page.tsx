@@ -20,6 +20,7 @@ import useSmoothScroll from "@/hooks/useSmoothScroll";
 import Roadmap from "@/components/pages/CourseDetails/CertificationPathway/CertificationPathway";
 import CourseSchedule from "@/components/pages/CourseDetails/CourseSchedule/CourseSchedule";
 import RevitSection from "@/components/pages/CourseDetails/RevitSectionProps/RevitSectionProps"; // Corrected import path based on your snippet
+import ProjectShowcase from "@/components/pages/CourseDetails/ProjectShowcase/ProjectShowcase";
 
 export default function CourseDetails() {
   useSmoothScroll();
@@ -69,7 +70,9 @@ export default function CourseDetails() {
           <MastercourseOverview course={course?.data} />
         </div>
 
-        <div className="">{RccshowRevitSection && <Roadmap />}</div>
+        {/* <div className="">{RccshowRevitSection && <Roadmap />}</div> */}
+
+      </div>
 
         <div id="course-content">
           <CourseContentList course={course?.data} />
@@ -78,6 +81,9 @@ export default function CourseDetails() {
           <div>
             <WorkingProjects course={course?.data} />
           </div>
+
+        <div className="">{RccshowRevitSection && <ProjectShowcase />}</div>
+
 
           {/* Conditional rendering for RevitSection */}
           {showRevitSection && <RevitSection />}
@@ -115,6 +121,5 @@ export default function CourseDetails() {
           </div>
         </div>
       </div>
-    </div>
   );
 }
