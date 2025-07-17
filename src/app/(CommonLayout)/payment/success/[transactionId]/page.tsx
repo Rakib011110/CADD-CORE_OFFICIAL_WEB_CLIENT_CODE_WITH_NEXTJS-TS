@@ -209,7 +209,7 @@ export default function PaymentSuccessPage() {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                     </div>
-                    <h1 className="text-2xl font-bold mb-3 text-gray-800">Payment Verification Failed</h1>
+                    <h1 className="text-2xl font-bold mb-3 text-gray-800"> Please Contact our suport team </h1>
                     <p className="mb-6 text-gray-600">We couldn't verify your payment. If amount was deducted, please contact our support team with your transaction details.</p>
                     
                     <div className="bg-gray-50 p-4 rounded-lg mb-6 text-left">
