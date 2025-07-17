@@ -10,15 +10,20 @@ import { useGetPaymentStatusQuery } from "@/redux/api/payment/paymentStatusApi";
 
 export default function PaymentSuccessPage() {
     const [isValid, setIsValid] = useState(false);
+    const [retryCount, setRetryCount] = useState(0);
     const params = useParams();
 
     const transactionId = Array.isArray(params.transactionId)
         ? params.transactionId[0]
         : params.transactionId;
 
-    const { data: paymentData, isLoading, error } = useGetPaymentStatusQuery(
+    const { data: paymentData, isLoading, error, refetch } = useGetPaymentStatusQuery(
         transactionId ?? "",
-        { skip: !transactionId }
+        { 
+            skip: !transactionId,
+            pollingInterval: 3000, // Poll every 3 seconds
+            refetchOnMountOrArgChange: true
+        }
     );
 
     useEffect(() => {
@@ -42,15 +47,21 @@ export default function PaymentSuccessPage() {
     useEffect(() => {
         console.log("Payment Data:", paymentData);
 
-        if (paymentData && paymentData.success && paymentData?.status === 'completed') {
-
+        if (paymentData && paymentData.success && paymentData.data?.status === 'completed') {
             toast.success("Payment verified successfully!");
+        } else if (paymentData && paymentData.success && paymentData.data?.status === 'pending' && retryCount < 10) {
+            // Payment exists but still pending, retry after delay
+            const timer = setTimeout(() => {
+                setRetryCount(prev => prev + 1);
+                refetch();
+            }, 2000);
+            return () => clearTimeout(timer);
         } else if (paymentData && !paymentData.success) {
             toast.error("Payment verification failed");
         } else if (error) {
             toast.error("Unable to verify payment. Please try again later.");
         }
-    }, [paymentData, error]);
+    }, [paymentData, error, retryCount, refetch]);
 
     const handleDownloadInvoice = () => {
         if (!paymentData || !paymentData.data) return;
@@ -157,7 +168,7 @@ export default function PaymentSuccessPage() {
         window.print();
     };
 
-    if (!isValid || isLoading) {
+    if (!isValid || isLoading || (paymentData?.success && paymentData.data?.status === 'pending' && retryCount < 10)) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
                 <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-md text-center border-t-4 border-blue-500">
@@ -171,15 +182,25 @@ export default function PaymentSuccessPage() {
                         <div className="h-3 bg-gray-200 rounded w-1/2"></div>
                     </div>
                     <h1 className="text-xl font-semibold mt-6 text-gray-700">
-                        {isLoading ? "Verifying Payment Details..." : "Validating Transaction..."}
+                        {paymentData?.data?.status === 'pending' 
+                            ? `Processing Payment... (${retryCount + 1}/10)` 
+                            : isLoading 
+                                ? "Verifying Payment Details..." 
+                                : "Validating Transaction..."
+                        }
                     </h1>
-                    <p className="text-sm text-gray-500 mt-2">Please wait while we process your payment</p>
+                    <p className="text-sm text-gray-500 mt-2">
+                        {paymentData?.data?.status === 'pending' 
+                            ? "Your payment is being processed. Please wait..." 
+                            : "Please wait while we process your payment"
+                        }
+                    </p>
                 </div>
             </div>
         );
     }
 
-    if (error || !paymentData || !paymentData.success || paymentData.data?.status !== 'completed') {
+    if (error || !paymentData || !paymentData.success || (paymentData.data?.status !== 'completed' && (paymentData.data?.status !== 'pending' || retryCount >= 10))) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
                 <div className="bg-white p-8 rounded-xl shadow-md max-w-md w-full text-center border-t-4 border-red-500">

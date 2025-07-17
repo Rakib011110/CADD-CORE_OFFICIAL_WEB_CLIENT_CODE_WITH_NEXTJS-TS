@@ -111,7 +111,7 @@ const [showModal, setShowModal] = useState(false);
                  
                  <Link href="https://docs.google.com/forms/d/e/1FAIpQLSe27ZcsU6VdsyYPMD4JO5VwW4d9CI3_HtTG8YRxyo43gyzGWA/viewform">
                  <button className="bg-white text-red-500 border border-red-500 hover:bg-red-50 px-5 py-2 rounded-md font-semibold">
-                 ভর্তি ফর্ম
+                 ভর্তি ফর্ম 
                   </button> 
                  </Link>
 
