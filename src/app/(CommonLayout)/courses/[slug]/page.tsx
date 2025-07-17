@@ -82,7 +82,7 @@ export default function CourseDetails() {
             <WorkingProjects course={course?.data} />
           </div>
 
-        {/* <div className="">{RccshowRevitSection && <ProjectShowcase />}</div> */}
+        <div className="">{RccshowRevitSection && <ProjectShowcase />}</div>
 
 
           {/* Conditional rendering for RevitSection */}
