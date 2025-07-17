@@ -31,7 +31,7 @@ export default function FailedPaymentTransaction() {
 
   // Query payment status
   const { data: paymentData, isLoading, error } = useGetPaymentStatusQuery(
-    transactionId as any,
+    transactionId ?? "",
     { skip: !transactionId }
   );
 

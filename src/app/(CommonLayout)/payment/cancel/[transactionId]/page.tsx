@@ -15,7 +15,7 @@ export default function PaymentCancelPage() {
     : params.transactionId;
 
   const { data: paymentData, isLoading, error } = useGetPaymentStatusQuery(
-    transactionId as any,
+    transactionId ?? "",
     { skip: !transactionId }
   );
 
@@ -23,7 +23,7 @@ export default function PaymentCancelPage() {
     if (!transactionId) {
       toast.error("Invalid transaction ID");
       return;
-    }
+    } 
     const isValidUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
       transactionId
     );
