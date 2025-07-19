@@ -21,6 +21,8 @@ import Roadmap from "@/components/pages/CourseDetails/CertificationPathway/Certi
 import CourseSchedule from "@/components/pages/CourseDetails/CourseSchedule/CourseSchedule";
 import RevitSection from "@/components/pages/CourseDetails/RevitSectionProps/RevitSectionProps"; // Corrected import path based on your snippet
 import ProjectShowcase from "@/components/pages/CourseDetails/ProjectShowcase/ProjectShowcase";
+import CoursePaymentPage from "@/components/pages/CourseDetails/CourseFees/CourseFees";
+import CourseFees from "@/components/pages/CourseDetails/CourseFees/CourseFees";
 
 export default function CourseDetails() {
   useSmoothScroll();
@@ -49,14 +51,13 @@ export default function CourseDetails() {
   const requiredSlug = "professional-architectural-bim-modeling-mastercourse";
   const showRevitSection = slug === requiredSlug;
   // Define the specific slug for conditional rendering
-  const RCCrequiredSlug =
-    "professional-autocad-mastercourse";
+  const RCCrequiredSlug = "professional-autocad-mastercourse";
   const RccshowRevitSection = slug === RCCrequiredSlug;
 
   return (
     <div style={{ fontFamily: "banglaFont" }} className="font-serif ">
       <DetailsBannar course={course?.data} />
-
+      <CourseFees course={course.data} />
       <div
         style={{ fontFamily: "banglaFont" }}
         className="text-justify font-sans">
@@ -71,55 +72,51 @@ export default function CourseDetails() {
         </div>
 
         {/* <div className="">{RccshowRevitSection && <Roadmap />}</div> */}
-
       </div>
-
-        <div id="course-content">
-          <CourseContentList course={course?.data} />
-        </div>
+      <div id="course-content">
+        <CourseContentList course={course?.data} />
+      </div>
+      <div>
         <div>
-          <div>
-            <WorkingProjects course={course?.data} />
-          </div>
+          <WorkingProjects course={course?.data} />
+        </div>
 
         {/* <div className="">{RccshowRevitSection && <ProjectShowcase />}</div> */}
 
-
-          {/* Conditional rendering for RevitSection */}
-          {showRevitSection && <RevitSection />}
+        {/* Conditional rendering for RevitSection */}
+        {showRevitSection && <RevitSection />}
+      </div>
+      <SoftwareTaught course={course?.data} />
+      <div>
+        <div id="freelancing-guide">
+          <FreelancingGuide />
         </div>
 
-        <SoftwareTaught course={course?.data} />
-        <div>
-          <div id="freelancing-guide">
-            <FreelancingGuide />
-          </div>
+        <div id="target-audience">
+          <CourseForWhom />
+        </div>
 
-          <div id="target-audience">
-            <CourseForWhom />
-          </div>
+        <div id="student-support">
+          <SupportAndTraining />
+        </div>
+        <div id="experienced-advisors">
+          <ExpertPanel course={course?.data} />
+        </div>
+        <div id="certificate-verification">
+          <OurCertificate course={course?.data} />
+        </div>
+        <div className="mt-10">
+          <CertificateVerification />
+        </div>
 
-          <div id="student-support">
-            <SupportAndTraining />
-          </div>
-          <div id="experienced-advisors">
-            <ExpertPanel course={course?.data} />
-          </div>
-          <div id="certificate-verification">
-            <OurCertificate course={course?.data} />
-          </div>
-          <div className="mt-10">
-            <CertificateVerification />
-          </div>
+        <div id="certificate-verification">
+          <Certificate course={course?.data} />
+        </div>
 
-          <div id="certificate-verification">
-            <Certificate course={course?.data} />
-          </div>
-
-          <div id="free-resources">
-            <FreeTrainingSessions course={course?.data} />
-          </div>
+        <div id="free-resources">
+          <FreeTrainingSessions course={course?.data} />
         </div>
       </div>
+    </div>
   );
 }

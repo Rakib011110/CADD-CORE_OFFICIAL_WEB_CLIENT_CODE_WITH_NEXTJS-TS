@@ -113,7 +113,7 @@ export default function DetailsBannar({ course }: { course: TCourse }) {
                   </button>
 
                   <div className="payment-section">
-                    <SslcommerzPayment
+                    <EnrollModal
                       open={showModal}
                       onClose={() => setShowModal(false)}
                       courseId={course._id}
