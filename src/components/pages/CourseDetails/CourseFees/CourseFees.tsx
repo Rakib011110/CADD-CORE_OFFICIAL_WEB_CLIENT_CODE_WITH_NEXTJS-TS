@@ -20,6 +20,7 @@ import { useInitiatePaymentMutation } from "@/redux/api/payment/paymentApi";
 import { toast } from "sonner";
 import { useUser } from "@/context/user.provider";
 import Image from "next/image";
+import { AuthModal } from "@/components/auth";
 
 // --- Interfaces (ensure these match your API response structures) ---
 interface APIInstallmentPlan {
@@ -75,6 +76,7 @@ export default function CourseFees({ course }: CourseFeesProps) {
     useState(0);
   const [installmentPlanDiscountAmount, setInstallmentPlanDiscountAmount] =
     useState(0);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   // --- EFFECTS ---
 
@@ -135,7 +137,7 @@ export default function CourseFees({ course }: CourseFeesProps) {
   // --- HANDLERS ---
   const handleOnlinePayment = async () => {
     if (!user) {
-      toast.error("পেমেন্ট করার জন্য অনুগ্রহ করে লগইন করুন।");
+      setShowAuthModal(true);
       return;
     }
     const selectedPlanDetails = installmentPlans.find(
@@ -198,6 +200,12 @@ export default function CourseFees({ course }: CourseFeesProps) {
   const selectedPlanDetails = installmentPlans.find(
     (p) => p.name === selectedPlanName
   );
+
+ const formattedFee = new Intl.NumberFormat("en-IN").format(
+    course?.courseFee || 0
+  );
+
+
 
   // --- RENDER ---
   return (
@@ -355,6 +363,8 @@ export default function CourseFees({ course }: CourseFeesProps) {
 
           <div className="bg-white rounded-xl shadow-2xl p-6 sm:p-8 space-y-4">
             <div className="space-y-3">
+              
+              
               <button
                 onClick={handleOnlinePayment}
                 disabled={isProcessingPayment || isLoadingInstallmentPlans}
@@ -363,13 +373,20 @@ export default function CourseFees({ course }: CourseFeesProps) {
                   <Loader2 className="animate-spin h-5 w-5" />
                 ) : (
                   <CreditCard />
-                )}
+                )} 
+
+
                 <span>
                   {isProcessingPayment
                     ? "প্রসেস হচ্ছে..."
                     : "অনলাইনে পেমেন্ট করুন"}
                 </span>
               </button>
+              
+              
+              
+              
+              
               <a
                 href="https://docs.google.com/forms/d/e/1FAIpQLSe27ZcsU6VdsyYPMD4JO5VwW4d9CI3_HtTG8YRxyo43gyzGWA/viewform"
                 target="_blank"
@@ -400,6 +417,13 @@ export default function CourseFees({ course }: CourseFeesProps) {
           </div>
         </div>
       </div>
+      
+      {/* Authentication Modal */}
+      <AuthModal 
+        isOpen={showAuthModal} 
+        onClose={() => setShowAuthModal(false)} 
+        defaultTab="login" 
+      />
     </div>
   );
 }

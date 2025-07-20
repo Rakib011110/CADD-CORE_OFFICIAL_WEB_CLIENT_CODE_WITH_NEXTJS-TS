@@ -45,21 +45,39 @@ export default function PaymentSuccessPage() {
     }, [transactionId]);
 
     useEffect(() => {
-        console.log("Payment Data:", paymentData);
+        console.log("🔍 Payment Data Debug:", {
+            paymentData,
+            hasData: !!paymentData,
+            isSuccess: paymentData?.success,
+            status: paymentData?.data?.status,
+            retryCount,
+            debugInfo: paymentData?.data?.debugInfo,
+            ipnReceived: paymentData?.data?.ipnReceived,
+            ipnValidated: paymentData?.data?.ipnValidated,
+            verifiedAt: paymentData?.data?.verifiedAt,
+            error
+        });
 
         if (paymentData && paymentData.success && paymentData.data?.status === 'completed') {
+            console.log("✅ Payment verified successfully!");
             toast.success("Payment verified successfully!");
-        } else if (paymentData && paymentData.success && paymentData.data?.status === 'pending' && retryCount < 10) {
+        } else if (paymentData && paymentData.success && paymentData.data?.status === 'pending' && retryCount < 15) {
             // Payment exists but still pending, retry after delay
+            console.log(`🔄 Payment pending, retry ${retryCount + 1}/15`);
             const timer = setTimeout(() => {
                 setRetryCount(prev => prev + 1);
                 refetch();
-            }, 2000);
+            }, 3000); // Increased to 3 seconds
             return () => clearTimeout(timer);
         } else if (paymentData && !paymentData.success) {
+            console.log("❌ Payment verification failed - API returned success: false");
             toast.error("Payment verification failed");
         } else if (error) {
+            console.log("❌ Payment verification error:", error);
             toast.error("Unable to verify payment. Please try again later.");
+        } else if (retryCount >= 15) {
+            console.log("⏰ Payment verification timed out after 15 attempts");
+            toast.error("Payment verification taking longer than expected. Please contact support.");
         }
     }, [paymentData, error, retryCount, refetch]);
 
@@ -168,7 +186,7 @@ export default function PaymentSuccessPage() {
         window.print();
     };
 
-    if (!isValid || isLoading || (paymentData?.success && paymentData.data?.status === 'pending' && retryCount < 10)) {
+    if (!isValid || isLoading || (paymentData?.success && paymentData.data?.status === 'pending' && retryCount < 15)) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
                 <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-md text-center border-t-4 border-blue-500">
@@ -183,7 +201,7 @@ export default function PaymentSuccessPage() {
                     </div>
                     <h1 className="text-xl font-semibold mt-6 text-gray-700">
                         {paymentData?.data?.status === 'pending' 
-                            ? `Processing Payment... (${retryCount + 1}/10)` 
+                            ? `Processing Payment... (${retryCount + 1}/15)` 
                             : isLoading 
                                 ? "Verifying Payment Details..." 
                                 : "Validating Transaction..."
@@ -195,12 +213,20 @@ export default function PaymentSuccessPage() {
                             : "Please wait while we process your payment"
                         }
                     </p>
+                    
+                    {/* Debug Information in Development */}
+                    {process.env.NODE_ENV === 'development' && paymentData?.data?.debugInfo && (
+                        <div className="mt-4 p-3 bg-gray-100 rounded text-xs text-left">
+                            <strong>Debug Info:</strong>
+                            <pre>{JSON.stringify(paymentData.data.debugInfo, null, 2)}</pre>
+                        </div>
+                    )}
                 </div>
             </div>
         );
     }
 
-    if (error || !paymentData || !paymentData.success || (paymentData.data?.status !== 'completed' && (paymentData.data?.status !== 'pending' || retryCount >= 10))) {
+    if (error || !paymentData || !paymentData.success || (paymentData.data?.status !== 'completed' && (paymentData.data?.status !== 'pending' || retryCount >= 15))) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
                 <div className="bg-white p-8 rounded-xl shadow-md max-w-md w-full text-center border-t-4 border-red-500">
