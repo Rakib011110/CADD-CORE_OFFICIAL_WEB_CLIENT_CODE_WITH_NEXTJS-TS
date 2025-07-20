@@ -201,9 +201,10 @@ export default function CourseFees({ course }: CourseFeesProps) {
     (p) => p.name === selectedPlanName
   );
 
- const formattedFee = new Intl.NumberFormat("en-IN").format(
-    course?.courseFee || 0
-  );
+  // Bangla number formatting function
+  const formatBanglaNumber = (number: number) => {
+    return new Intl.NumberFormat("bn-BD").format(number);
+  };
 
 
 
@@ -292,7 +293,7 @@ export default function CourseFees({ course }: CourseFeesProps) {
             <div className="flex justify-between items-center">
               <span className="text-gray-600">মূল কোর্স ফি:</span>
               <span className="font-medium text-gray-800">
-                {course.courseFee.toFixed(2)} ৳
+                {formatBanglaNumber(course.courseFee)} ৳
               </span>
             </div>
             {installmentPlanDiscountAmount > 0 && (
@@ -302,14 +303,14 @@ export default function CourseFees({ course }: CourseFeesProps) {
                   প্ল্যানের ছাড়:
                 </span>
                 <span className="font-medium">
-                  -{installmentPlanDiscountAmount.toFixed(2)} ৳
+                  -{formatBanglaNumber(installmentPlanDiscountAmount)} ৳
                 </span>
               </div>
             )}
             <div className="border-t my-2"></div>
             <div className="flex justify-between items-center text-lg font-bold text-red-600 pt-2">
               <span>পরিশোধযোগ্য মোট পরিমাণ:</span>
-              <span>{finalPayableAmount.toFixed(2)} ৳</span>
+              <span>{formatBanglaNumber(finalPayableAmount)} ৳</span>
             </div>
           </div>
         </div>
@@ -329,7 +330,7 @@ export default function CourseFees({ course }: CourseFeesProps) {
                     প্রথম ইন্সটলমেন্ট (এখন পরিশোধ করুন)
                   </p>
                   <p className="text-2xl font-bold text-red-700">
-                    {firstInstallmentAmount.toFixed(2)} ৳
+                    {formatBanglaNumber(firstInstallmentAmount)} ৳
                   </p>
                 </div>
                 {numberOfSubsequentInstallments > 0 &&
@@ -340,7 +341,7 @@ export default function CourseFees({ course }: CourseFeesProps) {
                         প্রত্যেকটি
                       </p>
                       <p className="text-xl font-semibold text-gray-800">
-                        {subsequentInstallmentAmount.toFixed(2)} ৳
+                        {formatBanglaNumber(subsequentInstallmentAmount)} ৳
                       </p>
                       <p className="text-xs text-gray-500 mt-2">
                         বাকি টাকা মোট দেয় টাকার উপর ভিত্তি করে সমন্বয় করা হবে।
@@ -352,7 +353,7 @@ export default function CourseFees({ course }: CourseFeesProps) {
               <div className="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg">
                 <p className="text-gray-600">সম্পূর্ণ পেমেন্ট একসাথে</p>
                 <p className="text-2xl font-bold text-green-700">
-                  {finalPayableAmount.toFixed(2)} ৳
+                  {formatBanglaNumber(finalPayableAmount)} ৳
                 </p>
                 <p className="text-xs text-green-600 mt-1">
                   একসাথে পেমেন্ট করে সর্বোচ্চ ছাড় উপভোগ করুন!
@@ -388,7 +389,7 @@ export default function CourseFees({ course }: CourseFeesProps) {
               
               
               <a
-                href="https://docs.google.com/forms/d/e/1FAIpQLSe27ZcsU6VdsyYPMD4JO5VwW4d9CI3_HtTG8YRxyo43gyzGWA/viewform"
+                href="https://res.cloudinary.com/dalpf8iip/image/upload/v1753016620/Payment_Banner_Jul24_V1-03_wstm6a.png"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full flex items-center justify-center gap-3 bg-gray-800 text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:bg-gray-900 transition-all duration-300">
@@ -407,10 +408,10 @@ export default function CourseFees({ course }: CourseFeesProps) {
               className="
               flex items-center  justify-center mt-4">
               <Image
-                className="h-full w-full   rounded-lg "
+                className=" w-full object-center  h-auto  rounded-lg "
                 src="https://res.cloudinary.com/dqpohzbea/image/upload/v1752925536/WhatsApp_Image_2025-07-16_at_13.22.59_a23fd7b8_wksig8.jpg"
                 width={500}
-                height={500}
+                height={700}
                 alt="sslcommerz"
               />
             </div>
