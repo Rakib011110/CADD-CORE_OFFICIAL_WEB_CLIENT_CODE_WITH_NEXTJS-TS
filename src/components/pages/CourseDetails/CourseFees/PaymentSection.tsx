@@ -354,7 +354,7 @@ export function PaymentSection({ course, user }: PaymentSectionProps) {
               </span>
             </button>
             <a
-              href="https://docs.google.com/document/d/your-doc-id"
+              href="https://docs.google.com/forms/d/e/1FAIpQLSe27ZcsU6VdsyYPMD4JO5VwW4d9CI3_HtTG8YRxyo43gyzGWA/viewform"
               target="_blank"
               rel="noopener noreferrer"
               className="w-full flex items-center justify-center gap-3 bg-gray-800 text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:bg-gray-900 transition-all duration-300">

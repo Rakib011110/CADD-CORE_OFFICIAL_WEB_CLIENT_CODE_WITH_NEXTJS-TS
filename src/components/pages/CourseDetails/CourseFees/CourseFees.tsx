@@ -389,7 +389,7 @@ export default function CourseFees({ course }: CourseFeesProps) {
               
               
               <a
-                href="https://res.cloudinary.com/dalpf8iip/image/upload/v1753016620/Payment_Banner_Jul24_V1-03_wstm6a.png"
+                href="https://docs.google.com/forms/d/e/1FAIpQLSe27ZcsU6VdsyYPMD4JO5VwW4d9CI3_HtTG8YRxyo43gyzGWA/viewform"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full flex items-center justify-center gap-3 bg-gray-800 text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:bg-gray-900 transition-all duration-300">
@@ -408,8 +408,8 @@ export default function CourseFees({ course }: CourseFeesProps) {
               className="
               flex items-center  justify-center mt-4">
               <Image
-                className=" w-full object-center  h-auto  rounded-lg "
-                src="https://res.cloudinary.com/dqpohzbea/image/upload/v1752925536/WhatsApp_Image_2025-07-16_at_13.22.59_a23fd7b8_wksig8.jpg"
+                className=" w-full object-contain border  h-full  rounded-lg "
+                src="https://res.cloudinary.com/dalpf8iip/image/upload/v1753016620/Payment_Banner_Jul24_V1-03_wstm6a.png"
                 width={500}
                 height={700}
                 alt="sslcommerz"
