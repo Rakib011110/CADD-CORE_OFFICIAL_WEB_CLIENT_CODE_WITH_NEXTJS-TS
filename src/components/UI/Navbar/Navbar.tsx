@@ -104,16 +104,12 @@ export default function Navbar() {
       <div className="hidden md:flex items-center space-x-6 text-white font-semibold">
         {user ? (
           <>
-            {user.emailVerified && (
-              <>
-                <motion.div whileHover={{ scale: 1.05 }}>
-                  <Notifications />
-                </motion.div>
-                <motion.div whileHover={{ scale: 1.05 }}>
-                  <Link href="/dashboard/manage-courses">ড্যাশবোর্ড</Link>
-                </motion.div>
-              </>
-            )}
+            <motion.div whileHover={{ scale: 1.05 }}>
+              <Notifications />
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.05 }}>
+              <Link href="/dashboard/manage-courses">ড্যাশবোর্ড</Link>
+            </motion.div>
             <motion.button
               whileHover={{ scale: 1.05 }}
               onClick={handleLogout}
@@ -203,14 +199,12 @@ export default function Navbar() {
             {/* Mobile Auth */}
             {user ? (
               <div className="flex flex-col gap-2 px-6">
-                {user.emailVerified && (
-                  <Link
-                    href="/dashboard/manage-courses"
-                    className="text-white bg-green-600 py-2 rounded-lg text-center"
-                    onClick={() => setMobileMenuOpen(false)}>
-                    ড্যাশবোর্ড
-                  </Link>
-                )}
+                <Link
+                  href="/dashboard/manage-courses"
+                  className="text-white bg-green-600 py-2 rounded-lg text-center"
+                  onClick={() => setMobileMenuOpen(false)}>
+                  ড্যাশবোর্ড
+                </Link>
                 <button
                   onClick={handleLogout}
                   className="text-white bg-red-700 py-2 rounded-lg"

@@ -35,10 +35,12 @@ export async function middleware(request: NextRequest) {
 
   // Check if email is verified
 // Fix: Ensure boolean comparison
-const isEmailVerified = user.emailVerified === true || user.emailVerified === 'true';
-if (!isEmailVerified && (pathname.startsWith("/dashboard") || pathname.startsWith("/user-profile"))) {
-  return NextResponse.redirect(new URL('/verify-email', request.url));
-}
+// const isEmailVerified = user.emailVerified === true || user.emailVerified === 'true';
+// if (!isEmailVerified && (pathname.startsWith("/dashboard") || pathname.startsWith("/user-profile"))) {
+//   return NextResponse.redirect(new URL('/verify-email', request.url));
+// }
+
+
   // Check if user has access to the requested path
   const userRole = user.role as Role;
   const allowedRoutes = roleBasedRoutes[userRole];

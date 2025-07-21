@@ -8,9 +8,9 @@ import {
   DialogTitle,
 } from "@/components/UI/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/UI/tabs";
-import LoginForm from "./LoginForm";
 import RegisterForm from "./RegisterForm";
 import { LogIn, UserPlus } from "lucide-react";
+import { LoginForm } from "./LoginForm";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -29,6 +29,7 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
   }, [isOpen, defaultTab]);
 
   const handleSuccess = () => {
+    // Don't redirect - just close modal and refresh the page to update user state
     onClose();
     // Small delay to allow the modal to close before reloading
     setTimeout(() => {
@@ -51,9 +52,9 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
           </DialogHeader>
         </div>
 
-        <div className="p-6">
+        <div className="p-4">
           <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "login" | "register")} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-6 bg-gray-100">
+            <TabsList className="grid w-full grid-cols-2 mb-4 bg-gray-100">
               <TabsTrigger 
                 value="login" 
                 className="flex items-center gap-2 text-sm font-medium data-[state=active]:bg-white data-[state=active]:text-red-600 data-[state=active]:shadow-sm"
@@ -71,16 +72,16 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
             </TabsList>
 
             <TabsContent value="login" className="mt-0">
-              <LoginForm onSuccess={handleSuccess} />
+              <LoginForm onSuccess={handleSuccess} hideHeader={true} />
             </TabsContent>
 
             <TabsContent value="register" className="mt-0">
-              <RegisterForm onSuccess={handleSuccess} />
+              <RegisterForm onSuccess={handleSuccess} hideHeader={true} />
             </TabsContent>
           </Tabs>
         </div>
 
-        <div className="bg-gray-50 px-6 py-4 border-t">
+        <div className="bg-gray-50 px-4 py-3 border-t">
           <p className="text-xs text-gray-500 text-center">
             আপনার তথ্য সুরক্ষিত এবং গোপনীয় রাখা হবে
           </p>

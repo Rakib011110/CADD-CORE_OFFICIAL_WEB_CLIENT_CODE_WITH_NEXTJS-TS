@@ -4,15 +4,15 @@ import { useMutation } from "@tanstack/react-query";
 
 
 import { getCurrentUser, loginUser, registerUser } from "../services/AuthService/index";
-import { ReactElement, JSXElementConstructor, ReactNode, ReactPortal } from "react";
-import { AxiosError } from "axios";
 import { useUser } from "@/context/user.provider";
 
 export const useUserRegistration = () => {
+  const { setUser } = useUser();
+
   return useMutation<any, Error, FieldValues>({
     mutationKey: ["USER_REGISTRATION"],
     mutationFn: async (userData: FieldValues) => await registerUser(userData),
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       // Check if the response indicates an error
       if (data.success === false) {
         toast.error(data.error || "Registration failed. Please try again.");
@@ -20,6 +20,9 @@ export const useUserRegistration = () => {
       }
 
       toast.success("User registration successful");
+      
+      const currentUser = await getCurrentUser();
+      setUser(currentUser ?? null);
     },
     onError: (error) => {
       // Fallback error handling for any other errors

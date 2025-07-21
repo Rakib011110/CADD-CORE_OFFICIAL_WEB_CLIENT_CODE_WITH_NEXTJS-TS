@@ -33,11 +33,13 @@ function SignUpContent() {
         duration: 5000,
         position: 'top-center',
       });
-      router.push('/email-verification-info');
+      // Redirect back to previous page or home instead of forcing email verification
+      if (redirect) {
+        router.push(redirect);
+      } else {
+        router.push('/');
+      }
     }
-
-
-    
 
     if (
       !isPending &&

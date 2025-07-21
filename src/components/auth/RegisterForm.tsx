@@ -1,19 +1,73 @@
-"use client";
+'use client';
 
-import React from "react";
-import { FieldValues, SubmitHandler } from "react-hook-form";
-import { useUserRegistration } from "@/hooks/auth.hook";
-import CaddForm from "@/components/resubaleform/CaddForm";
-import CaddInput from "@/components/resubaleform/CaddInput";
-import { Button } from "@/components/UI/button";
-import { toast } from "sonner";
+import React, { useEffect, Suspense } from 'react';
+import { FieldValues, SubmitHandler, useForm, Controller, FormProvider } from 'react-hook-form';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useUserRegistration } from '@/hooks/auth.hook';
+import CaddForm from '@/components/resubaleform/CaddForm';
+import { Button } from '@/components/UI/button';
+import CaddInput from '@/components/resubaleform/CaddInput';
+import { motion } from 'framer-motion';
+import { toast } from 'sonner';
+import Link from 'next/link';
 
 interface RegisterFormProps {
   onSuccess?: () => void;
+  hideHeader?: boolean;
 }
 
-export default function RegisterForm({ onSuccess }: RegisterFormProps) {
-  const { mutate: handleUserRegistration, isPending } = useUserRegistration();
+function SignUpContent({ onSuccess, hideHeader = false }: RegisterFormProps) {
+  const searchParams = useSearchParams();
+  const redirect = searchParams?.get('redirect');
+  const router = useRouter();
+
+  const methods = useForm<FieldValues>();
+  const { handleSubmit } = methods;
+
+  const {
+    mutate: handleUserRegistration,
+    isSuccess,
+    isPending,
+    isError,
+    error,
+  } = useUserRegistration();
+
+  useEffect(() => {
+    if (!isPending && isSuccess) {
+      toast.success('Registration successful! Please check your email to verify your account.', {
+        duration: 5000,
+        position: 'top-center',
+      });
+      
+      if (onSuccess) {
+        // If onSuccess callback is provided (modal context), call it instead of redirecting
+        onSuccess();
+      } else {
+        // Default behavior - redirect back to previous page or home
+        if (redirect) {
+          router.push(redirect);
+        } else {
+          router.push('/');
+        }
+      }
+    }
+
+    if (
+      !isPending &&
+      isError &&
+      typeof error === 'object' &&
+      error !== null &&
+      'response' in error &&
+      (error as any).response?.data?.message
+    ) {
+      const message = (error as any).response.data.message;
+      toast.error(
+        message.toLowerCase().includes('duplicate')
+          ? 'Email is already in use. Try logging in or use another email.'
+          : message
+      );
+    }
+  }, [isSuccess, isPending, isError, error, router]);
 
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     const userData = {
@@ -22,81 +76,95 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
     };
 
     localStorage.setItem('emailForVerification', data.email);
-    
-    handleUserRegistration(userData, {
-      onSuccess: () => {
-        toast.success("রেজিস্ট্রেশন সফল! আপনার ইমেইল যাচাই করুন।", {
-          duration: 5000,
-        });
-        // Store success message for email verification
-        localStorage.setItem('registrationSuccess', 'true');
-        onSuccess?.();
-      },
-      onError: (error: any) => {
-        const message = error?.response?.data?.message || error?.message;
-        toast.error(
-          message?.toLowerCase().includes('duplicate')
-            ? 'ইমেইল ইতিমধ্যে ব্যবহৃত হয়েছে। অন্য ইমেইল ব্যবহার করুন।'
-            : message || 'রেজিস্ট্রেশনে সমস্যা হয়েছে।'
-        );
-      },
-    });
+    handleUserRegistration(userData);
   };
 
   return (
-    <div className="space-y-6">
-      <div className="text-center">
-        <h3 className="text-2xl font-bold text-gray-900">রেজিস্টার করুন</h3>
-        <p className="text-gray-600 mt-2">নতুন অ্যাকাউন্ট তৈরি করুন</p>
+  <div className="bg-gradient-to-b from-gray-50 to-gray-100  flex justify-center items-center px-4 ">
+  <motion.div
+    initial={{ opacity: 0, y: 60 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.8 }}
+    className="shadow-xl rounded-xl p-8 bg-white w-full max-w-md border border-gray-200"
+  >
+    {!hideHeader && (
+      <div className="text-center mb-8">
+        <h3 className="text-3xl font-bold text-gray-900 mb-2">
+          CADD CORE – <span className="text-[#F01A24]">Knowledge to Design</span>
+        </h3>
+        <div className="w-16 h-1 bg-[#F01A24] mx-auto mb-4 rounded-full"></div>
+        <p className="text-gray-600">
+          Create your account and get started!
+        </p>
       </div>
+    )}
 
-      <CaddForm onSubmit={onSubmit}>
+    <CaddForm onSubmit={handleSubmit(onSubmit)}>
+      <FormProvider {...methods}>
         <div className="space-y-4">
-          <CaddInput
-            label="নাম"
-            name="name"
-            placeholder="আপনার নাম লিখুন"
-            required
+          <CaddInput 
+            label="Name" 
+            name="name" 
+            placeholder="Enter your name" 
+            size="sm" 
           />
-          
-          <CaddInput
-            label="ইমেইল"
-            name="email"
-            placeholder="আপনার ইমেইল লিখুন"
-            type="email"
-            required
+          <CaddInput 
+            label="Email" 
+            name="email" 
+            placeholder="Enter your email" 
+            size="sm" 
+          /> 
+          <CaddInput 
+            label="Mobile Number" 
+            name="mobileNumber" 
+            placeholder="Enter your mobile number" 
+            size="sm" 
           />
-          
-          <CaddInput
-            label="মোবাইল নম্বর"
-            name="mobileNumber"
-            placeholder="আপনার মোবাইল নম্বর লিখুন"
-            required
-          />
-          
-          <CaddInput
-            label="পাসওয়ার্ড"
-            name="password"
-            placeholder="আপনার পাসওয়ার্ড লিখুন"
-            type="password"
-            required
+          <CaddInput 
+            label="Password" 
+            name="password" 
+            placeholder="Enter your password" 
+            size="sm" 
+            type="password" 
           />
 
           <Button
-            className="w-full py-3 text-lg font-semibold text-white bg-gradient-to-r from-red-600 to-rose-600 rounded-lg hover:from-red-700 hover:to-rose-700 transition-all shadow-lg hover:shadow-xl"
+            className="mt-6 w-full rounded-lg bg-[#F01A24] hover:bg-[#D4141E] text-white font-semibold py-3 transition-colors duration-300 shadow-md hover:shadow-lg"
+            size="lg"
             type="submit"
             disabled={isPending}
           >
-            {isPending ? "রেজিস্টার হচ্ছে..." : "রেজিস্টার করুন"}
+            {isPending ? (
+              <span className="flex items-center justify-center">
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Registering...
+              </span>
+            ) : "Register"}
           </Button>
-          
-          <div className="text-center mt-4">
-            <p className="text-xs text-gray-500">
-              রেজিস্ট্রেশনের পর আপনার ইমেইল যাচাই করতে হবে
-            </p>
-          </div>
         </div>
-      </CaddForm>
-    </div>
+      </FormProvider>
+    </CaddForm>
+
+    {!hideHeader && (
+      <div className="mt-6 text-center text-sm text-gray-500">
+        Already have an account?{' '}
+        <Link href="/login" className="font-medium text-[#F01A24] hover:text-[#D4141E]">
+          Sign in
+        </Link>
+      </div>
+    )}
+  </motion.div>
+</div>
+  );
+}
+
+export default function RegisterForm({ onSuccess, hideHeader }: RegisterFormProps = {}) {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SignUpContent onSuccess={onSuccess} hideHeader={hideHeader} />
+    </Suspense>
   );
 }
