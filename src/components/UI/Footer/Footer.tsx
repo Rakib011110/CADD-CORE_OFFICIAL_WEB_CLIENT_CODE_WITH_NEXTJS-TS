@@ -84,9 +84,24 @@ export default function Footer() {
               height={100}
               alt="Caddcore Logo"
             />
-          </div>
-        </div>
+          </div> 
+
+          
+        </div> 
+
+        
       </div>
+<div className="max-w-6xl mx-auto mt-3 ">
+            <Image 
+            className="w-full mx-auto h-auto bg-black"
+              src="https://res.cloudinary.com/dalpf8iip/image/upload/v1753097013/0_c8xd5e.png"
+              width={1000}
+              height={1000}
+              alt="payment method"
+            />
+          </div>
+
+      
     </footer>
   );
 }
