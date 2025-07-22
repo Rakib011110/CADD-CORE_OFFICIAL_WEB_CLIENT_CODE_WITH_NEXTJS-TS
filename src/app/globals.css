@@ -123,6 +123,27 @@
   font-style: normal;
 }
 
+@font-face {
+  font-family: "banglaFontAlt1";
+  src: url("/fonts/LiAbuJMAkkasUnicode.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "banglaFontAlt2";
+  src: url("/fonts/SutonnySushreeMJRegular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "banglaFontAlt3";
+  src: url("/fonts/LiMehdiEkusheyUnicode.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
 
 @layer base {
   * {

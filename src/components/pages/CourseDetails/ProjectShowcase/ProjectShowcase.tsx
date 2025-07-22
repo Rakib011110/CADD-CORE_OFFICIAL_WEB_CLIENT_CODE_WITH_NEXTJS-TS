@@ -76,8 +76,6 @@ const ProjectShowcase: NextPage = () => {
             A curated collection of our latest engineering and architectural designs.
           </p>
         </header>
-
-        {/* Responsive grid layout for the project cards */}
         <main className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
           {projects.map((project) => (
             <ProjectCard key={project.id} project={project} />

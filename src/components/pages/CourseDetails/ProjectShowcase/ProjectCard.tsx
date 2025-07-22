@@ -1,18 +1,23 @@
 import React, { useState } from 'react';
 import { Project } from './ProjectShowcase';
+import { ImageModal } from './ImageModal';
 
-// --- Sub-component: ProjectCard ---
-// Renders a single project with the interactive vertical image stack.
 export const ProjectCard = ({ project }: { project: Project }) => {
-  // State to track the index of the hovered image. `null` means no image is hovered.
+ 
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+
+  // Function to open the modal with the clicked image
+  const handleImageClick = (index: number) => {
+    setSelectedImageIndex(index);
+    setModalIsOpen(true);
+  };
   return (
     <div className="rounded-2xl overflow-hidden border border-gray-800/50 transition-all duration-300 hover:border-gray-500/80 hover:shadow-2xl hover:shadow-gray-900/40">
       <div className="p-6">
-        {/* The image stack container. 
-            `onMouseLeave` resets the hover state when the cursor leaves the entire container.
-        */}
+       
         <div 
           className="relative h-96 mb-6"
           onMouseLeave={() => setHoveredIndex(null)}
@@ -57,6 +62,7 @@ export const ProjectCard = ({ project }: { project: Project }) => {
                   src={src}
                   alt={`Project image ${index + 1}`}
                   className="w-full h-full object-cover"
+                      onClick={() => handleImageClick(index)}
                   onError={(e) => {
                     (e.target as HTMLImageElement).src = 'https://placehold.co/600x400/ff0000/ffffff?text=Error';
                   }}
@@ -71,6 +77,14 @@ export const ProjectCard = ({ project }: { project: Project }) => {
         <p className="text-gray-400 text-sm leading-relaxed">
           Detailed design and structural analysis for a modern high-rise. View the gallery to see floor plans, 3D models, and facade details.
         </p>
+
+          {modalIsOpen && (
+        <ImageModal
+          images={project.images}
+          currentIndex={selectedImageIndex}
+          onClose={() => setModalIsOpen(false)}
+        />
+      )}
       </div>
     </div>
   );

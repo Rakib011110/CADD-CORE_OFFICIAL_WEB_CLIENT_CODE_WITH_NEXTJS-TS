@@ -43,6 +43,8 @@
     "embla-carousel-react": "^8.5.2",
     "framer-motion": "^12.4.10",
     "gsap": "^3.13.0",
+    "html2canvas": "^1.4.1",
+    "html2pdf.js": "^0.10.3",
     "js-cookie": "^3.0.5",
     "jsonwebtoken": "^9.0.2",
     "jspdf": "^3.0.1",

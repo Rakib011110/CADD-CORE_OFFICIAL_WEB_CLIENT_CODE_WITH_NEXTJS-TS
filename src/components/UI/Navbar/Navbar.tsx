@@ -101,7 +101,7 @@ export default function Navbar() {
       </div>
 
       {/* Desktop Auth */}
-      <div className="hidden md:flex items-center space-x-6 text-white font-semibold">
+      <div className=" md:flex items-center space-x-6 text-white font-semibold">
         {user ? (
           <>
             <motion.div whileHover={{ scale: 1.05 }}>
@@ -122,7 +122,7 @@ export default function Navbar() {
           <motion.div whileHover={{ scale: 1.05 }}>
             <Link
               href="/login"
-              className="bg-white text-[#F01A24] font-bold px-4 py-2 rounded-lg shadow-md hover:bg-gray-100">
+              className="bg-white text-[#F01A24] px-2 py-1 font-bold md:px-4 md:py-2 rounded-lg shadow-md   hover:bg-gray-100">
               সাইন ইন করুন
             </Link>
 

@@ -7,10 +7,87 @@ import Link from "next/link";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { useGetPaymentStatusQuery } from "@/redux/api/payment/paymentStatusApi";
+import { generatePaymentReceiptPDF, generateSimpleReceiptPDF } from "@/lib/pdfGenerator";
+import { generateHTMLToPDF } from "@/lib/htmlToPdfGenerator";
+import { mapBengaliCourseTitle } from "@/lib/courseTitleMapping";
+
+// Function to convert Bengali text to safe format for PDF
+const convertBengaliToSafeText = (text: string): string => {
+    // If text contains Bengali characters, convert to transliteration or use safe replacement
+    const bengaliPattern = /[\u0980-\u09FF]/;
+    if (bengaliPattern.test(text)) {
+        // Replace common Bengali words with English equivalents for PDF
+        return text
+            .replace(/কোর্স/g, 'Course')
+            .replace(/প্রশিক্ষণ/g, 'Training')
+            .replace(/ইনস্টিটিউট/g, 'Institute')
+            .replace(/সার্টিফিকেট/g, 'Certificate')
+            .replace(/ছাত্র/g, 'Student')
+            .replace(/ছাত্রী/g, 'Student')
+            .replace(/শিক্ষার্থী/g, 'Student')
+            .replace(/পেমেন্ট/g, 'Payment')
+            .replace(/টাকা/g, 'BDT')
+            .replace(/৳/g, 'BDT')
+            .replace(/ডিজাইন/g, 'Design')
+            .replace(/অটোক্যাড/g, 'AutoCAD')
+            .replace(/ক্যাড/g, 'CAD')
+            // Remove other Bengali characters that might cause issues
+            .replace(/[\u0980-\u09FF]/g, '');
+    }
+    return text;
+};
+
+// Function to load Bengali font for PDF with better error handling
+const loadBengaliFont = async (doc: jsPDF): Promise<boolean> => {
+    try {
+        // Try multiple font sources
+        const fontSources = [
+            '/fonts/HindSiliguri-Regular.ttf',
+            '/fonts/LiAbuJMAkkasUnicode.ttf',
+            '/fonts/SutonnySushreeMJRegular.ttf'
+        ];
+
+        for (const fontPath of fontSources) {
+            try {
+                const fontResponse = await fetch(fontPath);
+                if (!fontResponse.ok) continue;
+
+                const fontArrayBuffer = await fontResponse.arrayBuffer();
+                
+                // Use a more reliable method to convert to base64
+                const fontBytes = new Uint8Array(fontArrayBuffer);
+                let binary = '';
+                for (let i = 0; i < fontBytes.byteLength; i++) {
+                    binary += String.fromCharCode(fontBytes[i]);
+                }
+                const fontBase64 = btoa(binary);
+                
+                // Add the custom font to jsPDF
+                const fontName = fontPath.split('/').pop()?.split('.')[0] || 'BengaliFont';
+                doc.addFileToVFS(`${fontName}.ttf`, fontBase64);
+                doc.addFont(`${fontName}.ttf`, fontName, 'normal');
+                
+                // Test if font was added successfully
+                doc.setFont(fontName);
+                console.log(`✅ Bengali font loaded successfully: ${fontName}`);
+                return true;
+            } catch (fontError) {
+                console.warn(`❌ Failed to load font ${fontPath}:`, fontError);
+                continue;
+            }
+        }
+        
+        throw new Error('No Bengali fonts could be loaded');
+    } catch (error) {
+        console.warn('❌ Bengali font could not be loaded. Using text conversion fallback:', error);
+        return false;
+    }
+};
 
 export default function PaymentSuccessPage() {
     const [isValid, setIsValid] = useState(false);
     const [retryCount, setRetryCount] = useState(0);
+    const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
     const params = useParams();
 
     const transactionId = Array.isArray(params.transactionId)
@@ -81,20 +158,66 @@ export default function PaymentSuccessPage() {
         }
     }, [paymentData, error, retryCount, refetch]);
 
-    const handleDownloadInvoice = () => {
+    const handleDownloadInvoice = async () => {
         if (!paymentData || !paymentData.data) return;
-        const { data } = paymentData;
         
-        // Initialize PDF with proper fonts to prevent encoding issues
+        setIsGeneratingPDF(true);
+        try {
+            const { data } = paymentData;
+            
+            // Try HTML-to-PDF first (best Bengali font support)
+            try {
+                await generateHTMLToPDF(data);
+                toast.success('PDF with Bengali font generated successfully!');
+                return;
+            } catch (htmlError) {
+                console.warn('HTML-to-PDF generation failed, trying enhanced PDF:', htmlError);
+            }
+            
+            // Try the enhanced PDF generator second
+            try {
+                await generatePaymentReceiptPDF(data);
+                toast.success('Enhanced PDF generated successfully!');
+                return;
+            } catch (enhancedError) {
+                console.warn('Enhanced PDF generation failed, trying simple version:', enhancedError);
+            }
+            
+            // Try simple PDF generator third
+            try {
+                generateSimpleReceiptPDF(data);
+                toast.success('PDF generated successfully!');
+                return;
+            } catch (simpleError) {
+                console.error('Simple PDF generation also failed, using fallback:', simpleError);
+            }
+            
+            // Final fallback to original method with better text handling
+            await generateFallbackPDF(data);
+            toast.success('PDF generated with basic formatting!');
+            
+        } catch (error) {
+            console.error('All PDF generation methods failed:', error);
+            toast.error('Failed to generate PDF. Please try again or contact support.');
+        } finally {
+            setIsGeneratingPDF(false);
+        }
+    };
+
+    // Fallback PDF generation method
+    const generateFallbackPDF = async (data: any) => {
+        // Use course title mapping for better results
+        const safeCourseTitle = mapBengaliCourseTitle(data?.course?.title) || 'Course Enrollment Fee';
+        const safeUserName = convertBengaliToSafeText(data.user.name || 'Student');
+        
+        // Initialize PDF with proper settings
         const doc = new jsPDF({
             orientation: "portrait",
-            unit: "mm"
+            unit: "mm",
+            format: "a4"
         });
 
-        // Add company logo (if available)
-        // doc.addImage(logo, 'PNG', 15, 10, 30, 15);
-
-        // Set font to prevent character encoding issues
+        // Use helvetica font for maximum compatibility
         doc.setFont("helvetica", "normal");
 
         // Header Section
@@ -128,16 +251,17 @@ export default function PaymentSuccessPage() {
         doc.setTextColor(40, 40, 40);
         doc.text("Student Information:", 15, 70);
         doc.setFontSize(10);
-        doc.text(`Name: ${data.user.name}`, 15, 76);
+        doc.text(`Name: ${safeUserName}`, 15, 76);
         doc.text(`Email: ${data.user.email}`, 15, 81);
         doc.text(`Phone: ${data.user.phone || 'N/A'}`, 15, 86);
+        doc.text(`Course: ${safeCourseTitle}`, 15, 91);
 
-        // Payment Details Table
+        // Payment Details Table with safe text
         autoTable(doc, {
             startY: 95,
             head: [['Description', 'Amount (BDT)']],
             body: [
-                ['Course Enrollment Fee', `${data.amount.toFixed(2)}`],
+                [safeCourseTitle, `${data.amount.toFixed(2)}`],
                 ['Payment Method', `${data.cardType} (${data.cardIssuer})`],
                 ['Status', 'Completed']
             ],
@@ -145,7 +269,11 @@ export default function PaymentSuccessPage() {
             headStyles: { 
                 fillColor: [38, 38, 38],
                 textColor: [255, 255, 255],
-                fontStyle: 'bold'
+                fontStyle: 'bold',
+                font: 'helvetica'
+            },
+            bodyStyles: {
+                font: 'helvetica'
             },
             columnStyles: {
                 0: { cellWidth: 'auto' },
@@ -159,7 +287,7 @@ export default function PaymentSuccessPage() {
         // Total Amount
         doc.setFontSize(12);
         doc.setTextColor(40, 40, 40);
-        doc.text("       ", 150, finalY + 10);
+        doc.text("Total Amount:", 120, finalY + 10);
         doc.setFontSize(14);
         doc.setTextColor(0, 0, 0);
         doc.text(`${data.amount.toFixed(2)} BDT`, 170, finalY + 10, { align: "right" });
@@ -247,7 +375,7 @@ export default function PaymentSuccessPage() {
                     <div className="space-y-3">
                         <Link 
                             href="/support" 
-                            className="block w-full bg-blue-600 text-white px-4 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                            className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
                         >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
@@ -256,7 +384,7 @@ export default function PaymentSuccessPage() {
                         </Link>
                         <Link 
                             href="/courses" 
-                            className="block w-full border border-gray-300 text-gray-700 px-4 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+                            className="w-full border border-gray-300 text-gray-700 px-4 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors"
                         >
                             Back to Courses
                         </Link>
@@ -379,13 +507,61 @@ export default function PaymentSuccessPage() {
                     <div className="flex flex-col sm:flex-row gap-4">
                         <button 
                             onClick={handleDownloadInvoice}
-                            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2"
+                            disabled={isGeneratingPDF}
+                            className={`flex-1 ${isGeneratingPDF ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'} text-white font-medium py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2`}
                         >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                            </svg>
-                            Download Receipt
+                            {isGeneratingPDF ? (
+                                <svg className="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 2v4m0 12v4m9-9h-4M7 12H3m15.364-6.364l-2.828 2.828M9.464 9.464L6.636 6.636m9.192 9.192l2.828 2.828M9.464 14.536l-2.828 2.828" />
+                                </svg>
+                            ) : (
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                </svg>
+                            )}
+                            {isGeneratingPDF ? 'Generating PDF...' : 'Download Receipt (Auto)'}
                         </button>
+                        
+                        {/* Alternative download methods for testing */}
+                        <div className="flex gap-2">
+                            <button 
+                                onClick={async () => {
+                                    if (!paymentData?.data) return;
+                                    setIsGeneratingPDF(true);
+                                    try {
+                                        await generateHTMLToPDF(paymentData.data);
+                                        toast.success('HTML-to-PDF generated!');
+                                    } catch (error) {
+                                        toast.error('HTML-to-PDF failed');
+                                    }
+                                    setIsGeneratingPDF(false);
+                                }}
+                                disabled={isGeneratingPDF}
+                                className="px-3 py-2 text-xs bg-green-600 hover:bg-green-700 text-white rounded"
+                                title="Generate using HTML-to-PDF (Best Bengali support)"
+                            >
+                                HTML
+                            </button>
+                            <button 
+                                onClick={async () => {
+                                    if (!paymentData?.data) return;
+                                    setIsGeneratingPDF(true);
+                                    try {
+                                        generateSimpleReceiptPDF(paymentData.data);
+                                        toast.success('Simple PDF generated!');
+                                    } catch (error) {
+                                        toast.error('Simple PDF failed');
+                                    }
+                                    setIsGeneratingPDF(false);
+                                }}
+                                disabled={isGeneratingPDF}
+                                className="px-3 py-2 text-xs bg-purple-600 hover:bg-purple-700 text-white rounded"
+                                title="Generate using Simple jsPDF (English only)"
+                            >
+                                Simple
+                            </button>
+                        </div>
+                        
                         <button 
                             onClick={handlePrint}
                             className="flex-1 bg-white hover:bg-gray-50 text-gray-700 font-medium py-3 px-6 rounded-lg transition-colors border border-gray-300 flex items-center justify-center gap-2"
