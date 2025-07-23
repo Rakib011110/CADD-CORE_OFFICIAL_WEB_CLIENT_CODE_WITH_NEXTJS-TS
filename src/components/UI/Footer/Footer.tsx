@@ -61,8 +61,8 @@ export default function Footer() {
          <li><a href="https://www.facebook.com/groups/caddcore" className="hover:text-white">ইঞ্জিনিয়ারিং কমিউনিটি গ্রুপ</a></li>
          <li><a href="https://www.facebook.com/caddcorebd" className="hover:text-white">ফেসবুক পেজ</a></li>
 
-            <li><a href="http://localhost:3000/privecy-policy" className="hover:text-white">প্রাইভেসি পলিসি</a></li>
-            <li><a href="#" className="hover:text-white">রিফান্ড পলিসি</a></li>
+            <li><a href="https://www.caddcore.net/privecy-policy" className="hover:text-white">প্রাইভেসি পলিসি</a></li>
+            <li><a href="https://www.caddcore.net/privecy-policy" className="hover:text-white">রিফান্ড পলিসি</a></li>
           </ul>
         </div>
             
