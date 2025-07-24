@@ -90,9 +90,11 @@ export default function PaymentSuccessPage() {
     const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
     const params = useParams();
 
-    const transactionId = Array.isArray(params.transactionId)
-        ? params.transactionId[0]
-        : params.transactionId;
+    const transactionId = params && params.transactionId
+        ? (Array.isArray(params.transactionId)
+            ? params.transactionId[0]
+            : params.transactionId)
+        : undefined;
 
     const { data: paymentData, isLoading, error, refetch } = useGetPaymentStatusQuery(
         transactionId ?? "",

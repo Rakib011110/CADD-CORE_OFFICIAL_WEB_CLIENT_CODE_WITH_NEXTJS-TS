@@ -10,9 +10,11 @@ export default function PaymentCancelPage() {
   const [isValid, setIsValid] = useState(false);
   const params = useParams();
   
-  const transactionId = Array.isArray(params.transactionId)
+  const transactionId: string | undefined = params && Array.isArray(params.transactionId)
     ? params.transactionId[0]
-    : params.transactionId;
+    : typeof params?.transactionId === "string"
+      ? params.transactionId
+      : undefined;
 
   const { data: paymentData, isLoading, error } = useGetPaymentStatusQuery(
     transactionId ?? "",

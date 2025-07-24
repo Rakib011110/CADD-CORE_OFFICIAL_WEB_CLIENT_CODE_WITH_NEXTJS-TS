@@ -25,9 +25,11 @@ export default function FailedPaymentTransaction() {
   const params = useParams();
   
   // Get transaction ID safely
-  const transactionId = Array.isArray(params.transactionId)
-    ? params.transactionId[0]
-    : params.transactionId;
+  const transactionId = params && params.transactionId
+    ? (Array.isArray(params.transactionId)
+        ? params.transactionId[0]
+        : params.transactionId)
+    : undefined;
 
   // Query payment status
   const { data: paymentData, isLoading, error } = useGetPaymentStatusQuery(
