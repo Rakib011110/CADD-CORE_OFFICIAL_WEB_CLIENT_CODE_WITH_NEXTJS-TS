@@ -74,7 +74,7 @@ const PrivacyPolicy: React.FC = () => {
       id: 'terms', 
       label: 'Terms & Conditions', 
       icon: FileText,
-      color: 'from-blue-600 to-indigo-600',
+      color: 'from-gray-950 to-gray-900',
       accentColor: 'blue'
     },
     { 
@@ -182,7 +182,7 @@ const PrivacyPolicy: React.FC = () => {
         },
         {
           title: "3. Data Sharing",
-          description: "We do not sell your data. We may share it with:",
+          description: "We do not sell your data.",
           items: [
             "Affiliated certification bodies",
             "Government bodies (if legally required)",
@@ -256,7 +256,7 @@ const PrivacyPolicy: React.FC = () => {
         {
           title: "2. Personal Contact and Boundaries",
           items: [
-            "Students are **not allowed** to send personal messages to female students or any instructor/faculty using the name of the institute, whether through social media, WhatsApp, or any other platform.",
+          
             "Any form of personal communication that breaches professional boundaries will be considered a violation of institutional ethics and may lead to **disciplinary action**."
           ]
         },
@@ -407,7 +407,7 @@ const PrivacyPolicy: React.FC = () => {
           <div className="lg:w-80 flex-shrink-0">
             <div className="sticky top-8">
               <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-                <div className="p-6 bg-gradient-to-r from-blue-600 to-indigo-600">
+                <div className="p-6 bg-gradient-to-r from-red-600 to-red-600">
                   <h3 className="text-lg font-semibold text-white">Quick Navigation</h3>
                 </div>
                 <nav className="p-2">

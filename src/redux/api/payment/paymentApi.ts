@@ -49,16 +49,11 @@ const paymentApi = baseApi.injectEndpoints({
       query: (userId: string) => `/payments/my-payments/${userId}`,
     }),
 
-    // 🔧 Admin: Get payments with simple pagination
-    getPaymentsWithFilters: builder.query({
-      query: ({ page = 1, limit = 10 }) => 
-        `/payments/admin/payments?page=${page}&limit=${limit}`,
-    }),
 
     // 🔧 Admin: Mark payment as checked
-    markPaymentAsChecked: builder.mutation({
-      query: (transactionId: string) => ({
-        url: `/payments/admin/mark-checked/${transactionId}`,
+    updatePayment: builder.mutation({
+      query: (id: string) => ({
+        url: `/payments/update/${id}`,
         method: 'PUT',
       }),
     }),
@@ -69,10 +64,7 @@ const paymentApi = baseApi.injectEndpoints({
         `/payments/admin/user-history/${userId}?page=${page}&limit=${limit}`,
     }),
 
-    // 🔧 Admin: Get payment statistics (simple)
-    getPaymentStatistics: builder.query({
-      query: () => `/payments/admin/statistics`,
-    }),
+   
   }),
 });
 
@@ -85,10 +77,8 @@ export const {
   useGetMyPaymentsQuery,
   useCreatePaymentMutation,
   // Admin hooks
-  useGetPaymentsWithFiltersQuery,
-  useMarkPaymentAsCheckedMutation,
+  useUpdatePaymentMutation,
   useGetUserPaymentHistoryQuery,
-  useGetPaymentStatisticsQuery,
 } = paymentApi;
 
 

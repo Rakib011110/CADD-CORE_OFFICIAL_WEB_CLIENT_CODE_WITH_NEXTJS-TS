@@ -12,6 +12,8 @@ import {
   Loader2,
   User2,
   Phone,
+  Check,
+  X,
 } from "lucide-react";
 
 // --- Import your actual hooks from your project structure ---
@@ -21,6 +23,7 @@ import { toast } from "sonner";
 import { useUser } from "@/context/user.provider";
 import Image from "next/image";
 import { AuthModal } from "@/components/auth";
+import { TermsAndConditionsModal } from "../../Payments/TermsAndConditionsModal/TermsAndConditionsModal";
 
 // --- Interfaces (ensure these match your API response structures) ---
 interface APIInstallmentPlan {
@@ -51,6 +54,7 @@ interface CourseFeesProps {
   course: Course;
 }
 
+
 // --- Main Exported Component ---
 export default function CourseFees({ course }: CourseFeesProps) {
   // --- HOOKS ---
@@ -77,6 +81,8 @@ export default function CourseFees({ course }: CourseFeesProps) {
   const [installmentPlanDiscountAmount, setInstallmentPlanDiscountAmount] =
     useState(0);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   // --- EFFECTS ---
 
@@ -118,7 +124,7 @@ export default function CourseFees({ course }: CourseFeesProps) {
     if (selectedPlanDetails) {
       const { installments } = selectedPlanDetails;
       if (installments === 2) {
-        firstInst = course.courseFee * 0.5; // 40% of original fee
+        firstInst = course.courseFee * 0.5; // 50% of original fee
         const remaining = finalAmount - firstInst;
         subsequentInst = Math.max(0, remaining);
         numSubsequent = 1;
@@ -140,6 +146,25 @@ export default function CourseFees({ course }: CourseFeesProps) {
       setShowAuthModal(true);
       return;
     }
+    
+    if (!termsAccepted) {
+      setShowTermsModal(true);
+      return;
+    }
+    
+    // If user is logged in and terms are accepted, process payment
+    processPayment();
+  };
+
+  const handleTermsAccepted = () => {
+    setTermsAccepted(true);
+    setShowTermsModal(false);
+    // Continue with payment processing
+    processPayment();
+  };
+
+  // Extract payment processing logic to a separate function
+  const processPayment = async () => {
     const selectedPlanDetails = installmentPlans.find(
       (p) => p.name === selectedPlanName
     );
@@ -150,6 +175,11 @@ export default function CourseFees({ course }: CourseFeesProps) {
 
     if (amountToPayNow < 0) {
       toast.error("টাকার পরিমাণ সঠিক নয়।");
+      return;
+    }
+
+    if (!user) {
+      toast.error("ব্যবহারকারীর তথ্য পাওয়া যায়নি। দয়া করে লগইন করুন।");
       return;
     }
 
@@ -206,11 +236,9 @@ export default function CourseFees({ course }: CourseFeesProps) {
     return new Intl.NumberFormat("bn-BD").format(number);
   };
 
-
-
   // --- RENDER ---
   return (
-    <div id="course-fees" className=" p-4 sm:p-8 font-sans">
+    <div id="course-fees" className="p-4 sm:p-8 font-sans">
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-5 gap-8">
         {/* Left Column: Payment Details */}
         <div className="lg:col-span-3 bg-white rounded-xl shadow-2xl p-6 sm:p-8 space-y-6">
@@ -242,7 +270,20 @@ export default function CourseFees({ course }: CourseFeesProps) {
                 )}
               </div>
             ) : (
-              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200"></div>
+              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200 mb-10">
+                <div className="p-2 bg-blue-50 rounded-full">
+                  <User2 className="h-5 w-5 text-blue-600" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-medium text-gray-800">আপনি লগইন করেননি</p>
+                  <button 
+                    onClick={() => setShowAuthModal(true)}
+                    className="text-sm text-blue-600 hover:underline"
+                  >
+                    পেমেন্ট করতে লগইন করুন
+                  </button>
+                </div>
+              </div>
             )}
             <div className="flex items-center gap-3 text-gray-600">
               <CalendarDays className="h-5 w-5 text-red-500" />
@@ -279,7 +320,7 @@ export default function CourseFees({ course }: CourseFeesProps) {
                         </span>
                         {plan.discountPercent > 0 && (
                           <span className="text-xs font-bold text-green-600">
-                            ({plan.discountPercent}% ছাড়)
+                            ({plan.discountPercent}% ছাড়)
                           </span>
                         )}
                       </button>
@@ -300,7 +341,7 @@ export default function CourseFees({ course }: CourseFeesProps) {
               <div className="flex justify-between items-center text-green-600">
                 <span className="flex items-center gap-1">
                   <BadgePercent size={14} /> {selectedPlanDetails?.name}{" "}
-                  প্ল্যানের ছাড়:
+                  প্ল্যানের ছাড়:
                 </span>
                 <span className="font-medium">
                   -{formatBanglaNumber(installmentPlanDiscountAmount)} ৳
@@ -356,7 +397,7 @@ export default function CourseFees({ course }: CourseFeesProps) {
                   {formatBanglaNumber(finalPayableAmount)} ৳
                 </p>
                 <p className="text-xs text-green-600 mt-1">
-                  একসাথে পেমেন্ট করে সর্বোচ্চ ছাড় উপভোগ করুন!
+                  একসাথে পেমেন্ট করে সর্বোচ্চ ছাড় উপভোগ করুন!
                 </p>
               </div>
             )}
@@ -364,7 +405,18 @@ export default function CourseFees({ course }: CourseFeesProps) {
 
           <div className="bg-white rounded-xl shadow-2xl p-6 sm:p-8 space-y-4">
             <div className="space-y-3">
-              
+              {/* Payment Summary if terms are accepted */}
+              {user && termsAccepted && (
+                <div className="p-3 bg-green-50 rounded-lg border border-green-200 mb-3">
+                  <div className="flex items-center gap-2 text-green-700 mb-1">
+                    <Check className="h-5 w-5" />
+                    <span className="font-medium">শর্তাবলী গৃহীত হয়েছে</span>
+                  </div>
+                  <p className="text-sm text-gray-600">
+                    আপনি সকল শর্তাবলীতে সম্মত হয়েছেন এবং পেমেন্ট করতে প্রস্তুত
+                  </p>
+                </div>
+              )}
               
               <button
                 onClick={handleOnlinePayment}
@@ -374,9 +426,7 @@ export default function CourseFees({ course }: CourseFeesProps) {
                   <Loader2 className="animate-spin h-5 w-5" />
                 ) : (
                   <CreditCard />
-                )} 
-
-
+                )}
                 <span>
                   {isProcessingPayment
                     ? "প্রসেস হচ্ছে..."
@@ -384,17 +434,18 @@ export default function CourseFees({ course }: CourseFeesProps) {
                 </span>
               </button>
               
-              
-              
-              
-              
               <a
                 href="https://docs.google.com/forms/d/e/1FAIpQLSe27ZcsU6VdsyYPMD4JO5VwW4d9CI3_HtTG8YRxyo43gyzGWA/viewform"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full flex items-center justify-center gap-3 bg-gray-800 text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:bg-gray-900 transition-all duration-300">
+                onClick={(e) => isProcessingPayment && e.preventDefault()}
+                className={`w-full flex items-center justify-center gap-3 ${
+                  isProcessingPayment
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-gray-800 hover:bg-gray-900"
+                } text-white font-bold py-3 px-4 rounded-lg shadow-lg transition-all duration-300`}>
                 <FileText />
-                <span>ম্যানুয়াল পেমেন্ট</span>
+                <span>ম্যানুয়াল পেমেন্ট</span>
                 <ArrowRight className="h-4 w-4" />
               </a>
             </div>
@@ -404,11 +455,9 @@ export default function CourseFees({ course }: CourseFeesProps) {
                 SSLCommerz এর মাধ্যমে ১০০% নিরাপদ।
               </p>
             </div>
-            <div
-              className="
-              flex items-center  justify-center mt-4">
+            <div className="flex items-center justify-center mt-4">
               <Image
-                className=" w-full object-contain border  h-full  rounded-lg "
+                className="w-full object-contain border h-full rounded-lg"
                 src="https://res.cloudinary.com/dalpf8iip/image/upload/v1753016620/Payment_Banner_Jul24_V1-03_wstm6a.png"
                 width={500}
                 height={700}
@@ -424,6 +473,13 @@ export default function CourseFees({ course }: CourseFeesProps) {
         isOpen={showAuthModal} 
         onClose={() => setShowAuthModal(false)} 
         defaultTab="login" 
+      />
+      
+      {/* Terms and Conditions Modal */}
+      <TermsAndConditionsModal
+        isOpen={showTermsModal}
+        onClose={() => setShowTermsModal(false)}
+        onAccept={handleTermsAccepted}
       />
     </div>
   );
