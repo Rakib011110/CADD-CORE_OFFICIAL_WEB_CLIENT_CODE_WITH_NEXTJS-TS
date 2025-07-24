@@ -58,7 +58,7 @@ interface Payment {
 const UserPaymentHistory = () => {
   const params = useParams();
   const router = useRouter();
-  const userId = params.userId as string;
+  const userId = params?.userId as string;
   const [currentPage, setCurrentPage] = useState(1);
 
   const { data: paymentData, isLoading } = useGetUserPaymentHistoryQuery({
