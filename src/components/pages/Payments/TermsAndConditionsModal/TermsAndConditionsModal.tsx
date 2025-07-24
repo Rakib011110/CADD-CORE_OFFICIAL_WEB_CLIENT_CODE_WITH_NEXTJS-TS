@@ -51,8 +51,7 @@ export const TermsAndConditionsModal: React.FC<TermsModalProps> = ({
   const [showSidebar, setShowSidebar] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
-  const [autoReadThreshold] = useState(60); // 60% threshold for auto-read
-  const [canProceedToPayment, setCanProceedToPayment] = useState(false);
+  const [readThreshold] = useState(60); // 60% threshold for completion tracking (display only)
   
   const contentRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
@@ -323,7 +322,7 @@ export const TermsAndConditionsModal: React.FC<TermsModalProps> = ({
     { icon: MapPin, label: "Address", value: "149/A, Baitush Sharaf Complex, Airport Road, Farmgate, Dhaka-1215", type: "address" }
   ];
 
-  // Enhanced scroll tracking
+  // Enhanced scroll tracking (no auto-accept)
   const handleScroll = useCallback(() => {
     const contentElement = contentRef.current;
     if (!contentElement) return;
@@ -332,13 +331,11 @@ export const TermsAndConditionsModal: React.FC<TermsModalProps> = ({
     const progress = Math.min((scrollTop / (scrollHeight - clientHeight)) * 100, 100);
     setScrollProgress(progress);
 
-    // Auto-mark sections as read and auto-accept terms
-    if (progress >= autoReadThreshold && !termsAccepted) {
-      setTermsAccepted(true);
+    // Auto-mark sections as read but don't auto-accept terms
+    if (progress >= readThreshold) {
       setReadSections(new Set(sectionsData.map(s => s.id)));
-      setCanProceedToPayment(true);
     }
-  }, [autoReadThreshold, termsAccepted, sectionsData]);
+  }, [readThreshold, sectionsData]);
 
   useEffect(() => {
     const contentElement = contentRef.current;
@@ -354,7 +351,6 @@ export const TermsAndConditionsModal: React.FC<TermsModalProps> = ({
       setReadSections(new Set());
       setShowSidebar(false);
       setScrollProgress(0);
-      setCanProceedToPayment(false);
       
       // Focus the content area for better keyboard/scroll interaction
       setTimeout(() => {
@@ -366,7 +362,7 @@ export const TermsAndConditionsModal: React.FC<TermsModalProps> = ({
   }, [isOpen]);
 
   const handleAccept = () => {
-    if (termsAccepted && canProceedToPayment) {
+    if (termsAccepted) {
       onAccept();
     }
   };
@@ -509,7 +505,7 @@ export const TermsAndConditionsModal: React.FC<TermsModalProps> = ({
             <div className="min-w-0 flex-1">
               <h3 className="text-xl sm:text-2xl font-bold truncate">Terms & Conditions</h3>
               <p className="text-gray-200 text-sm sm:text-base truncate">
-                {scrollProgress >= autoReadThreshold ? "✅ Ready to proceed" : "Please scroll to read all sections"}
+                Please read all sections carefully before proceeding
               </p>
             </div>
           </div>
@@ -574,10 +570,10 @@ export const TermsAndConditionsModal: React.FC<TermsModalProps> = ({
                   </div>
                   
                   <div className="text-xs text-gray-500 bg-blue-50 rounded-lg p-3">
-                    {canProceedToPayment ? (
-                      <span className="text-green-600 font-medium">✅ Ready to proceed to payment</span>
+                    {scrollProgress >= readThreshold ? (
+                      <span className="text-green-600 font-medium">✅ Recommended reading completed</span>
                     ) : (
-                      <span>Scroll down to read all content ({Math.round(autoReadThreshold - scrollProgress)}% remaining)</span>
+                      <span>Continue reading to reach recommended completion</span>
                     )}
                   </div>
                 </div>
@@ -676,7 +672,7 @@ export const TermsAndConditionsModal: React.FC<TermsModalProps> = ({
                         Read All Sections
                       </p>
                       <p className="text-sm text-blue-700">
-                        Scroll down to read all terms and conditions. Use the sidebar to jump to specific sections. Progress will be tracked automatically.
+                        Scroll down to read all terms and conditions. Use the sidebar to jump to specific sections. Check the agreement box manually after reading.
                       </p>
                     </div>
                   </div>
@@ -725,19 +721,19 @@ export const TermsAndConditionsModal: React.FC<TermsModalProps> = ({
                 {/* Completion indicator */}
                 <div className="mt-12 text-center mb-16">
                   <div className={`inline-block px-8 py-4 rounded-2xl transition-all duration-300 ${
-                    scrollProgress >= autoReadThreshold
+                    scrollProgress >= readThreshold
                       ? 'bg-green-100 text-green-800 border-2 border-green-300'
                       : 'bg-gray-100 text-gray-600 border-2 border-gray-300'
                   }`}>
-                    {scrollProgress >= autoReadThreshold ? (
+                    {scrollProgress >= readThreshold ? (
                       <>
                         <CheckCircle className="h-6 w-6 inline mr-2" />
-                        <span className="font-bold text-lg">All Sections Completed!</span>
+                        <span className="font-bold text-lg">Recommended Reading Completed!</span>
                       </>
                     ) : (
                       <>
                         <Eye className="h-6 w-6 inline mr-2" />
-                        <span className="font-semibold text-lg">Continue reading to complete ({Math.round(autoReadThreshold - scrollProgress)}% remaining)</span>
+                        <span className="font-semibold text-lg">Continue reading ({Math.round(readThreshold - scrollProgress)}% remaining)</span>
                       </>
                     )}
                   </div>
@@ -752,7 +748,7 @@ export const TermsAndConditionsModal: React.FC<TermsModalProps> = ({
         
         {/* Enhanced Footer */}
         <div className="p-6 sm:p-8 border-t border-gray-200 bg-gradient-to-r from-gray-50 to-white rounded-b-3xl">
-          {/* Auto-acceptance indicator */}
+          {/* Manual acceptance checkbox */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-8">
             <div className="flex items-start">
               <input 
@@ -770,7 +766,7 @@ export const TermsAndConditionsModal: React.FC<TermsModalProps> = ({
               {termsAccepted && (
                 <p className="text-sm text-green-600 font-medium mt-1 flex items-center">
                   <CheckCircle className="h-4 w-4 mr-1" />
-                  {scrollProgress >= autoReadThreshold ? "Auto-accepted based on reading progress" : "Terms accepted"}
+                  Terms accepted manually
                 </p>
               )}
             </div>
@@ -785,30 +781,27 @@ export const TermsAndConditionsModal: React.FC<TermsModalProps> = ({
             </button>
             <button
               onClick={handleAccept}
-              disabled={!termsAccepted || !canProceedToPayment}
+              disabled={!termsAccepted}
               className={`w-full sm:w-auto px-10 py-4 rounded-2xl text-white font-semibold flex items-center justify-center gap-3 text-base order-1 sm:order-2 transition-all shadow-lg hover:shadow-xl ${
-                termsAccepted && canProceedToPayment
+                termsAccepted
                   ? "bg-gradient-to-r from-gray-950 to-gray-800 hover:from-gray-800 hover:to-gray-700" 
                   : "bg-gray-400 cursor-not-allowed"
               }`}
             >
               <CheckCircle className="h-5 w-5" />
               <span>
-                {!canProceedToPayment 
-                  ? `Continue Reading (${Math.round(scrollProgress)}%)`
+                {!termsAccepted 
+                  ? "Please Check the Agreement Box"
                   : "Proceed to Payment"
                 }
               </span>
             </button>
           </div>
           
-          {!canProceedToPayment && (
+          {!termsAccepted && (
             <div className="mt-4 text-center">
               <p className="text-sm text-gray-500">
-                {autoReadThreshold - scrollProgress > 0 
-                  ? `${Math.round(autoReadThreshold - scrollProgress)}% more reading required to proceed`
-                  : "Almost there! Keep scrolling to complete."
-                }
+                Please read the terms and conditions and check the agreement box to proceed
               </p>
             </div>
           )}
