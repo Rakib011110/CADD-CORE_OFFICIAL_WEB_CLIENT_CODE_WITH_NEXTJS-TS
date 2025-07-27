@@ -1,8 +1,8 @@
 "use client";
-import { CheckCircle } from "lucide-react";
+import { ArrowRight, CheckCircle } from "lucide-react";
 import DetailsHeadNav from "../DetailsHeadNav/DetailsHeadNav";
 import { TCourse } from "@/lib/courses";
-import Link from "next/link";
+
 import { useUser } from "@/context/user.provider";
 import { useRouter } from "next/navigation";
 import { useInitiatePaymentMutation } from "@/redux/api/payment/paymentApi";
@@ -10,6 +10,7 @@ import PaymentButton from "../../Payments/PayementButton";
 import EnrollModal from "../EnrollCourse/EnrollModal";
 import { useState } from "react";
 import SslcommerzPayment from "../SslcommerzPayment/SslcommerzPayment";
+import { Link as ScrollLink } from "react-scroll";
 
 export default function DetailsBannar({ course }: { course: TCourse }) {
   const { user } = useUser();
@@ -102,15 +103,31 @@ export default function DetailsBannar({ course }: { course: TCourse }) {
                     ফ্রি ক্লাস দেখতে চাই
                   </button> */}
 
-                  <Link href="https://docs.google.com/forms/d/e/1FAIpQLSe27ZcsU6VdsyYPMD4JO5VwW4d9CI3_HtTG8YRxyo43gyzGWA/viewform">
-                    <button className="bg-white text-red-500 border border-red-500 hover:bg-red-50 px-5 py-2 rounded-md font-semibold">
-                      ভর্তি ফর্ম
+                {/* Action Buttons */}
+                <div className="flex flex-col sm:flex-row gap-4">
+                   <ScrollLink
+                    to="payment-section" // Target ID for the enrollment/payment section
+                    smooth={true}
+                    duration={800}
+                    offset={-100}
+                  >
+                    <button className="w-full sm:w-auto flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg font-semibold transition-transform duration-300 hover:scale-105 shadow-lg shadow-red-500/20">
+                      <span>ভর্তি হোন</span>
+                      <ArrowRight className="w-5 h-5" />
                     </button>
-                  </Link>
-
-                  <button className="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-md font-semibold">
-                    কোর্স ফি {formattedFee} টাকা
-                  </button>
+                  </ScrollLink>
+                  
+                  <ScrollLink
+                to="payment-section" 
+                    smooth={true}
+                    duration={800}
+                    offset={-100}
+                  >
+                    <button className="w-full sm:w-auto bg-white/10 border border-white/20 hover:bg-white/20 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300">
+                      কোর্স ফি দেখুন
+                    </button>
+                  </ScrollLink>
+                </div>
 
                   <div className="payment-section">
                     <EnrollModal

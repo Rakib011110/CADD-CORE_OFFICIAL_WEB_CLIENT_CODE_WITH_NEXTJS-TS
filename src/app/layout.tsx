@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import "aos/dist/aos.css";
 import { Providers } from "@/lib/Providers";
@@ -17,7 +18,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "CADD CORE IT | Professional IT Training Institute in Bangladesh",
   description:
-    "Join CADD CORE – Bangladesh’s leading training institute for AutoCAD, Civil Engineering, Architecture, and IT skills. Learn from industry experts through practical, job-ready courses. International certification, real-world projects, and career-focused education.",
+    "Join CADD CORE – Bangladesh's leading training institute for AutoCAD, Civil Engineering, Architecture, and IT skills. Learn from industry experts through practical, job-ready courses. International certification, real-world projects, and career-focused education.",
 
   keywords: [
     "AutoCAD Training Bangladesh",
@@ -63,7 +64,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "CADD CORE IT | Professional IT Training Institute in Bangladesh",
     description:
-      "Transform your career with CADD CORE’s expert-led AutoCAD, Civil Engineering, and IT training. Real-world projects, international certifications, and job-ready skills.",
+      "Transform your career with CADD CORE's expert-led AutoCAD, Civil Engineering, and IT training. Real-world projects, international certifications, and job-ready skills.",
     url: "https://www.caddcore.net",
     siteName: "CADD CORE",
     images: [
@@ -89,6 +90,7 @@ export const metadata: Metadata = {
   },
   metadataBase: new URL("https://www.caddcore.net"),
 };
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -99,9 +101,54 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali&display=swap"
           rel="stylesheet"
         />
+        {/* Facebook Pixel Meta Tag */}
+        <meta property="fb:pixel_id" content="408403910510266" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        {/* Facebook Pixel Code */}
+        <Script
+          id="facebook-pixel"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              !function(f,b,e,v,n,t,s)
+              {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+              n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+              if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+              n.queue=[];t=b.createElement(e);t.async=!0;
+              t.src=v;s=b.getElementsByTagName(e)[0];
+              s.parentNode.insertBefore(t,s)}(window, document,'script',
+              'https://connect.facebook.net/en_US/fbevents.js');
+              
+              fbq('init', '408403910510266');
+              fbq('track', 'PageView');
+              
+              // Enable Advanced Matching (optional - improves conversion tracking)
+              fbq('init', '408403910510266', {
+                em: 'auto', // Email hashing
+                fn: 'auto', // First name hashing  
+                ln: 'auto', // Last name hashing
+                ph: 'auto', // Phone hashing
+                ct: 'auto', // City hashing
+                st: 'auto', // State hashing
+                zp: 'auto'  // Zip code hashing
+              });
+            `,
+          }}
+        />
+        
+        {/* Facebook Pixel NoScript (for users with JavaScript disabled) */}
+        <noscript>
+          <img
+            height="1"
+            width="1"
+            style={{ display: 'none' }}
+            src="https://www.facebook.com/tr?id=408403910510266&ev=PageView&noscript=1"
+          />
+        </noscript>
+
         <Providers>{children}</Providers>
       </body>
     </html>

@@ -677,22 +677,22 @@ export const TermsAndConditionsModal: React.FC<TermsModalProps> = ({
         {/* Footer */}
         <div className="p-3 sm:p-4 border-t border-gray-200 bg-white">
           <div className="flex flex-col items-center justify-center max-w-4xl mx-auto">
-            <div className="flex items-center gap-3 mb-3">
+            <div className="flex items-center gap-3 mb-3 ">
               <input 
                 type="checkbox" 
                 id="accept-terms" 
                 checked={termsAccepted}
                 onChange={(e) => setTermsAccepted(e.target.checked)}
-                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 flex-shrink-0"
+                className="h-7 w-8 rounded border-gray-950 text-blue-600 focus:ring-blue-500 flex-shrink-0"
               />
-              <label htmlFor="accept-terms" className="text-gray-700 select-none text-sm font-medium cursor-pointer">
+              <label htmlFor="accept-terms" className="animate-bounce text-green-60 text-green-600 select-none text-sm font-medium cursor-pointer">
                 I agree to all terms and conditions
               </label>
             </div>
             
             <div className="flex items-center gap-3">
               {termsAccepted && (
-                <span className="text-xs text-green-600 font-medium flex items-center">
+                <span className="text-xs animate-bounce text-green-600  flex items-center font-bold">
                   <CheckCircle className="h-3 w-3 mr-1" />
                   Accepted
                 </span>
