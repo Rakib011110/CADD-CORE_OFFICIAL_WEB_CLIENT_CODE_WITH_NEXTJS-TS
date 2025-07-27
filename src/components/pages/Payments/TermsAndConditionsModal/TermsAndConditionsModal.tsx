@@ -764,14 +764,10 @@ export const TermsAndConditionsModal: React.FC<TermsModalProps> = ({
                     : "bg-gray-400 cursor-not-allowed"
                 }`}
               >
-                <CheckCircle className="h-4 w-4" />
-                <span>
-                  {!termsAccepted ? "Accept Terms" : "Proceed"}
-                </span>
+               
               </button>
             </div>
             
-            {/* Enhanced footer messages */}
             {hasReachedBottom && !termsAccepted && (
               <p className="text-xs text-orange-600 text-center mt-2 animate-pulse">
                 ⏰ Auto redirecting in 2 seconds, or click checkbox to proceed immediately
