@@ -12,7 +12,8 @@ import {
   MapPin,
   Clock,
   Eye,
-  CheckCircle
+  CheckCircle,
+  Menu
 } from "lucide-react";
 import { sectionsData } from "@/types/termsData";
 
@@ -54,11 +55,13 @@ export const TermsAndConditionsModal: React.FC<TermsModalProps> = ({
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isContentLoaded, setIsContentLoaded] = useState(false);
   const [readThreshold] = useState(60);
+  const [hasReachedBottom, setHasReachedBottom] = useState(false);
   
   const contentRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   const sectionRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const progressUpdateTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const autoRedirectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Check if mobile
   useEffect(() => {
@@ -124,9 +127,39 @@ export const TermsAndConditionsModal: React.FC<TermsModalProps> = ({
         document.documentElement.style.overflow = originalHtmlOverflow;
         document.body.style.scrollBehavior = originalBodyScrollBehavior;
         document.removeEventListener('wheel', handleWheel, true);
+        if (autoRedirectTimeoutRef.current) {
+          clearTimeout(autoRedirectTimeoutRef.current);
+        }
       };
     }
   }, [isOpen]);
+
+  // Auto redirect when user reaches bottom
+  useEffect(() => {
+    if (hasReachedBottom && !termsAccepted) {
+      // Auto redirect after 2 seconds when reaching bottom
+      autoRedirectTimeoutRef.current = setTimeout(() => {
+        onAccept();
+      }, 2000);
+    }
+    
+    return () => {
+      if (autoRedirectTimeoutRef.current) {
+        clearTimeout(autoRedirectTimeoutRef.current);
+      }
+    };
+  }, [hasReachedBottom, termsAccepted, onAccept]);
+
+  // Handle checkbox change - immediate redirect
+  const handleTermsAcceptedChange = (checked: boolean) => {
+    setTermsAccepted(checked);
+    if (checked) {
+      // Immediate redirect when checkbox is clicked
+      setTimeout(() => {
+        onAccept();
+      }, 500); // Small delay for better UX
+    }
+  };
 
   const contactInfo = [
     { icon: Mail, label: "Email", value: "caddcorebd@gmail.com", type: "email" },
@@ -134,7 +167,7 @@ export const TermsAndConditionsModal: React.FC<TermsModalProps> = ({
     { icon: MapPin, label: "Address", value: "149/A, Baitush Sharaf Complex, Airport Road, Farmgate, Dhaka-1215", type: "address" }
   ];
 
-  // Fixed and optimized scroll tracking
+  // Fixed and optimized scroll tracking with bottom detection
   const handleScroll = useCallback(() => {
     const contentElement = contentRef.current;
     if (!contentElement || !isContentLoaded) return;
@@ -153,6 +186,7 @@ export const TermsAndConditionsModal: React.FC<TermsModalProps> = ({
           // If content is shorter than container, mark as 100% read
           setScrollProgress(100);
           setReadSections(new Set(sectionsData.map(s => s.id)));
+          setHasReachedBottom(true);
           return;
         }
 
@@ -161,6 +195,12 @@ export const TermsAndConditionsModal: React.FC<TermsModalProps> = ({
         const progress = Math.min(Math.max((scrollTop / maxScrollTop) * 100, 0), 100);
         
         setScrollProgress(progress);
+
+        // Check if user reached bottom (with small tolerance)
+        const bottomThreshold = 95; // Consider 95% as bottom
+        if (progress >= bottomThreshold) {
+          setHasReachedBottom(true);
+        }
 
         // Update read sections based on scroll position
         const visibleSections = new Set<string>();
@@ -195,47 +235,6 @@ export const TermsAndConditionsModal: React.FC<TermsModalProps> = ({
     }, 16); // ~60fps throttling
   }, [readThreshold, isContentLoaded]);
 
-  // Optimized scroll event listener
-  useEffect(() => {
-    const contentElement = contentRef.current;
-    if (!contentElement) return;
-
-    let rafId: number | null = null;
-    let lastScrollTime = 0;
-
-    const throttledHandleScroll = () => {
-      const now = Date.now();
-      
-      // Throttle to max 60fps
-      if (now - lastScrollTime < 16) {
-        return;
-      }
-      
-      lastScrollTime = now;
-      
-      if (rafId) {
-        cancelAnimationFrame(rafId);
-      }
-      
-      rafId = requestAnimationFrame(() => {
-        handleScroll();
-        rafId = null;
-      });
-    };
-
-    contentElement.addEventListener('scroll', throttledHandleScroll, { passive: true });
-    
-    return () => {
-      contentElement.removeEventListener('scroll', throttledHandleScroll);
-      if (rafId) {
-        cancelAnimationFrame(rafId);
-      }
-      if (progressUpdateTimeoutRef.current) {
-        clearTimeout(progressUpdateTimeoutRef.current);
-      }
-    };
-  }, [handleScroll]);
-
   // Initialize when modal opens
   useEffect(() => {
     if (isOpen) {
@@ -244,6 +243,12 @@ export const TermsAndConditionsModal: React.FC<TermsModalProps> = ({
       setShowSidebar(false);
       setScrollProgress(0);
       setIsContentLoaded(false);
+      setHasReachedBottom(false);
+      
+      // Clear any existing timeout
+      if (autoRedirectTimeoutRef.current) {
+        clearTimeout(autoRedirectTimeoutRef.current);
+      }
       
       // Focus and initialize content
       setTimeout(() => {
@@ -276,12 +281,6 @@ export const TermsAndConditionsModal: React.FC<TermsModalProps> = ({
       return () => clearTimeout(timeout);
     }
   }, [isOpen, isContentLoaded, handleScroll]);
-
-  const handleAccept = () => {
-    if (termsAccepted) {
-      onAccept();
-    }
-  };
 
   // Enhanced section navigation with faster scrolling
   const scrollToSection = (sectionId: string) => {
@@ -329,83 +328,69 @@ export const TermsAndConditionsModal: React.FC<TermsModalProps> = ({
     }
   };
 
-  const renderContentSection = (section: ContentSection) => {
-    return (
-      <div className="space-y-3 sm:space-y-4">
-        {section.subsections ? (
-          <div className="space-y-2 sm:space-y-3">
-            {section.subsections.map((subsection, index) => (
-              <div key={index} className="bg-gradient-to-r from-gray-50 to-white rounded-xl p-3 sm:p-4 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200">
-                <h5 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">{subsection.title}</h5>
-                <ul className="space-y-1 text-gray-700 text-xs sm:text-sm">
-                  {subsection.items.map((item, itemIndex) => (
-                    <li key={itemIndex} className="flex items-start">
-                      <span className="text-blue-600 mr-2 flex-shrink-0 mt-1">•</span>
-                      <span className="break-words leading-relaxed">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        ) : section.items ? (
-          <ul className="space-y-2 text-gray-700 text-sm sm:text-base">
-            {section.items.map((item, index) => (
-              <li key={index} className="flex items-start bg-white rounded-lg p-3 border border-gray-100 hover:border-gray-200 transition-all duration-200">
-                <span className="text-gray-950 mr-2 flex-shrink-0 mt-1">•</span>
-                <span 
-                  className="break-words leading-relaxed"
-                  dangerouslySetInnerHTML={{ 
-                    __html: item.replace(/\*\*(.*?)\*\*/g, '<strong class="text-gray-950 bg-yellow-100 px-1 rounded">$1</strong>') 
-                  }} 
-                />
-              </li>
-            ))}
-          </ul>
-        ) : null}
-        
-        {section.description && (
-          <div className="bg-blue-50 rounded-xl p-3 sm:p-4 border-l-4 border-blue-400">
-            <p className="text-gray-700 text-sm sm:text-base leading-relaxed break-words">{section.description}</p>
-          </div>
-        )}
-        
-        {section.highlight && section.highlight.email && (
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-400 p-3 sm:p-4 rounded-xl text-sm sm:text-base shadow-sm">
-            <p className="text-gray-700 break-words">
-              📧 <strong className="text-blue-800">{section.highlight.title}</strong><br />
-              📨 <a href={`mailto:${section.highlight.email}`} className="text-blue-600 hover:text-blue-800 hover:underline break-all font-medium">
-                {section.highlight.email}
-              </a>
+  // Render content section
+  const renderContentSection = (section: ContentSection, sectionIndex: number) => (
+    <div key={sectionIndex} className="mb-8">
+      <h3 className="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b border-gray-200">
+        {section.title}
+      </h3>
+      
+      {section.description && (
+        <p className="text-gray-600 mb-4 leading-relaxed">{section.description}</p>
+      )}
+
+      {section.items && (
+        <ul className="space-y-3 mb-4">
+          {section.items.map((item, itemIndex) => (
+            <li key={itemIndex} className="flex items-start gap-2">
+              <div className="h-1.5 w-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+              <span className="text-gray-700 leading-relaxed">{item}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {section.subsections && (
+        <div className="space-y-6">
+          {section.subsections.map((subsection, subIndex) => (
+            <div key={subIndex} className="pl-4 border-l-2 border-blue-100">
+              <h4 className="text-md font-medium text-gray-800 mb-3">{subsection.title}</h4>
+              <ul className="space-y-2">
+                {subsection.items.map((item, itemIndex) => (
+                  <li key={itemIndex} className="flex items-start gap-2">
+                    <div className="h-1 w-1 bg-gray-400 rounded-full mt-2.5 flex-shrink-0"></div>
+                    <span className="text-gray-600 text-sm leading-relaxed">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {section.highlight && (
+        <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <h4 className="font-semibold text-blue-800 mb-2">{section.highlight.title}</h4>
+          {section.highlight.email && (
+            <p className="text-blue-700 mb-2">
+              Email: <a href={`mailto:${section.highlight.email}`} className="underline">{section.highlight.email}</a>
             </p>
-          </div>
-        )}
-        
-        {section.highlight && section.highlight.content && (
-          <div className="bg-gradient-to-r from-red-50 to-pink-50 border-l-4 border-red-400 p-3 sm:p-4 rounded-xl text-sm sm:text-base shadow-sm">
-            <p className="text-red-800 break-words leading-relaxed">
-              <strong className="text-red-900">{section.highlight.title}</strong><br />
-              {section.highlight.content}
-            </p>
-          </div>
-        )}
-        
-        {section.additionalInfo && (
-          <div className="bg-gray-50 rounded-xl p-3 sm:p-4 border border-gray-200">
-            <p className="text-gray-700 text-sm sm:text-base leading-relaxed break-words">{section.additionalInfo}</p>
-          </div>
-        )}
-        
-        {section.contact && (
-          <div className="bg-green-50 rounded-xl p-3 sm:p-4 border-l-4 border-green-400">
-            <p className="text-gray-700 text-sm sm:text-base break-words">
-              <strong>Contact:</strong> 📧 <a href="mailto:caddcorebd@gmail.com" className="text-green-600 hover:text-green-800 hover:underline break-all font-medium">caddcorebd@gmail.com</a>
-            </p>
-          </div>
-        )}
-      </div>
-    );
-  };
+          )}
+          {section.highlight.content && (
+            <p className="text-blue-700">{section.highlight.content}</p>
+          )}
+        </div>
+      )}
+
+      {section.additionalInfo && (
+        <p className="text-gray-600 text-sm mt-4 italic">{section.additionalInfo}</p>
+      )}
+
+      {section.contact && (
+        <p className="text-gray-600 text-sm mt-4">{section.contact}</p>
+      )}
+    </div>
+  );
 
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
@@ -425,148 +410,141 @@ export const TermsAndConditionsModal: React.FC<TermsModalProps> = ({
         className="bg-white rounded-3xl shadow-2xl w-full max-w-7xl max-h-[98vh] sm:max-h-[95vh] flex flex-col overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Enhanced Header */}
-        <div className="flex justify-between items-center p-4 sm:p-6 border-b bg-gradient-to-r from-gray-950 via-gray-900 to-gray-800 rounded-t-3xl">
-          <div className="flex items-center text-white min-w-0 flex-1">
-            <FileText className="h-6 w-6 sm:h-7 sm:w-7 mr-3 sm:mr-4 flex-shrink-0" />
-            <div className="min-w-0 flex-1">
-              <h3 className="text-xl sm:text-2xl font-bold truncate">Terms & Conditions</h3>
-              <p className="text-gray-200 text-sm sm:text-base truncate">
-                Please read all sections carefully before proceeding
-              </p>
+        {/* Header */}
+        <div className="p-4 sm:p-6 border-b border-gray-200 bg-white rounded-t-3xl">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-blue-100 rounded-xl">
+                <FileText className="h-6 w-6 text-blue-600" />
+              </div>
+              <div>
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-800">Terms & Conditions</h2>
+                <p className="text-sm text-gray-600">Please read carefully before proceeding</p>
+              </div>
             </div>
-          </div>
-          
-          {/* Enhanced progress indicator */}
-          <div className="hidden sm:flex items-center mr-6 bg-white bg-opacity-20 rounded-full px-4 py-2">
-            <div className="w-32 h-2 bg-gray-600 rounded-full overflow-hidden mr-3">
-              <div 
-                className="h-full bg-gradient-to-r from-blue-400 to-green-400 transition-all duration-300 ease-out"
-                style={{ width: `${scrollProgress}%` }}
-              />
-            </div>
-            <span className="text-white text-xs font-semibold min-w-0">{Math.round(scrollProgress)}%</span>
-          </div>
-          
-          <button 
-            onClick={onClose}
-            className="p-2 rounded-full hover:bg-gray-700 transition-colors ml-2"
-          >
-            <X className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
-          </button>
-        </div>
+            
+            <div className="flex items-center gap-2">
+              {/* Progress indicator */}
+              <div className="hidden sm:flex items-center gap-2">
+                <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-blue-500 transition-all duration-300 ease-out"
+                    style={{ width: `${scrollProgress}%` }}
+                  />
+                </div>
+                <span className="text-sm font-medium text-gray-600">
+                  {Math.round(scrollProgress)}%
+                </span>
+              </div>
 
-        {/* Mobile progress */}
-        {isMobile && (
-          <div className="bg-gray-50 px-4 py-3 border-b">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-xs text-gray-600 font-medium">Reading Progress</span>
-              <span className="text-xs text-gray-600 font-bold">{Math.round(scrollProgress)}%</span>
-            </div>
-            <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-              <div 
-                className="h-full bg-gradient-to-r from-blue-500 to-green-500 transition-all duration-300"
-                style={{ width: `${scrollProgress}%` }}
-              />
+              {/* Mobile sidebar toggle */}
+              {isMobile && (
+                <button
+                  onClick={() => setShowSidebar(!showSidebar)}
+                  className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                  aria-label="Toggle sidebar"
+                >
+                  <Menu className="h-5 w-5 text-gray-600" />
+                </button>
+              )}
+
+              {/* Close button */}
+              <button 
+                onClick={onClose}
+                className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                aria-label="Close modal"
+              >
+                <X className="h-5 w-5 text-gray-600" />
+              </button>
             </div>
           </div>
-        )}
+
+          {/* Mobile progress bar */}
+          <div className="sm:hidden mt-3">
+            <div className="flex items-center gap-2">
+              <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-blue-500 transition-all duration-300 ease-out"
+                  style={{ width: `${scrollProgress}%` }}
+                />
+              </div>
+              <span className="text-sm font-medium text-gray-600">
+                {Math.round(scrollProgress)}%
+              </span>
+            </div>
+          </div>
+        </div>
         
         <div className="flex flex-1 overflow-hidden relative">
-          {/* Enhanced Desktop Sidebar */}
-          <div className={`w-72 border-r border-gray-200 bg-gradient-to-b from-gray-50 to-white overflow-y-auto ${isMobile ? 'hidden' : 'block'}`}>
-            <div className="p-4">
-              {/* Progress Overview */}
-              <div className="mb-6 bg-white rounded-xl p-4 shadow-sm border border-gray-200">
-                <h4 className="font-bold text-gray-900 mb-3 flex items-center text-sm">
-                  <Eye className="h-4 w-4 mr-2 text-blue-600" />
-                  Reading Progress
-                </h4>
-                <div className="space-y-3">
-                  <div>
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-xs text-gray-600">Overall Progress</span>
-                      <span className="text-xs font-bold text-gray-900">{Math.round(scrollProgress)}%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                      <div 
-                        className="h-full bg-gradient-to-r from-blue-500 to-green-500 transition-all duration-300"
-                        style={{ width: `${scrollProgress}%` }}
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="text-xs text-gray-500 bg-blue-50 rounded-lg p-2">
-                    {scrollProgress >= readThreshold ? (
-                      <span className="text-green-600 font-medium">✅ Recommended reading completed</span>
-                    ) : (
-                      <span>Continue reading to reach recommended completion</span>
-                    )}
-                  </div>
-                </div>
-              </div>
+          {/* Sidebar */}
+          <div className={`${
+            showSidebar || !isMobile ? 'translate-x-0' : '-translate-x-full'
+          } ${isMobile ? 'absolute inset-y-0 left-0 z-10' : 'relative'} 
+          w-80 bg-white border-r border-gray-200 transition-transform duration-300 ease-in-out`}>
+            
+            {/* Mobile overlay */}
+            {isMobile && showSidebar && (
+              <div 
+                className="fixed inset-0 bg-black bg-opacity-20 z-[-1]"
+                onClick={() => setShowSidebar(false)}
+              />
+            )}
+            
+            <div className="p-4 sm:p-6 h-full overflow-y-auto">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">Quick Navigation</h3>
               
-              {/* Section List - Now Clickable */}
+              {/* Section links */}
               <div className="space-y-2">
-                <h4 className="font-bold text-gray-900 mb-3 flex items-center text-sm">
-                  <Clock className="h-4 w-4 mr-2 text-gray-600" />
-                  Quick Navigation
-                </h4>
-                {sectionsData.map((section, index) => {
-                  const SectionIcon = section.icon;
+                {sectionsData.map((section) => {
+                  const IconComponent = section.icon;
                   const isRead = readSections.has(section.id);
                   
                   return (
                     <button
                       key={section.id}
                       onClick={() => scrollToSection(section.id)}
-                      className={`w-full text-left rounded-xl transition-all duration-200 p-3 border hover:shadow-md hover:scale-[1.02] group ${
-                        isRead
-                          ? 'bg-green-50 border-green-200 text-green-800 hover:bg-green-100'
-                          : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
+                      className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all duration-200 group ${
+                        isRead 
+                          ? 'bg-green-50 border border-green-200 text-green-800' 
+                          : 'hover:bg-gray-50 border border-transparent text-gray-700'
                       }`}
                     >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center min-w-0 flex-1">
-                          <SectionIcon className="h-4 w-4 mr-2 flex-shrink-0 group-hover:scale-110 transition-transform" />
-                          <span className="font-semibold text-xs truncate">{section.title}</span>
-                        </div>
-                        <div className="flex items-center ml-2">
-                          {isRead && <CheckCircle className="h-3 w-3 text-green-600 mr-1" />}
-                          <ChevronRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                        </div>
+                      <div className={`p-2 rounded-lg transition-colors ${
+                        isRead ? 'bg-green-100' : 'bg-gray-100 group-hover:bg-blue-100'
+                      }`}>
+                        <IconComponent className={`h-4 w-4 ${
+                          isRead ? 'text-green-600' : 'text-gray-600 group-hover:text-blue-600'
+                        }`} />
                       </div>
-                      <span className="text-xs mt-1 block ml-6 text-left opacity-70">
-                        {isRead ? 'Completed' : 'Click to jump'}
-                      </span>
+                      
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-sm truncate">{section.title}</span>
+                          {isRead && <Check className="h-4 w-4 text-green-600 flex-shrink-0" />}
+                        </div>
+                        <p className="text-xs text-gray-500 truncate">
+                          {section.effectiveDate}
+                        </p>
+                      </div>
+                      
+                      <ChevronRight className="h-4 w-4 text-gray-400 group-hover:text-blue-500 transition-colors" />
                     </button>
                   );
                 })}
               </div>
 
-              {/* Contact Info */}
-              <div className="mt-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-200 shadow-sm">
-                <h5 className="font-bold text-gray-900 mb-3 text-sm flex items-center">
-                  <Phone className="h-3 w-3 mr-2 text-blue-600" />
-                  Contact Us
-                </h5>
-                <div className="space-y-2 text-xs">
+              {/* Contact info */}
+              <div className="mt-8 pt-6 border-t border-gray-200">
+                <h4 className="text-sm font-semibold text-gray-800 mb-3">Contact Information</h4>
+                <div className="space-y-3">
                   {contactInfo.map((contact, index) => {
-                    const ContactIcon = contact.icon;
+                    const IconComponent = contact.icon;
                     return (
-                      <div key={index} className="flex items-start bg-white rounded-lg p-2 border border-blue-100">
-                        <ContactIcon className="h-3 w-3 mr-2 text-blue-600 mt-0.5 flex-shrink-0" />
-                        <div className="min-w-0 flex-1">
-                          <span className="font-medium text-gray-700 text-xs">{contact.label}:</span>
-                          <p className={`break-all text-xs ${contact.type === 'email' ? 'text-blue-600' : 'text-gray-600'}`}>
-                            {contact.type === 'email' ? (
-                              <a href={`mailto:${contact.value}`} className="hover:underline">{contact.value}</a>
-                            ) : contact.type === 'phone' ? (
-                              <a href={`tel:${contact.value}`} className="hover:underline">{contact.value}</a>
-                            ) : (
-                              contact.value
-                            )}
-                          </p>
+                      <div key={index} className="flex items-start gap-2">
+                        <IconComponent className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                        <div>
+                          <p className="text-xs font-medium text-gray-700">{contact.label}</p>
+                          <p className="text-xs text-gray-600 break-words">{contact.value}</p>
                         </div>
                       </div>
                     );
@@ -590,62 +568,59 @@ export const TermsAndConditionsModal: React.FC<TermsModalProps> = ({
                 willChange: 'scroll-position'
               }}
               tabIndex={0}
+              onScroll={handleScroll}
             >
               <div className="p-4 sm:p-6 lg:p-8 pb-6">
-                {/* Reading instruction */}
-                <div className="mb-6 p-4 sm:p-5 bg-gradient-to-r from-blue-50 to-indigo-50 border-l-4 border-blue-400 rounded-xl shadow-sm">
-                  <div className="flex items-center">
-                    <Eye className="h-5 w-5 text-blue-600 mr-3" />
-                    <div>
-                      <p className="text-sm sm:text-base text-blue-900 font-semibold mb-1">
-                        Read All Sections
-                      </p>
-                      <p className="text-xs sm:text-sm text-blue-700">
-                        Scroll to read all terms. Use sidebar navigation for quick access.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* All Sections Combined */}
-                {sectionsData.map((sectionData, sectionIndex) => {
+                {/* Content sections */}
+                {sectionsData.map((sectionData) => {
                   const IconComponent = sectionData.icon;
+                  
                   return (
-                    <div 
-                      key={sectionData.id} 
+                    <div
+                      key={sectionData.id}
                       ref={(el) => { sectionRefs.current[sectionData.id] = el; }}
-                      className="mb-8 scroll-mt-6"
+                      className="bg-white rounded-2xl shadow-sm border border-gray-200 mb-6 overflow-hidden hover:shadow-md transition-shadow duration-300"
                     >
-                      {/* Section Header */}
-                      <div className={`bg-gradient-to-r ${sectionData.color} rounded-2xl p-4 sm:p-6 mb-6 shadow-lg transition-all duration-300`}>
-                        <div className="flex items-center text-white">
-                          <IconComponent className="h-6 w-6 sm:h-8 sm:w-8 mr-3 sm:mr-4 flex-shrink-0" />
-                          <div className="min-w-0 flex-1">
-                            <h4 className="text-lg sm:text-2xl font-bold mb-1">{sectionData.title}</h4>
-                            <p className="text-white text-opacity-90 text-xs sm:text-base">
+                      {/* Section header */}
+                      <div className={`p-6 ${sectionData.color} text-white`}>
+                        <div className="flex items-center gap-4">
+                          <div className="p-3 bg-white bg-opacity-20 rounded-xl">
+                            <IconComponent className="h-6 w-6" />
+                          </div>
+                          <div>
+                            <h2 className="text-xl font-bold">{sectionData.title}</h2>
+                            <p className="text-white text-opacity-90 text-sm mt-1">
                               Effective: {sectionData.effectiveDate}
                             </p>
                           </div>
                         </div>
                       </div>
 
-                      {/* Introduction */}
-                      <div className="mb-6 bg-white rounded-xl p-4 sm:p-5 shadow-sm border border-gray-200">
-                        <p className="text-gray-700 text-sm sm:text-base leading-relaxed break-words">{sectionData.introduction}</p>
-                      </div>
-
-                      {/* Content Sections */}
-                      <div className="space-y-4 mb-10">
-                        {sectionData.sections.map((section: ContentSection, index: any) => (
-                          <div key={index} className="bg-white border border-gray-200 rounded-xl p-4 sm:p-5 shadow-sm hover:shadow-md transition-all duration-300">
-                            <h5 className="text-base sm:text-lg font-bold text-gray-900 mb-3 break-words border-b border-gray-100 pb-2">{section.title}</h5>
-                            {renderContentSection(section)}
-                          </div>
-                        ))}
+                      {/* Section content */}
+                      <div className="p-6">
+                        <p className="text-gray-600 mb-6 leading-relaxed">
+                          {sectionData.introduction}
+                        </p>
+                        
+                        {sectionData.sections.map((section, index) => 
+                          renderContentSection(section, index)
+                        )}
                       </div>
                     </div>
                   );
                 })}
+
+                {/* Bottom reached indicator */}
+                {hasReachedBottom && !termsAccepted && (
+                  <div className="mt-6 text-center mb-4">
+                    <div className="inline-block px-6 py-3 rounded-xl bg-green-100 text-green-800 border border-green-300 animate-pulse">
+                      <CheckCircle className="h-4 w-4 inline mr-2" />
+                      <span className="font-bold text-sm sm:text-base">
+                        You've reached the end! Redirecting in 2 seconds...
+                      </span>
+                    </div>
+                  </div>
+                )}
 
                 {/* Completion indicator */}
                 <div className="mt-6 text-center mb-4">
@@ -674,49 +649,31 @@ export const TermsAndConditionsModal: React.FC<TermsModalProps> = ({
           </div>
         </div>
         
-        {/* Footer */}
+        {/* Footer - Only Checkbox */}
         <div className="p-3 sm:p-4 border-t border-gray-200 bg-white">
           <div className="flex flex-col items-center justify-center max-w-4xl mx-auto">
-            <div className="flex items-center gap-3 mb-3 ">
+            <div className="flex items-center gap-3">
               <input 
                 type="checkbox" 
                 id="accept-terms" 
                 checked={termsAccepted}
-                onChange={(e) => setTermsAccepted(e.target.checked)}
+                onChange={(e) => handleTermsAcceptedChange(e.target.checked)}
                 className="h-7 w-8 rounded border-gray-950 text-blue-600 focus:ring-blue-500 flex-shrink-0"
               />
-              <label htmlFor="accept-terms" className="animate-bounce text-green-60 text-green-600 select-none text-sm font-medium cursor-pointer">
-                I agree to all terms and conditions
+              <label htmlFor="accept-terms" className="animate-bounce text-green-600 select-none text-sm font-medium cursor-pointer">
+                I agree to all terms and conditions {termsAccepted && '(Redirecting...)'}
               </label>
             </div>
             
-            <div className="flex items-center gap-3">
-              {termsAccepted && (
-                <span className="text-xs animate-bounce text-green-600  flex items-center font-bold">
-                  <CheckCircle className="h-3 w-3 mr-1" />
-                  Accepted
-                </span>
-              )}
-              
-              <button
-                onClick={handleAccept}
-                disabled={!termsAccepted}
-                className={`px-6 py-2 rounded-xl text-white font-semibold flex items-center gap-2 text-sm transition-all shadow-md hover:shadow-lg ${
-                  termsAccepted
-                    ? "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800" 
-                    : "bg-gray-400 cursor-not-allowed"
-                }`}
-              >
-                <CheckCircle className="h-4 w-4" />
-                <span>
-                  {!termsAccepted ? "Accept Terms" : "Proceed"}
-                </span>
-              </button>
-            </div>
+            {hasReachedBottom && !termsAccepted && (
+              <p className="text-xs text-orange-600 text-center mt-2 animate-pulse">
+                ⏰ Auto redirecting in 2 seconds, or click checkbox to proceed immediately
+              </p>
+            )}
             
-            {!termsAccepted && (
+            {!hasReachedBottom && !termsAccepted && (
               <p className="text-xs text-gray-500 text-center mt-2">
-                Please check the agreement box to continue
+                Read to the bottom or check the agreement box to continue
               </p>
             )}
           </div>

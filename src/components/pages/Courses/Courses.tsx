@@ -17,10 +17,10 @@ export default function AllCourses() {
     "All",
     "Civil",
     "Architectural",
+    "BIM",
     "Mechanical",
     "Project Management",
-    "Electrical",
-    "Bim",
+    // "Electrical",
   ];
 
   const { data: coursesResponse, error, isLoading } = useGetAllCourseQuery({});
@@ -46,20 +46,24 @@ export default function AllCourses() {
       <div className="min-h-screen bg-gray-50 p-8">
         <div className="max-w-6xl mx-auto">
           {/* Filter Buttons */}
-          <div className="flex flex-wrap gap-3 mb-8 items-center justify-center text-center">
-            {categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
-                className={`px-5 py-2 rounded-md text-sm font-medium transition-colors
-                  ${
-                    selectedCategory === category
-                      ? "bg-red-600 text-white"
-                      : "bg-white text-gray-600 border border-gray-200 hover:border-blue-200 hover:bg-blue-50"
-                  }`}>
-                {category === "All" ? "All Courses" : category}
-              </button>
-            ))}
+        <div className="flex justify-center mb-10">
+            <div className="bg-gray-100 rounded-full p-1.5 flex flex-wrap justify-center gap-2">
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  onClick={() => setSelectedCategory(category)}
+                  className={`px-4 sm:px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50
+                    ${
+                      selectedCategory === category
+                        ? "bg-black text-white shadow-md" // Active tab style
+                        : "bg-transparent text-black hover:bg-white hover:shadow-sm" // Inactive tab style
+                    }`}
+                >
+                  {category === "All" ? "All Courses" : category}
+                </button>
+              ))}
+          </div>
+
           </div>
 
           {/* Course Grid */}

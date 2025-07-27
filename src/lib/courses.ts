@@ -2,8 +2,8 @@ export type Category =
   | "Civil"
   | "Architectural"
   | "Mechanical"
-  | "Electrical"
-  | "Bim"
+  // | "Electrical"
+  | "BIM"
   | "Project Management";
 
 export type TSchedule = {

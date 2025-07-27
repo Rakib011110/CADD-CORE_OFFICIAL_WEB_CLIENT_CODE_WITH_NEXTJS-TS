@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CADD CORE IT | Professional IT Training Institute in Bangladesh",
+  title: "CADD CORE | Professional Training Institute And IT Services in Bangladesh",
   description:
     "Join CADD CORE – Bangladesh's leading training institute for AutoCAD, Civil Engineering, Architecture, and IT skills. Learn from industry experts through practical, job-ready courses. International certification, real-world projects, and career-focused education.",
 
@@ -62,7 +62,7 @@ export const metadata: Metadata = {
   ],
 
   openGraph: {
-    title: "CADD CORE IT | Professional IT Training Institute in Bangladesh",
+    title: "CADD CORE  | Professional Training Institute And IT Services in Bangladesh",
     description:
       "Transform your career with CADD CORE's expert-led AutoCAD, Civil Engineering, and IT training. Real-world projects, international certifications, and job-ready skills.",
     url: "https://www.caddcore.net",
