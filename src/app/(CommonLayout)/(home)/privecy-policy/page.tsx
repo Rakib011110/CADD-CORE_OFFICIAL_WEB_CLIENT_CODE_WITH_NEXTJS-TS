@@ -220,13 +220,13 @@ const PrivacyPolicy: React.FC = () => {
           description: "If a student wishes to withdraw before the batch begins, they must send a formal email to:",
           highlight: {
             title: "Engr. Hachnayen Ahmed, CEO",
-            email: "caddcorebd@gmail.com"
+            email: "hachnayen@gmail.com"
           },
           additionalInfo: "Clearly state the reason for withdrawal. After CEO approval, the refund will be processed within the designated timeline."
         },
         {
-          title: "3. 7-Day Refund Window",
-          description: "Students are eligible for a refund within 7 days of enrollment, provided the batch hasn't started or special conditions apply."
+          title: "3. 7-10 Day Refund Window",
+          description: "Students are eligible for a refund within 7-10 days of enrollment, provided the batch hasn't started or special conditions apply."
         },
         {
           title: "4. Refund Conditions",

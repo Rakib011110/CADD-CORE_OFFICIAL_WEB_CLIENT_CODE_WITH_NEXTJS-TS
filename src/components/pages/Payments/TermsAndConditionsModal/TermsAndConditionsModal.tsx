@@ -1,11 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { 
-  Check, 
   X, 
   FileText, 
-  Shield, 
-  DollarSign, 
-  Users, 
   ChevronRight,
   Mail,
   Phone,
