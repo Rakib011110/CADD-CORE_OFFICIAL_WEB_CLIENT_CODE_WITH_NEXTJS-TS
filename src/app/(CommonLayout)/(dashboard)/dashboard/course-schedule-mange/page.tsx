@@ -9,9 +9,6 @@ import {
 // import { useGetAllCourseQuery } from "@/redux/api/courseApi"; // Removed as per new requirements
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/UI/table";
 import { Button } from "@/components/UI/button";
-// Dialog, Input components removed as form is removed
-// import { Input } from "@/components/UI/input";
-// import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/UI/dialog";
 
 // Helper for formatting date
 const formatDate = (dateStr: string) => {
@@ -52,6 +49,7 @@ type EditableField =
 
 export default function CourseScheduleManage() {
   const { data: scheduleData, isLoading, isError, error } = useGetAllSchedulesQuery({});
+  console.log(scheduleData)
   const [updateSchedule] = useUpdateScheduleMutation();
   const [deleteSchedule] = useDeleteScheduleMutation();
 

@@ -33,11 +33,16 @@ export default function CourseForm() {
       overviewDescription: "",
       videoUrl: ""
     },
+
+
     courseIncludes: {
       duration: "",
       weeklyLiveClasses: "",
-      weeklyClassHours: ""
+      weeklyClassHours: "" 
     },
+
+
+    
     topicsCovered: [{ topicTitle: "", topicDescription: "" }],
     softwaresTaught: [{ softwareTitle: "", photoUrl: "" }],
     demoCertificate: [{ title: "", photoUrl: "" }],

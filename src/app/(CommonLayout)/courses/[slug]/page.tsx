@@ -17,7 +17,7 @@ import WorkingProjects from "@/components/pages/CourseDetails/WorkingProject/Wor
 import OurCertificate from "@/components/pages/CourseDetails/Certificate/Ourcerticates";
 import CertificateVerification from "@/components/pages/StudentCornar/CertificateVerification/CertificateVerification";
 import useSmoothScroll from "@/hooks/useSmoothScroll";
-import Roadmap from "@/components/pages/CourseDetails/CertificationPathway/CertificationPathway";
+
 import CourseSchedule from "@/components/pages/CourseDetails/CourseSchedule/CourseSchedule";
 import RevitSection from "@/components/pages/CourseDetails/RevitSectionProps/RevitSectionProps"; // Corrected import path based on your snippet
 import ProjectShowcase from "@/components/pages/CourseDetails/ProjectShowcase/ProjectShowcase";
@@ -56,6 +56,16 @@ export default function CourseDetails() {
 
   return (
     <div style={{ fontFamily: "banglaFont" }} className="font-serif ">
+
+
+
+
+
+
+
+
+
+      
       <DetailsBannar course={course?.data} />
       <CourseFees course={course.data} />
       <div
@@ -81,7 +91,7 @@ export default function CourseDetails() {
           <WorkingProjects course={course?.data} />
         </div>
 
-        <div className="">{RccshowRevitSection && <ProjectShowcase />}</div>
+        {/* <div className="">{RccshowRevitSection && <ProjectShowcase />}</div> */}
 
         {/* Conditional rendering for RevitSection */}
         {showRevitSection && <RevitSection />}

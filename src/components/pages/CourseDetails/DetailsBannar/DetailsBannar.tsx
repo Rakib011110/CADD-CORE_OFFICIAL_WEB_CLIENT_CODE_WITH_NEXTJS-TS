@@ -4,43 +4,17 @@ import DetailsHeadNav from "../DetailsHeadNav/DetailsHeadNav";
 import { TCourse } from "@/lib/courses";
 
 import { useUser } from "@/context/user.provider";
-import { useRouter } from "next/navigation";
-import { useInitiatePaymentMutation } from "@/redux/api/payment/paymentApi";
-import PaymentButton from "../../Payments/PayementButton";
 import EnrollModal from "../EnrollCourse/EnrollModal";
 import { useState } from "react";
-import SslcommerzPayment from "../SslcommerzPayment/SslcommerzPayment";
 import { Link as ScrollLink } from "react-scroll";
 
 export default function DetailsBannar({ course }: { course: TCourse }) {
   const { user } = useUser();
-  const router = useRouter();
-  const [initiatePayment, { isLoading }] = useInitiatePaymentMutation();
-  // const formattedFee = new Intl.NumberFormat("en-IN").format(course?.courseFee || 0);
   const [showModal, setShowModal] = useState(false);
 
-  const formattedFee = new Intl.NumberFormat("en-IN").format(
-    course?.courseFee || 0
-  );
-
-  const handleEnroll = async () => {
-    if (!user) {
-      router.push("/login");
-      return;
-    }
-    try {
-      const res = await initiatePayment({
-        courseId: course._id,
-        amount: course.courseFee,
-        user,
-      }).unwrap();
-      // Redirect to SSLCommerz gateway
-      window.location.href = res.data.gatewayUrl;
-    } catch (err) {
-      console.error(err);
-      alert("Payment initiation failed. Please try again.");
-    }
-  };
+  // const formattedFee = new Intl.NumberFormat("en-IN").format(
+  //   course?.courseFee || 0
+  // );
 
   return (
     <section className="max-w-6xl mx-auto px-">
@@ -77,31 +51,69 @@ export default function DetailsBannar({ course }: { course: TCourse }) {
                   {course?.description}
                 </p>
 
-                <div className="flex flex-wrap items-center gap-5 text-gray-300 font-semibold mb-6">
-                  {/* Duration */}
-                  <div className="flex items-center gap-2 border-l-4 border-red-500 pl-3">
-                    <CheckCircle className="text-red-500 w-5 h-5" />
-                    <span>{course?.courseIncludes.duration}</span>
-                  </div>
+               <div className="flex border-2 p-2 border--700 bg-gray-950 flex-wrap items-center gap-2 text-gray-300 font-semibold mb-6 text-sm">
+  {/* Duration */}
+  {course?.courseIncludes?.duration && (
+    <div className="flex items-center gap-2 border-l-4 border-red-500 pl-2">
+      <CheckCircle className="text-gray-200 w-4 h-4" />
+      <span>{course.courseIncludes.duration}</span>
+    </div>
+  )}
 
-                  {/* Lessons */}
-                  <div className="flex items-center gap-2 border-l-4 border-red-500 pl-3">
-                    <CheckCircle className="text-red-500 w-5 h-5" />
-                    <span>{course?.lessons}</span>
-                  </div>
+ 
 
-                  {/* Projects */}
-                  <div className="flex items-center gap-2 border-l-4 border-red-500 pl-3">
-                    <CheckCircle className="text-red-500 w-5 h-5" />
-                    <span>{course?.projects}</span>
-                  </div>
-                </div>
+  
 
-                {/* Buttons */}
+  {/* Live Sessions */}
+  {course?.courseIncludes?.liveSessions && (
+    <div className="flex items-center gap-2 border-l-4 border-red-500 pl-2">
+      <CheckCircle className="text-gray-200 w-4 h-4" />
+      <span>{course.courseIncludes.liveSessions}</span>
+    </div>
+  )}
+
+  {/* Certificate */}
+  {course?.courseIncludes?.certificate && (
+    <div className="flex items-center gap-2 border-l-4 border-red-500 pl-2">
+      <CheckCircle className="text-gray-200 w-4 h-4" />
+      <span>{course.courseIncludes.certificate}</span>
+    </div>
+  )}
+
+  {/* On Job Training */}
+  {course?.courseIncludes?.onJobTraining && (
+    <div className="flex items-center gap-2 border-l-4 border-red-500 pl-2">
+      <CheckCircle className="text-gray-200 w-4 h-4" />
+      <span>{course.courseIncludes.onJobTraining}</span>
+    </div>
+  )}
+
+  {/* Projects */}
+  {course?.courseIncludes?.projects && (
+    <div className="flex items-center gap-2 border-l-4 border-red-500 pl-2">
+      <CheckCircle className="text-gray-200 w-4 h-4" />
+      <span>{course.courseIncludes.projects}</span>
+    </div>
+  )}
+
+  {/* Experience Letter */}
+  {course?.courseIncludes?.experienceLetter && (
+    <div className="flex items-center gap-2 border-l-4 border-red-500 pl-2">
+      <CheckCircle className="text-gray-200 w-4 h-4" />
+      <span>{course.courseIncludes.experienceLetter}</span>
+    </div>
+  )}
+
+  
+
+</div>
+
+
+
+
+
                 <div className="flex flex-wrap gap-4">
-                  {/* <button className="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-md font-semibold">
-                    ফ্রি ক্লাস দেখতে চাই
-                  </button> */}
+                
 
                 {/* Action Buttons */}
                 <div className="flex flex-col sm:flex-row gap-4">

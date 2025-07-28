@@ -19,9 +19,13 @@ export type TOverview = {
 };
 
 export type TCourseIncludes = {
-  duration: string;
-  weeklyLiveClasses: string;
-  weeklyClassHours: string;
+   duration?: string;
+  
+    liveSessions?: string;
+    certificate?: string;
+    onJobTraining?: string;
+    projects?: string;
+    experienceLetter?: string;
 };
 
 export type TTopic = {
@@ -84,7 +88,7 @@ export type TCourse = {
   title: string;
   _id: string;
   slug: any;
-  categories: Category;
+  categories: Category[];
   courseBanner: string;
   batch: string;
 
