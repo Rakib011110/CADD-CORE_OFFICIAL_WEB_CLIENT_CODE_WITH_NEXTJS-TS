@@ -51,7 +51,7 @@ export default function DetailsBannar({ course }: { course: TCourse }) {
                   {course?.description}
                 </p>
 
-               <div className="flex border-2 p-2 border--700 bg-gray-950 flex-wrap items-center gap-2 text-gray-300 font-semibold mb-6 text-sm">
+               <div className="flex border-2 p-2 border--700  flex-wrap items-center gap-2 text-gray-300 font-semibold mb-6 text-sm">
   {/* Duration */}
   {course?.courseIncludes?.duration && (
     <div className="flex items-center gap-2 border-l-4 border-red-500 pl-2">
