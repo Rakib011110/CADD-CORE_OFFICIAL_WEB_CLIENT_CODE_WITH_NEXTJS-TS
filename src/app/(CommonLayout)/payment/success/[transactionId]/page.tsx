@@ -1,4 +1,3 @@
-// app/payment/success/[transactionId]/page.tsx
 "use client";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
@@ -88,6 +87,7 @@ export default function PaymentSuccessPage() {
     const [isValid, setIsValid] = useState(false);
     const [retryCount, setRetryCount] = useState(0);
     const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+    const [autoDownloadCompleted, setAutoDownloadCompleted] = useState(false);
     const params = useParams();
 
     const transactionId = params && params.transactionId
@@ -140,6 +140,11 @@ export default function PaymentSuccessPage() {
         if (paymentData && paymentData.success && paymentData.data?.status === 'completed') {
             console.log("✅ Payment verified successfully!");
             toast.success("Payment verified successfully!");
+            
+            // Auto-download PDF only once when payment is verified
+            if (!autoDownloadCompleted) {
+                handleAutoDownloadInvoice();
+            }
         } else if (paymentData && paymentData.success && paymentData.data?.status === 'pending' && retryCount < 15) {
             // Payment exists but still pending, retry after delay
             console.log(`🔄 Payment pending, retry ${retryCount + 1}/15`);
@@ -158,7 +163,58 @@ export default function PaymentSuccessPage() {
             console.log("⏰ Payment verification timed out after 15 attempts");
             toast.error("Payment verification taking longer than expected. Please contact support.");
         }
-    }, [paymentData, error, retryCount, refetch]);
+    }, [paymentData, error, retryCount, refetch, autoDownloadCompleted]);
+
+    // Auto-download function
+    const handleAutoDownloadInvoice = async () => {
+        if (!paymentData || !paymentData.data || autoDownloadCompleted) return;
+        
+        setIsGeneratingPDF(true);
+        try {
+            const { data } = paymentData;
+            
+            // Try HTML-to-PDF first (best Bengali font support)
+            try {
+                await generateHTMLToPDF(data);
+                toast.success('Receipt PDF downloaded automatically!');
+                setAutoDownloadCompleted(true);
+                return;
+            } catch (htmlError) {
+                console.warn('HTML-to-PDF generation failed, trying enhanced PDF:', htmlError);
+            }
+            
+            // Try the enhanced PDF generator second
+            try {
+                await generatePaymentReceiptPDF(data);
+                toast.success('Receipt PDF downloaded automatically!');
+                setAutoDownloadCompleted(true);
+                return;
+            } catch (enhancedError) {
+                console.warn('Enhanced PDF generation failed, trying simple version:', enhancedError);
+            }
+            
+            // Try simple PDF generator third
+            try {
+                generateSimpleReceiptPDF(data);
+                toast.success('Receipt PDF downloaded automatically!');
+                setAutoDownloadCompleted(true);
+                return;
+            } catch (simpleError) {
+                console.error('Simple PDF generation also failed, using fallback:', simpleError);
+            }
+            
+            // Final fallback to original method with better text handling
+            await generateFallbackPDF(data);
+            toast.success('Receipt PDF downloaded automatically!');
+            setAutoDownloadCompleted(true);
+            
+        } catch (error) {
+            console.error('Auto PDF generation failed:', error);
+            toast.error('Failed to auto-download PDF. You can manually download it below.');
+        } finally {
+            setIsGeneratingPDF(false);
+        }
+    };
 
     const handleDownloadInvoice = async () => {
         if (!paymentData || !paymentData.data) return;
@@ -418,6 +474,33 @@ export default function PaymentSuccessPage() {
                             </svg>
                             Transaction ID: {data.transactionId}
                         </div>
+
+                        {/* Auto-download notification */}
+                        {autoDownloadCompleted && (
+                            <div className="mt-4 bg-blue-50 border border-blue-200 text-blue-800 p-3 rounded-lg text-sm">
+                                <div className="flex items-start gap-2">
+                                    <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                    </svg>
+                                    <div>
+                                        <p className="font-medium">Receipt Downloaded Successfully!</p>
+                                        <p className="mt-1">Please send this receipt to our support team at <span className="font-medium">caddcorebd@gmail.com</span> if you need additional verification or have any questions about your enrollment.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Loading state for auto-download */}
+                        {isGeneratingPDF && !autoDownloadCompleted && (
+                            <div className="mt-4 bg-yellow-50 border border-yellow-200 text-yellow-800 p-3 rounded-lg text-sm">
+                                <div className="flex items-center gap-2">
+                                    <svg className="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                    </svg>
+                                    <span>Generating your receipt PDF automatically...</span>
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {/* Invoice Card */}
@@ -514,14 +597,14 @@ export default function PaymentSuccessPage() {
                         >
                             {isGeneratingPDF ? (
                                 <svg className="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 2v4m0 12v4m9-9h-4M7 12H3m15.364-6.364l-2.828 2.828M9.464 9.464L6.636 6.636m9.192 9.192l2.828 2.828M9.464 14.536l-2.828 2.828" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                                 </svg>
                             ) : (
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                                 </svg>
                             )}
-                            {isGeneratingPDF ? 'Generating PDF...' : 'Download Receipt (Auto)'}
+                            {isGeneratingPDF ? 'Generating PDF...' : 'Download Receipt (Manual)'}
                         </button>
                         
                         {/* Alternative download methods for testing */}
@@ -596,19 +679,27 @@ export default function PaymentSuccessPage() {
                         </Link>
                     </div>
 
-                    {/* Support Information */}
+                    {/* Support Information with verification message */}
                     <div className="mt-8 bg-blue-50 p-4 rounded-lg border border-blue-100">
                         <h3 className="font-medium text-blue-800 mb-2 flex items-center gap-2">
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
                             </svg>
-                            Need Help?
+                            Need Help or Additional Verification?
                         </h3>
-                        <p className="text-blue-700 text-sm mb-3">For any questions regarding your payment or enrollment, please contact our support team:</p>
+                        <p className="text-blue-700 text-sm mb-3">
+                            For any questions regarding your payment, enrollment verification, or if you need additional confirmation, 
+                            please send your downloaded receipt to our support team along with your query.
+                        </p>
                         <div className="space-y-1 text-sm">
                             <p className="text-blue-800"><span className="font-medium">Phone:</span> +880 1611-223637</p>
                             <p className="text-blue-800"><span className="font-medium">Email:</span> caddcorebd@gmail.com</p>
                             <p className="text-blue-800"><span className="font-medium">Address:</span> 149/A, Baitush Sharaf Complex (2nd Floor), Airport Road, Farmgate, Dhaka-1215</p>
+                        </div>
+                        <div className="mt-3 p-2 bg-blue-100 rounded border-l-4 border-blue-400">
+                            <p className="text-blue-800 text-xs">
+                                <span className="font-medium">📧 Verification Tip:</span> Please attach your downloaded receipt when contacting support for faster assistance and verification.
+                            </p>
                         </div>
                     </div>
                 </div>
