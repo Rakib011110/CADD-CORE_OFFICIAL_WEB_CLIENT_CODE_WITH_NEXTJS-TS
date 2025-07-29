@@ -408,8 +408,7 @@ export default function CourseFees({ course }: CourseFeesProps) {
               <div className="flex  items-center justify-center gap-2 mb-4 text-xs ">
                           <Link
                             href="/privecy-policy"
-                            target="_blank"
-                            rel="noopener noreferrer"
+                          
                             className="text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors duration-200 flex items-center gap-1"
                           >
                             <FileText className="h-3 w-3" />
@@ -418,8 +417,7 @@ export default function CourseFees({ course }: CourseFeesProps) {
                           <span className="text-gray-300">|</span>
                           <Link
                             href="/privecy-policy"
-                            target="_blank"
-                            rel="noopener noreferrer"
+                          
                             className="text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors duration-200 flex items-center gap-1"
                           >
                             <FileText className="h-3 w-3" />
@@ -428,8 +426,7 @@ export default function CourseFees({ course }: CourseFeesProps) {
                           <span className="text-gray-300">|</span>
                           <Link
                             href="/privecy-policy"
-                            target="_blank"
-                            rel="noopener noreferrer"
+                          
                             className="text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors duration-200 flex items-center gap-1"
                           >
                             <FileText className="h-3 w-3" />

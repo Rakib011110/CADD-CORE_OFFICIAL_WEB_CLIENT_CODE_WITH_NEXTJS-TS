@@ -237,6 +237,24 @@ export const PaymentTable = ({
                       <Copy className="w-4 h-4 cursor-pointer" onClick={() => handleCopy(payment.transactionId)} />
                     </TableCell>
                    
+
+ <TableCell className="max-w-[140px] flex items-center gap-1">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <code
+                            className="text-xs bg-gray-100 px-2 py-1 rounded block truncate cursor-pointer"
+                            onClick={() => handleCopy(payment.transactionId)}
+                          >
+                            {payment.transactionId.slice(0, 8)}...
+                          </code>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          Click to copy Transaction ID {payment.transactionId}
+                        </TooltipContent>
+                      </Tooltip>
+                      <Copy className="w-4 h-4 cursor-pointer" onClick={() => handleCopy(payment.transactionId)} />
+                    </TableCell>
+                   
                     <TableCell className="max-w-[100px]">
                       <div className="font-medium text-sm">{formatAmount(payment.amount)}</div>
                     </TableCell>
