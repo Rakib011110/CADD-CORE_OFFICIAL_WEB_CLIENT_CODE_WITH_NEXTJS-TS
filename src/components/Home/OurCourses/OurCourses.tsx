@@ -53,13 +53,13 @@ export default function OurCourses() {
                 stopOnMouseEnter: true,
               }) as any // Add 'as any' to bypass type incompatibility if needed
             ]}
-            className="w-full max-w-7xl mx-auto relative"
+            className="w-full max-w-7xl mx-auto relativ  p-2"
           >
             <CarouselContent>
               {courses?.data?.map((course: TCourse) => (
                 <CarouselItem
                   key={course._id}
-                  className="md:basis-1/2 lg:basis-1/3 p-4"
+                  className="md:basis-1/2 lg:basis-1/3"
                 >
                   <CourseCard key={course._id} {...course} />
                 </CarouselItem>
@@ -69,8 +69,10 @@ export default function OurCourses() {
             {/* Only show arrows when hovered */}
         
               <>
-                <CarouselPrevious className="bg-gray-950 text-white" />
-        <CarouselNext  className="bg-gray-950 text-white"/>
+               <div className="hidden md:block">
+                 <CarouselPrevious className="bg-gray-950  text-white" />
+        <CarouselNext  className="bg-gray-950 text-white "/>
+               </div>
               </>
         
           </Carousel>

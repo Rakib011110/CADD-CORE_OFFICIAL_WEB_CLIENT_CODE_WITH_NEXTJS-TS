@@ -115,39 +115,42 @@ import { DollarSign, FileText, Shield, Users } from "lucide-react";
     },
     {
       id: 'refund',
-      title: 'Refund Policy',
+      title: 'Refund & Cancellation Policy',
       icon: DollarSign,
       color: 'from-amber-600 to-orange-600',
       effectiveDate: 'January 1, 2024',
       introduction: 'We aim to maintain transparency and fairness in our refund and cancellation practices.',
       sections: [
         {
-          title: "1. Batch Not Started on Scheduled Date",
-          description: "If the course batch doesn't begin on the announced date and the student requests a refund, 100% of the course fee will be refunded."
+          title: "1. Full Refund - Before Batch Starts",
+          description: "100% refund if you cancel before the course batch begins, regardless of the reason."
         },
         {
-          title: "2. Student Withdraws Before Batch Starts",
-          description: "If a student wishes to withdraw before the batch begins, they must send a formal email to:",
-          highlight: {
-            title: "Engr. Hachnayen Ahmed, CEO",
-            email: "hachnayen@gmail.com"
-          },
-          additionalInfo: "Clearly state the reason for withdrawal. After CEO approval, the refund will be processed within the designated timeline."
+          title: "2. Batch Delayed or Cancelled",
+          description: "If the course batch doesn't begin on the announced date or is cancelled by CADD CORE, you will receive a full refund or can transfer to another batch."
         },
         {
-          title: "3. 7-10 Day Refund Window",
-          description: "Students are eligible for a refund within 7-10 days of enrollment, provided the batch hasn't started or special conditions apply."
+          title: "3. Early Withdrawal",
+          description: "If you withdraw within the first 7-10 days of starting the course"
         },
         {
-          title: "4. Refund Conditions",
+          title: "4. No Refund Conditions",
           items: [
-            "Refunds will not be processed once classes begin unless special exceptions are approved by the CEO.",
-            "No refund is applicable for missed classes, video inaccessibility due to rule violations, or failing to complete the course within 6 months."
+            "After completing 10 days of the course",
+            "For personal reasons after the batch has started"
           ]
         },
         {
-          title: "5. Cancellation of Course by Institute",
-          description: "If a course is canceled by CADD CORE, students will be eligible for a full refund or can opt to transfer to another batch/course."
+          title: "5. Refund Process",
+          items: [
+            "Refund requests must be submitted via email to caddcorebd@gmail.com",
+            "Refunds will be processed within 7-10 business days",
+            "Refunds will be made to the original payment method"
+          ]
+        },
+        {
+          title: "6. Course Transfer",
+          description: "Instead of a refund, you can transfer to another available batch at no additional cost (subject to availability)."
         }
       ]
     },

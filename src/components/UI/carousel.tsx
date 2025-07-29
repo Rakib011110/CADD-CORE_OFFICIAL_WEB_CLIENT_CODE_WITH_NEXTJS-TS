@@ -188,8 +188,8 @@ function CarouselPrevious({
       className={cn(
         "absolute size-8 rounded-full",
         orientation === "horizontal"
-          ? "top-1/2 -left-5 -translate-y-1/2"
-          : "-top-12 left-1/2 -translate-x-1/2 rotate-90",
+          ? "top-1/2 -left-5 -translate-y-1/2 "
+          : "-top-12 left-1/2 -translate-x-1/2 rotate-90 hidden md:block",
         className
       )}
       disabled={!canScrollPrev}
@@ -218,8 +218,8 @@ function CarouselNext({
       className={cn(
         "absolute size-8 rounded-full",
         orientation === "horizontal"
-          ? "top-1/2 -right-5 -translate-y-1/2"
-          : "-bottom-12 left-1/2 -translate-x-1/2 rotate-90",
+          ? "top-1/2 -right-0 -translate-y-1/2 "
+          : "-bottom-12 left-1/2 -translate-x-1/2 rotate-90 hidden md:block",
         className
       )}
       disabled={!canScrollNext}

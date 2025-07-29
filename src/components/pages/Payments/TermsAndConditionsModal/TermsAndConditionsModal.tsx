@@ -728,18 +728,54 @@ export const TermsAndConditionsModal: React.FC<TermsModalProps> = ({
         </div>
         
         {/* Footer - Keep Original Design with Enhancements */}
+               {/* Footer - Enhanced with Policy Links */}
         <div className="p-3 sm:p-4 border-t border-gray-200 bg-white">
           <div className="flex flex-col items-center justify-center max-w-4xl mx-auto">
-            <div className="flex items-center gap-3 mb-3">
+            {/* Policy Links */}
+            <div className="flex flex-wrap items-center justify-center gap-4 mb-4 text-xs sm:text-sm">
+              <a 
+                href="https://www.caddcore.net/privecy-policy" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors duration-200 flex items-center gap-1"
+              >
+                <FileText className="h-3 w-3" />
+                Privacy Policy
+              </a>
+              <span className="text-gray-300">|</span>
+              <a 
+                href="https://www.caddcore.net/privecy-policy" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors duration-200 flex items-center gap-1"
+              >
+                <FileText className="h-3 w-3" />
+                Refund Policy
+              </a>
+              <span className="text-gray-300">|</span>
+              <a 
+                href="https://www.caddcore.net/privecy-policy" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors duration-200 flex items-center gap-1"
+              >
+                <FileText className="h-3 w-3" />
+                Terms & Conditions
+              </a>
+            </div>
+
+            {/* Agreement Checkbox with Enhanced Text */}
+            <div className="flex items-start gap-3  text-center">
               <input 
                 type="checkbox" 
                 id="accept-terms" 
                 checked={termsAccepted}
                 onChange={(e) => handleTermsAcceptedChange(e.target.checked)}
-                className="h-7 w-8 rounded border-gray-950 text-blue-600 focus:ring-blue-500 flex-shrink-0"
+                className="h-6 w-6 rounded border-gray-400 text-blue-600 focus:ring-blue-500 flex-shrink-0"
               />
-              <label htmlFor="accept-terms" className="animate-bounce text-green-600 select-none text-sm font-medium cursor-pointer">
-                I agree to all terms and conditions
+              <label htmlFor="accept-terms" className="text-md font-bold cursor-pointer text-green-500 leading-relaxed">
+                I have read and agree
+
               </label>
             </div>
             
@@ -751,17 +787,7 @@ export const TermsAndConditionsModal: React.FC<TermsModalProps> = ({
                 </span>
               )}
               
-              <button
-                onClick={handleAccept}
-                disabled={!termsAccepted}
-                className={`px-6 py-2 rounded-xl text-white font-semibold flex items-center gap-2 text-sm transition-all shadow-md hover:shadow-lg ${
-                  termsAccepted
-                    ? "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800" 
-                    : "bg-gray-400 cursor-not-allowed"
-                }`}
-              >
-               
-              </button>
+             
             </div>
             
             {hasReachedBottom && !termsAccepted && (
@@ -770,11 +796,9 @@ export const TermsAndConditionsModal: React.FC<TermsModalProps> = ({
               </p>
             )}
             
-            {!hasReachedBottom && !termsAccepted && (
-              <p className="text-xs text-gray-500 text-center mt-2">
-                Read to the bottom or check the agreement box to continue
-              </p>
-            )}
+          
+
+          
           </div>
         </div>
       </div>
