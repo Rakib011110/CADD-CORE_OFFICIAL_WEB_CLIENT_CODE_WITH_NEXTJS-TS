@@ -435,6 +435,7 @@ export default function UserProfile() {
     skip: !userId,
   });
 
+
   // --- DATA TRANSFORMATION ---
   // Memoizing this would be a good optimization for larger datasets.
   const myPayments: Payment[] = paymentsData?.data || [];
@@ -699,7 +700,7 @@ export default function UserProfile() {
       </motion.div>
 
       {/* Recent Courses Preview */}
-      {enrolledCourses.length > 0 && (
+      {/* {enrolledCourses.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -737,7 +738,7 @@ export default function UserProfile() {
             ))}
           </div>
         </motion.div>
-      )}
+      )} */}
 
       {/* Course Video Access Section */}
       <CourseVideoAccess />

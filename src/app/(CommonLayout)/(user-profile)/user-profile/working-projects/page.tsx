@@ -153,7 +153,7 @@ const mockProjects: Project[] = [
       { id: "8", name: "Mood_Board.jpg", type: "image", url: "#", size: "2.1 MB" }
     ],
     links: {},
-    tasks: { total: 12, completed: 3 },
+    tasks: { total: 12, completed: 0 },
     createdAt: "2024-02-01",
     updatedAt: "2024-02-05"
   }
@@ -294,7 +294,7 @@ export default function WorkingProjects() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-500">Total Projects</p>
-              <p className="text-2xl font-bold text-gray-900">{totalProjects}</p>
+              <p className="text-2xl font-bold text-gray-900"> 0</p>
             </div>
             <div className="bg-blue-100 p-3 rounded-full">
               <FiBriefcase className="text-blue-600" size={24} />
@@ -311,7 +311,7 @@ export default function WorkingProjects() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-500">Completed</p>
-              <p className="text-2xl font-bold text-gray-900">{completedProjects}</p>
+              <p className="text-2xl font-bold text-gray-900"> 0 </p>
             </div>
             <div className="bg-green-100 p-3 rounded-full">
               <FiEye className="text-green-600" size={24} />
@@ -328,7 +328,7 @@ export default function WorkingProjects() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-500">In Progress</p>
-              <p className="text-2xl font-bold text-gray-900">{inProgressProjects}</p>
+              <p className="text-2xl font-bold text-gray-900">0</p>
             </div>
             <div className="bg-yellow-100 p-3 rounded-full">
               <FiClock className="text-yellow-600" size={24} />
@@ -345,7 +345,7 @@ export default function WorkingProjects() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-500">On Schedule</p>
-              <p className="text-2xl font-bold text-gray-900">{onTimeProjects}</p>
+              <p className="text-2xl font-bold text-gray-900"> 0 </p>
             </div>
             <div className="bg-purple-100 p-3 rounded-full">
               <FiCalendar className="text-purple-600" size={24} />
@@ -404,136 +404,7 @@ export default function WorkingProjects() {
         </div>
       </div>
 
-      {/* Projects Display */}
-      {filteredProjects.length > 0 ? (
-        <div className={`${
-          viewMode === "grid" 
-            ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" 
-            : "space-y-4"
-        }`}>
-          {filteredProjects.map((project, index) => (
-            <motion.div
-              key={project.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className={`bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-shadow ${
-                viewMode === "list" ? "flex gap-6 p-6" : ""
-              }`}
-            >
-              {/* Project Image */}
-              <div className={`relative ${
-                viewMode === "list" ? "w-48 h-32 flex-shrink-0" : "h-48 w-full"
-              } overflow-hidden`}>
-                <Image
-                  src={project.thumbnailUrl || "https://placehold.co/400x300/6B7280/FFFFFF?text=No+Image"}
-                  alt={project.title}
-                  fill
-                  className="object-cover"
-                />
-                <div className="absolute top-3 left-3">
-                  <Badge className={getStatusColor(project.status)}>
-                    {project.status.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                  </Badge>
-                </div>
-                <div className="absolute top-3 right-3">
-                  <Badge className={getPriorityColor(project.priority)}>
-                    {project.priority.toUpperCase()}
-                  </Badge>
-                </div>
-              </div>
-
-              {/* Project Content */}
-              <div className={`${viewMode === "list" ? "flex-1" : "p-6"}`}>
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex-1">
-                    <h3 className="text-lg font-bold text-gray-900 mb-1">{project.title}</h3>
-                    <p className="text-gray-600 text-sm line-clamp-2">{project.description}</p>
-                  </div>
-                </div>
-
-                <div className="space-y-3 mb-4">
-                  <div className="flex items-center gap-4 text-sm text-gray-600">
-                    <div className="flex items-center gap-1">
-                      <FiCalendar size={14} />
-                      <span>{new Date(project.startDate).toLocaleDateString()}</span>
-                    </div>
-                    {project.client && (
-                      <div className="flex items-center gap-1">
-                        <FiUser size={14} />
-                        <span className="truncate">{project.client}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex flex-wrap gap-1">
-                    {project.technologies.slice(0, 3).map((tech) => (
-                      <Badge key={tech.name} className={`text-xs ${tech.color}`}>
-                        {tech.name}
-                      </Badge>
-                    ))}
-                    {project.technologies.length > 3 && (
-                      <Badge className="text-xs bg-gray-100 text-gray-600">
-                        +{project.technologies.length - 3}
-                      </Badge>
-                    )}
-                  </div>
-
-                  {project.status !== "completed" && (
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span>Progress</span>
-                        <span>{project.progress}%</span>
-                      </div>
-                      <Progress value={project.progress} className="h-2" />
-                    </div>
-                  )}
-
-                  <div className="text-sm text-gray-600">
-                    <span>Tasks: {project.tasks.completed}/{project.tasks.total}</span>
-                  </div>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex gap-2">
-                  <Button 
-                    size="sm" 
-                    className="flex-1"
-                    onClick={() => setSelectedProject(project)}
-                  >
-                    View Details
-                  </Button>
-                  <Button size="sm" variant="outline">
-                    <FiEdit2 size={14} />
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    variant="outline"
-                    onClick={() => handleDeleteProject(project.id)}
-                    className="text-red-600 hover:text-red-700"
-                  >
-                    <FiTrash2 size={14} />
-                  </Button>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      ) : (
-        <div className="bg-white rounded-xl shadow-lg p-12 text-center border border-gray-100">
-          <FiBriefcase size={64} className="mx-auto mb-4 text-gray-300" />
-          <h3 className="text-xl font-semibold text-gray-800 mb-2">No Projects Found</h3>
-          <p className="text-gray-600 mb-6">
-            {searchTerm || filterStatus !== "all" 
-              ? "No projects match your current filters." 
-              : "Start building your portfolio by creating your first project."}
-          </p>
-          <Button onClick={() => setIsCreating(true)}>
-            Create Your First Project
-          </Button>
-        </div>
-      )}
-
+   
       {/* Create Project Modal */}
       <AnimatePresence>
         {isCreating && (

@@ -77,169 +77,6 @@ type LearningCourse = {
   studentsEnrolled: number;
 };
 
-const mockCourses: LearningCourse[] = [
-  {
-    id: "1",
-    title: "AutoCAD 2D & 3D Complete Course",
-    instructor: "Eng. John Smith",
-    thumbnailUrl: "https://placehold.co/400x225/007ACC/FFFFFF?text=AutoCAD",
-    progress: 75,
-    totalDuration: "40 hours",
-    enrolledDate: "2024-01-15",
-    lastAccessed: "2024-01-28",
-    studentId: "CADD001-2024",
-    password: "AutoCAD@123",
-    portalUrl: "https://engineeringitskills.com/autocad-course",
-    status: "active",
-    certificateAvailable: false,
-    rating: 4.8,
-    studentsEnrolled: 1250,
-    modules: [
-      {
-        id: "1",
-        title: "Introduction to AutoCAD",
-        description: "Getting started with AutoCAD interface and basic tools",
-        duration: "2h 30m",
-        locked: false,
-        completed: true,
-        completedMaterials: 5,
-        totalMaterials: 5,
-        materials: [
-          {
-            id: "1",
-            title: "Welcome to AutoCAD",
-            type: "video",
-            duration: "15 min",
-            url: "#",
-            locked: false,
-            completed: true
-          },
-          {
-            id: "2",
-            title: "Interface Overview",
-            type: "video",
-            duration: "25 min",
-            url: "#",
-            locked: false,
-            completed: true
-          },
-          {
-            id: "3",
-            title: "Basic Commands Cheat Sheet",
-            type: "document",
-            size: "2.5 MB",
-            url: "#",
-            downloadUrl: "#",
-            locked: false,
-            completed: true
-          }
-        ]
-      },
-      {
-        id: "2",
-        title: "2D Drawing Fundamentals",
-        description: "Master the essential 2D drawing tools and techniques",
-        duration: "4h 15m",
-        locked: false,
-        completed: true,
-        completedMaterials: 8,
-        totalMaterials: 8,
-        materials: [
-          {
-            id: "4",
-            title: "Drawing Lines and Shapes",
-            type: "video",
-            duration: "45 min",
-            url: "#",
-            locked: false,
-            completed: true
-          },
-          {
-            id: "5",
-            title: "Precision Drawing Techniques",
-            type: "video",
-            duration: "35 min",
-            url: "#",
-            locked: false,
-            completed: true
-          }
-        ]
-      },
-      {
-        id: "3",
-        title: "3D Modeling Basics",
-        description: "Introduction to 3D modeling in AutoCAD",
-        duration: "3h 45m",
-        locked: false,
-        completed: false,
-        completedMaterials: 3,
-        totalMaterials: 6,
-        materials: [
-          {
-            id: "6",
-            title: "3D Workspace Setup",
-            type: "video",
-            duration: "20 min",
-            url: "#",
-            locked: false,
-            completed: true
-          },
-          {
-            id: "7",
-            title: "Basic 3D Primitives",
-            type: "video",
-            duration: "30 min",
-            url: "#",
-            locked: false,
-            completed: false
-          }
-        ]
-      },
-      {
-        id: "4",
-        title: "Advanced 3D Techniques",
-        description: "Advanced 3D modeling and editing techniques",
-        duration: "5h 20m",
-        locked: true,
-        completed: false,
-        completedMaterials: 0,
-        totalMaterials: 10,
-        materials: []
-      }
-    ]
-  },
-  {
-    id: "2",
-    title: "3ds Max Modeling & Rendering",
-    instructor: "Eng. Sarah Johnson",
-    thumbnailUrl: "https://placehold.co/400x225/FF6B35/FFFFFF?text=3ds+Max",
-    progress: 100,
-    totalDuration: "50 hours",
-    enrolledDate: "2023-11-10",
-    lastAccessed: "2024-01-20",
-    studentId: "CADD002-2023",
-    password: "3dsMax@456",
-    portalUrl: "https://engineeringitskills.com/3dsmax-course",
-    status: "completed",
-    certificateAvailable: true,
-    rating: 4.9,
-    studentsEnrolled: 890,
-    modules: [
-      {
-        id: "5",
-        title: "3ds Max Interface",
-        description: "Complete overview of 3ds Max interface and workflow",
-        duration: "3h 00m",
-        locked: false,
-        completed: true,
-        completedMaterials: 6,
-        totalMaterials: 6,
-        materials: []
-      }
-    ]
-  }
-];
-
 export default function LearningPortal() {
   const [selectedCourse, setSelectedCourse] = useState<LearningCourse | null>(null);
   const [selectedModule, setSelectedModule] = useState<CourseModule | null>(null);
@@ -251,8 +88,8 @@ export default function LearningPortal() {
   const userId = user?._id;
   const { data: paymentsData } = useGetMyPaymentsQuery(userId, { skip: !userId });
 
-  // Use mock data for demonstration
-  const courses = mockCourses;
+  // Empty courses array - all data will come from API
+  const courses: LearningCourse[] = [];
 
   const getTypeIcon = (type: string) => {
     switch (type) {
@@ -333,9 +170,7 @@ export default function LearningPortal() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-500">Active Courses</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {courses.filter(c => c.status === "active").length}
-                  </p>
+                  <p className="text-2xl font-bold text-gray-900">0</p>
                 </div>
                 <div className="bg-green-100 p-3 rounded-full">
                   <FiBook className="text-green-600" size={24} />
@@ -352,9 +187,7 @@ export default function LearningPortal() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-500">Completed</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {courses.filter(c => c.status === "completed").length}
-                  </p>
+                  <p className="text-2xl font-bold text-gray-900">0</p>
                 </div>
                 <div className="bg-blue-100 p-3 rounded-full">
                   <FiStar className="text-blue-600" size={24} />
@@ -371,9 +204,7 @@ export default function LearningPortal() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-500">Watch Time</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {courses.reduce((acc, course) => acc + parseInt(course.totalDuration), 0)}h
-                  </p>
+                  <p className="text-2xl font-bold text-gray-900">0h</p>
                 </div>
                 <div className="bg-purple-100 p-3 rounded-full">
                   <FiClock className="text-purple-600" size={24} />
@@ -390,9 +221,7 @@ export default function LearningPortal() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-500">Certificates</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {courses.filter(c => c.certificateAvailable).length}
-                  </p>
+                  <p className="text-2xl font-bold text-gray-900">0</p>
                 </div>
                 <div className="bg-yellow-100 p-3 rounded-full">
                   <FiDownload className="text-yellow-600" size={24} />
@@ -404,122 +233,18 @@ export default function LearningPortal() {
           {/* Courses List */}
           <div className="space-y-4">
             <h2 className="text-2xl font-bold text-gray-800">Your Courses</h2>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {courses.map((course, index) => (
-                <motion.div
-                  key={course.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-shadow"
-                >
-                  <div className="relative h-48">
-                    <Image
-                      src={course.thumbnailUrl}
-                      alt={course.title}
-                      fill
-                      className="object-cover"
-                    />
-                    <div className="absolute top-4 left-4">
-                      <Badge className={getStatusColor(course.status)}>
-                        {course.status.charAt(0).toUpperCase() + course.status.slice(1)}
-                      </Badge>
-                    </div>
-                    <div className="absolute top-4 right-4">
-                      {course.rating && (
-                        <div className="bg-black/50 text-white px-2 py-1 rounded-lg flex items-center gap-1 text-sm">
-                          <FiStar className="text-yellow-400 fill-current" size={14} />
-                          <span>{course.rating}</span>
-                        </div>
-                      )}
-                    </div>
-                    {course.progress > 0 && course.progress < 100 && (
-                      <div className="absolute bottom-4 left-4 right-4">
-                        <Progress value={course.progress} className="h-2 bg-white/20" />
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="p-6">
-                    <div className="flex items-start justify-between mb-3">
-                      <div>
-                        <h3 className="text-lg font-bold text-gray-900 mb-1">{course.title}</h3>
-                        <p className="text-gray-600 text-sm">{course.instructor}</p>
-                      </div>
-                    </div>
-
-                    <div className="space-y-3 mb-4">
-                      <div className="flex items-center gap-4 text-sm text-gray-600">
-                        <div className="flex items-center gap-1">
-                          <FiClock size={14} />
-                          <span>{course.totalDuration}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <FiUser size={14} />
-                          <span>{course.studentsEnrolled} students</span>
-                        </div>
-                      </div>
-
-                      {course.progress > 0 && (
-                        <div>
-                          <div className="flex justify-between text-sm mb-1">
-                            <span>Progress</span>
-                            <span>{course.progress}%</span>
-                          </div>
-                          <Progress value={course.progress} className="h-2" />
-                        </div>
-                      )}
-
-                      {course.lastAccessed && (
-                        <p className="text-sm text-gray-500">
-                          Last accessed: {new Date(course.lastAccessed).toLocaleDateString()}
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Course Credentials */}
-                    {course.studentId && course.password && (
-                      <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                        <h4 className="font-semibold text-gray-800 mb-2">Portal Credentials</h4>
-                        <div className="space-y-2 text-sm">
-                          <div className="flex justify-between">
-                            <span className="text-gray-600">Student ID:</span>
-                            <span className="font-mono bg-white px-2 py-1 rounded">{course.studentId}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-600">Password:</span>
-                            <span className="font-mono bg-white px-2 py-1 rounded">{course.password}</span>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="flex gap-2">
-                      <Button 
-                        onClick={() => setSelectedCourse(course)}
-                        className="flex-1 gap-2"
-                      >
-                        <FiPlay size={16} />
-                        {course.status === "completed" ? "Review Course" : "Continue Learning"}
-                      </Button>
-                      
-                      <a href={course.portalUrl} target="_blank" rel="noopener noreferrer">
-                        <Button variant="outline" size="sm" className="gap-2">
-                          <FiExternalLink size={14} />
-                          Portal
-                        </Button>
-                      </a>
-
-                      {course.certificateAvailable && (
-                        <Button variant="outline" size="sm" className="gap-2">
-                          <FiDownload size={14} />
-                          Certificate
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
+            
+            {/* Empty State */}
+            <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-12 text-center">
+              <FiBook size={64} className="mx-auto mb-4 text-gray-300" />
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">No Courses Available</h3>
+              <p className="text-gray-600 mb-4">
+                You haven't enrolled in any courses yet. Contact support to get access to your learning materials.
+              </p>
+              <Button className="gap-2">
+                <FiExternalLink size={16} />
+                Browse Courses
+              </Button>
             </div>
           </div>
         </div>

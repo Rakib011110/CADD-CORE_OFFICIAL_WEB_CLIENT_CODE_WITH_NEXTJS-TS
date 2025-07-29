@@ -23,6 +23,7 @@ import { useGetMeQuery } from "@/redux/api/userApi";
 import { useGetMyPaymentsQuery } from "@/redux/api/payment/paymentApi";
 import Image from "next/image";
 import { toast } from "sonner";
+import StudentCertificate from "@/components/StudentCertificateApplications/StudentCertificateApplications";
 
 type CertificateApplication = {
   id: string;
@@ -42,48 +43,12 @@ type CertificateApplication = {
   };
 };
 
-const mockApplications: CertificateApplication[] = [
-  {
-    id: "1",
-    courseName: "AutoCAD 2D & 3D Complete Course",
-    courseCode: "CADD-001",
-    completionDate: "2024-12-15",
-    status: "approved",
-    submittedDate: "2024-11-20",
-    certificateType: "completion",
-    requirements: {
-      projectsCompleted: 8,
-      requiredProjects: 8,
-      attendancePercentage: 95,
-      requiredAttendance: 80,
-      finalExamScore: 88,
-      requiredExamScore: 70
-    }
-  },
-  {
-    id: "2", 
-    courseName: "3ds Max Modeling & Rendering",
-    courseCode: "CADD-002",
-    completionDate: "2024-11-30",
-    status: "pending",
-    submittedDate: "2024-11-25",
-    certificateType: "completion",
-    requirements: {
-      projectsCompleted: 6,
-      requiredProjects: 8,
-      attendancePercentage: 85,
-      requiredAttendance: 80,
-      finalExamScore: 75,
-      requiredExamScore: 70
-    }
-  }
-];
 
 export default function ApplyCertificate() {
   const [activeTab, setActiveTab] = useState<"apply" | "applications">("apply");
   const [selectedCourse, setSelectedCourse] = useState<string>("");
   const [certificateType, setCertificateType] = useState<"completion" | "participation">("completion");
-  const [applications, setApplications] = useState<CertificateApplication[]>(mockApplications);
+  const [applications, setApplications] = useState<CertificateApplication[]>([]);
 
   const { data: userData } = useGetMeQuery({});
   const user = userData?.data;
@@ -116,7 +81,7 @@ export default function ApplyCertificate() {
         requiredExamScore: 70
       }
     };
-
+    // Add to applications
     setApplications([newApplication, ...applications]);
     setSelectedCourse("");
     setActiveTab("applications");
@@ -206,183 +171,7 @@ export default function ApplyCertificate() {
           className="space-y-6"
         >
           {/* Application Form */}
-          <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-            <h3 className="text-xl font-bold text-gray-800 mb-6">New Certificate Application</h3>
-            
-            {/* Personal Information */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <FiUser className="text-indigo-600" />
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Full Name</p>
-                    <p className="text-gray-900">{user?.name || "Not provided"}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <FiMail className="text-indigo-600" />
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Email Address</p>
-                    <p className="text-gray-900">{user?.email || "Not provided"}</p>
-                  </div>
-                </div>
-              </div>
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <FiPhone className="text-indigo-600" />
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Phone Number</p>
-                    <p className="text-gray-900">{user?.mobileNumber || "Not provided"}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <FiCalendar className="text-indigo-600" />
-                  <div>
-                    <p className="text-sm font-medium text-gray-500">Application Date</p>
-                    <p className="text-gray-900">{new Date().toLocaleDateString()}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Course Selection */}
-            <div className="space-y-4 mb-6">
-              <label className="block text-sm font-medium text-gray-700">
-                Select Course
-              </label>
-              <div className="space-y-3">
-                {enrolledCourses.length > 0 ? (
-                  enrolledCourses.map((payment: any) => {
-                    const eligibility = checkEligibility(payment.course);
-                    return (
-                      <motion.div
-                        key={payment._id}
-                        whileHover={{ scale: 1.01 }}
-                        className={`p-4 border rounded-lg cursor-pointer transition-all ${
-                          selectedCourse === payment._id
-                            ? "border-blue-500 bg-blue-50"
-                            : "border-gray-200 hover:border-gray-300"
-                        } ${!eligibility.eligible && "opacity-60"}`}
-                        onClick={() => eligibility.eligible && setSelectedCourse(payment._id)}
-                      >
-                        <div className="flex items-start gap-4">
-                          <div className="relative h-16 w-16 rounded-lg overflow-hidden">
-                            <Image
-                              src={payment.course?.photoUrl || "/default-course.jpg"}
-                              alt={payment.course?.title || "Course"}
-                              fill
-                              className="object-cover"
-                            />
-                          </div>
-                          <div className="flex-1">
-                            <div className="flex items-start justify-between">
-                              <div>
-                                <h4 className="font-semibold text-gray-900">
-                                  {payment.course?.title || "Unknown Course"}
-                                </h4>
-                                <p className="text-sm text-gray-500">
-                                  Completed: {new Date(payment.createdAt).toLocaleDateString()}
-                                </p>
-                              </div>
-                              {eligibility.eligible ? (
-                                <Badge className="bg-green-100 text-green-800">Eligible</Badge>
-                              ) : (
-                                <Badge variant="outline" className="bg-red-50 text-red-600 border-red-200">
-                                  Not Eligible
-                                </Badge>
-                              )}
-                            </div>
-                            {!eligibility.eligible && (
-                              <div className="mt-2 text-sm text-red-600">
-                                <p>Requirements not met. Please contact support for details.</p>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </motion.div>
-                    );
-                  })
-                ) : (
-                  <div className="text-center py-8 text-gray-500">
-                    <FiBook size={48} className="mx-auto mb-4 text-gray-300" />
-                    <p>No completed courses found. Complete a course to apply for a certificate.</p>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Certificate Type */}
-            <div className="space-y-4 mb-6">
-              <label className="block text-sm font-medium text-gray-700">
-                Certificate Type
-              </label>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div
-                  className={`p-4 border rounded-lg cursor-pointer transition-all ${
-                    certificateType === "completion"
-                      ? "border-blue-500 bg-blue-50"
-                      : "border-gray-200 hover:border-gray-300"
-                  }`}
-                  onClick={() => setCertificateType("completion")}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={`w-4 h-4 rounded-full border-2 ${
-                      certificateType === "completion" 
-                        ? "border-blue-500 bg-blue-500" 
-                        : "border-gray-300"
-                    }`}>
-                      {certificateType === "completion" && (
-                        <div className="w-full h-full rounded-full bg-white scale-50" />
-                      )}
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-gray-900">Course Completion Certificate</h4>
-                      <p className="text-sm text-gray-500">
-                        For successfully completing all course requirements
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div
-                  className={`p-4 border rounded-lg cursor-pointer transition-all ${
-                    certificateType === "participation"
-                      ? "border-blue-500 bg-blue-50"
-                      : "border-gray-200 hover:border-gray-300"
-                  }`}
-                  onClick={() => setCertificateType("participation")}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={`w-4 h-4 rounded-full border-2 ${
-                      certificateType === "participation" 
-                        ? "border-blue-500 bg-blue-500" 
-                        : "border-gray-300"
-                    }`}>
-                      {certificateType === "participation" && (
-                        <div className="w-full h-full rounded-full bg-white scale-50" />
-                      )}
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-gray-900">Participation Certificate</h4>
-                      <p className="text-sm text-gray-500">
-                        For attending and participating in the course
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Submit Button */}
-            <div className="flex justify-end">
-              <Button 
-                onClick={handleSubmitApplication}
-                disabled={!selectedCourse}
-                className="px-8 py-3 bg-blue-600 hover:bg-blue-700"
-              >
-                Submit Application
-              </Button>
-            </div>
-          </div>
+         <StudentCertificate/>
         </motion.div>
       )}
 

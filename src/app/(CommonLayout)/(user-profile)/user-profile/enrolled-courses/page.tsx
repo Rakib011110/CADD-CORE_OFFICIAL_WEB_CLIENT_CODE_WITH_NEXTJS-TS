@@ -345,31 +345,7 @@ export default function EnrolledCourses() {
               }`}
             >
               {/* Course Image */}
-              <div className={`relative ${
-                viewMode === "list" ? "w-48 h-32 flex-shrink-0" : "h-48 w-full"
-              } overflow-hidden`}>
-                <Image
-                  src={course.thumbnailUrl}
-                  alt={course.title}
-                  fill
-                  className="object-cover"
-                />
-                <div className="absolute top-3 left-3">
-                  <Badge className={getStatusColor(course.status)}>
-                    {course.status.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                  </Badge>
-                </div>
-                <div className="absolute top-3 right-3">
-                  <Badge className="bg-red-100 text-red-800 border-red-200">
-                    ৳{course.amount.toLocaleString()}
-                  </Badge>
-                </div>
-                {course.status === "in-progress" && (
-                  <div className="absolute bottom-3 left-3 right-3">
-                    <Progress value={course.progress} className="h-2 bg-white/20" />
-                  </div>
-                )}
-              </div>
+             
 
               {/* Course Content */}
               <div className={`${viewMode === "list" ? "flex-1" : "p-6"}`}>
@@ -402,15 +378,7 @@ export default function EnrolledCourses() {
                     </div>
                   </div>
 
-                  {course.status === "in-progress" && (
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span className="text-gray-950 font-medium">Progress</span>
-                        <span className="text-gray-950 font-medium">{course.progress}%</span>
-                      </div>
-                      <Progress value={course.progress} className="h-2" />
-                    </div>
-                  )}
+                 
 
                   {course.status === "completed" && course.certificateEligible && (
                     <div className="bg-green-50 border border-green-200 rounded-lg p-3">
@@ -422,35 +390,7 @@ export default function EnrolledCourses() {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex gap-2">
-                  {course.status === "completed" ? (
-                    <>
-                      <Button size="sm" className="flex-1 gap-2 bg-red-600 hover:bg-red-700">
-                        <FiFileText size={14} />
-                        Review Course
-                      </Button>
-                      {course.certificateEligible && (
-                        <Button size="sm" variant="outline" className="gap-2 border-gray-300 text-gray-950 hover:bg-red-50 hover:text-red-600">
-                          <FiDownload size={14} />
-                          Certificate
-                        </Button>
-                      )}
-                    </>
-                  ) : (
-                    <>
-                      <Button size="sm" className="flex-1 gap-2 bg-red-600 hover:bg-red-700">
-                        <FiPlay size={14} />
-                        {course.status === "not-started" ? "Start Course" : "Continue"}
-                      </Button>
-                      <Link href="https://engineeringitskills.com/" target="_blank">
-                        <Button size="sm" variant="outline" className="gap-2 border-gray-300 text-gray-950 hover:bg-red-50 hover:text-red-600">
-                          <FiExternalLink size={14} />
-                          Portal
-                        </Button>
-                      </Link>
-                    </>
-                  )}
-                </div>
+             
 
                 {/* Course Details */}
                 <div className="mt-4 pt-4 border-t border-gray-200">
