@@ -24,6 +24,7 @@ import { useUser } from "@/context/user.provider";
 import Image from "next/image";
 import { AuthModal } from "@/components/auth";
 import { TermsAndConditionsModal } from "../../Payments/TermsAndConditionsModal/TermsAndConditionsModal";
+import Link from "next/link";
 
 // --- Interfaces (ensure these match your API response structures) ---
 interface APIInstallmentPlan {
@@ -405,35 +406,35 @@ export default function CourseFees({ course }: CourseFeesProps) {
 
           <div className="bg-white rounded-xl shadow-2xl p-6 sm:p-8 space-y-4">
               <div className="flex  items-center justify-center gap-2 mb-4 text-xs ">
-                          <a 
-                            href="https://www.caddcore.net/privecy-policy" 
+                          <Link
+                            href="/privecy-policy"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors duration-200 flex items-center gap-1"
                           >
                             <FileText className="h-3 w-3" />
                             Privacy Policy
-                          </a>
+                          </Link>
                           <span className="text-gray-300">|</span>
-                          <a 
-                            href="https://www.caddcore.net/privecy-policy" 
+                          <Link
+                            href="/privecy-policy"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors duration-200 flex items-center gap-1"
                           >
                             <FileText className="h-3 w-3" />
                             Refund Policy
-                          </a>
+                          </Link>
                           <span className="text-gray-300">|</span>
-                          <a 
-                            href="https://www.caddcore.net/privecy-policy" 
+                          <Link
+                            href="/privecy-policy"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors duration-200 flex items-center gap-1"
                           >
                             <FileText className="h-3 w-3" />
                             Terms & Conditions
-                          </a>
+                          </Link>
                         </div>
             <div className="space-y-3">
               {/* Payment Summary if terms are accepted */}
