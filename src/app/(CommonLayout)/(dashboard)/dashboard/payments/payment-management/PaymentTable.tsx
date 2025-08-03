@@ -23,6 +23,8 @@ import {
   AlertCircle,
   XCircle,
   Copy,
+  User,
+  FileText,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -65,12 +67,14 @@ export const PaymentTable = ({
   payments,
   isLoading,
   onMarkChecked,
+  onViewPaymentDetails,
   onViewUserHistory,
   isMarkingChecked,
 }: {
   payments: Payment[];
   isLoading: boolean;
   onMarkChecked: (id: string) => void;
+  onViewPaymentDetails: (paymentId: string) => void;
   onViewUserHistory: (userId: string) => void;
   isMarkingChecked: boolean;
 }) => {
@@ -118,184 +122,236 @@ export const PaymentTable = ({
   return (
     <div className="w-full">
       <TooltipProvider>
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="min-w-[200px]">User Details</TableHead>
-                <TableHead className="min-w-[180px]">Course</TableHead>
-                <TableHead className="min-w-[140px]">Transaction ID</TableHead>
-                <TableHead className="min-w-[100px]">Amount</TableHead>
-                <TableHead className="min-w-[100px]">Method</TableHead>
-                <TableHead className="min-w-[100px]">Status</TableHead>
-                <TableHead className="min-w-[120px]">Date</TableHead>
-                <TableHead className="min-w-[100px]">Review</TableHead>
-                <TableHead className="min-w-[120px]">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+        <div className="rounded-md border overflow-hidden">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-gray-50">
+                  <TableHead className="font-semibold text-gray-900 min-w-[200px]">User Details</TableHead>
+                  <TableHead className="font-semibold text-gray-900 min-w-[180px]">Course</TableHead>
+                  <TableHead className="font-semibold text-gray-900 min-w-[140px]">Transaction ID</TableHead>
+                  <TableHead className="font-semibold text-gray-900 min-w-[100px]">Amount</TableHead>
+                  <TableHead className="font-semibold text-gray-900 min-w-[100px]">Method</TableHead>
+                  <TableHead className="font-semibold text-gray-900 min-w-[100px]">Status</TableHead>
+                  <TableHead className="font-semibold text-gray-900 min-w-[120px]">Date</TableHead>
+                  <TableHead className="font-semibold text-gray-900 min-w-[100px]">Review</TableHead>
+                  <TableHead className="font-semibold text-gray-900 text-center min-w-[140px]">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={9} className="text-center py-8 text-gray-500">
-                    Loading...
+                  <TableCell colSpan={9} className="text-center py-12">
+                    <div className="flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                      <span className="ml-2 text-gray-500">Loading payments...</span>
+                    </div>
                   </TableCell>
                 </TableRow>
               ) : payments.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={9} className="text-center py-8 text-gray-500">
-                    No payments found.
+                  <TableCell colSpan={9} className="text-center py-12">
+                    <div className="flex flex-col items-center">
+                      <AlertCircle className="w-12 h-12 text-gray-400 mb-2" />
+                      <span className="text-gray-500 font-medium">No payments found</span>
+                      <span className="text-gray-400 text-sm">Try adjusting your filters</span>
+                    </div>
                   </TableCell>
                 </TableRow>
               ) : (
-                payments.map((payment) => (
-                  <TableRow key={payment._id}>
-                    <TableCell className="max-w-[200px]">
-                      <div className="truncate flex items-center gap-1">
+                payments.map((payment, index) => (
+                  <TableRow key={payment._id} className={index % 2 === 0 ? "bg-white" : "bg-gray-50/50"}>
+                    <TableCell className="py-4">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span
+                                className="font-medium cursor-pointer hover:text-blue-600 transition-colors"
+                                onClick={() => handleCopy(payment.user?.name || "")}
+                              >
+                                {payment.user?.name?.split(" ").slice(0, 2).join(" ")}
+                              </span>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              Click to copy: {payment.user?.name}
+                            </TooltipContent>
+                          </Tooltip>
+                          <Copy 
+                            className="w-3 h-3 cursor-pointer text-gray-400 hover:text-gray-600" 
+                            onClick={() => handleCopy(payment.user?.name || "")} 
+                          />
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span
+                                className="text-sm text-gray-500 cursor-pointer hover:text-blue-600 transition-colors"
+                                onClick={() => handleCopy(payment.user?.email || "")}
+                              >
+                                {payment.user?.email}
+                              </span>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              Click to copy: {payment.user?.email}
+                            </TooltipContent>
+                          </Tooltip>
+                          <Copy 
+                            className="w-3 h-3 cursor-pointer text-gray-400 hover:text-gray-600" 
+                            onClick={() => handleCopy(payment.user?.email || "")} 
+                          />
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span
+                                className="text-sm text-gray-500 cursor-pointer hover:text-blue-600 transition-colors"
+                                onClick={() => handleCopy(payment.user?.mobileNumber || "")}
+                              >
+                                {payment.user?.mobileNumber}
+                              </span>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              Click to copy: {payment.user?.mobileNumber}
+                            </TooltipContent>
+                          </Tooltip>
+                          <Copy 
+                            className="w-3 h-3 cursor-pointer text-gray-400 hover:text-gray-600" 
+                            onClick={() => handleCopy(payment.user?.mobileNumber || "")} 
+                          />
+                        </div>
+                      </div>
+                    </TableCell>
+
+                    <TableCell className="py-4">
+                      <div className="flex items-center gap-2">
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <span
-                              className="font-medium truncate cursor-pointer"
-                              onClick={() => handleCopy(payment.user?.name || "")}
+                              className="font-medium cursor-pointer hover:text-blue-600 transition-colors max-w-[150px] truncate"
+                              onClick={() => handleCopy(payment.course?.title || "")}
                             >
-                              {payment.user?.name?.split(" ").slice(0, 2).join(" ")}
+                              {payment.course?.title}
                             </span>
                           </TooltipTrigger>
                           <TooltipContent>
-                            Click to copy name
+                            Click to copy: {payment.course?.title}
                           </TooltipContent>
                         </Tooltip>
-                        <Copy className="w-4 h-4 cursor-pointer" onClick={() => handleCopy(payment.user?.name || "")} />
+                        <Copy 
+                          className="w-3 h-3 cursor-pointer text-gray-400 hover:text-gray-600" 
+                          onClick={() => handleCopy(payment.course?.title || "")} 
+                        />
                       </div>
-                      <div className="text-sm text-gray-500 truncate flex items-center gap-1">
+                    </TableCell>
+
+                    <TableCell className="py-4">
+                      <div className="flex items-center gap-2">
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <span
-                              className="truncate cursor-pointer"
-                              onClick={() => handleCopy(payment.user?.email || "")}
+                            <code
+                              className="text-xs bg-gray-100 px-2 py-1 rounded cursor-pointer hover:bg-gray-200 transition-colors"
+                              onClick={() => handleCopy(payment.transactionId)}
                             >
-                              {payment.user?.email}
-                            </span>
+                              {payment.transactionId.slice(0, 12)}...
+                            </code>
                           </TooltipTrigger>
                           <TooltipContent>
-                            Click to copy email
+                            Click to copy: {payment.transactionId}
                           </TooltipContent>
                         </Tooltip>
-                        <Copy className="w-4 h-4 cursor-pointer" onClick={() => handleCopy(payment.user?.email || "")} />
-                      </div>
-                      <div className="text-sm text-gray-500 truncate flex items-center gap-1">
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <span
-                              className="truncate cursor-pointer"
-                              onClick={() => handleCopy(payment.user?.mobileNumber || "")}
-                            >
-                              {payment.user?.mobileNumber}
-                            </span>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            Click to copy mobile number
-                          </TooltipContent>
-                        </Tooltip>
-                        <Copy className="w-4 h-4 cursor-pointer" onClick={() => handleCopy(payment.user?.mobileNumber || "")} />
+                        <Copy 
+                          className="w-3 h-3 cursor-pointer text-gray-400 hover:text-gray-600" 
+                          onClick={() => handleCopy(payment.transactionId)} 
+                        />
                       </div>
                     </TableCell>
-                    <TableCell className="max-w-[180px] flex items-center gap-1">
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <span
-                            className="font-medium truncate cursor-pointer"
-                            onClick={() => handleCopy(payment.course?.title || "")}
-                          >
-                            {payment.course?.title?.length > 18
-                              ? payment.course?.title.slice(0, 18) + "..."
-                              : payment.course?.title}
-                          </span>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          Click to copy course title
-                        </TooltipContent>
-                      </Tooltip>
-                      <Copy className="w-4 h-4 cursor-pointer ml-1" onClick={() => handleCopy(payment.course?.title || "")} />
+                    
+                    <TableCell className="py-4">
+                      <div className="font-semibold text-green-600">
+                        {formatAmount(payment.amount)}
+                      </div>
                     </TableCell>
 
-
-
- <TableCell className="max-w-[140px] flex items-center gap-1">
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <code
-                            className="text-xs bg-gray-100 px-2 py-1 rounded block truncate cursor-pointer"
-                            onClick={() => handleCopy(payment.transactionId)}
-                          >
-                            {payment.transactionId.slice(0, 8)}...
-                          </code>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          Click to copy Transaction ID {payment.transactionId}
-                        </TooltipContent>
-                      </Tooltip>
-                      <Copy className="w-4 h-4 cursor-pointer" onClick={() => handleCopy(payment.transactionId)} />
-                    </TableCell>
-                   
-
- <TableCell className="max-w-[140px] flex items-center gap-1">
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <code
-                            className="text-xs bg-gray-100 px-2 py-1 rounded block truncate cursor-pointer"
-                            onClick={() => handleCopy(payment.transactionId)}
-                          >
-                            {payment.transactionId.slice(0, 8)}...
-                          </code>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          Click to copy Transaction ID {payment.transactionId}
-                        </TooltipContent>
-                      </Tooltip>
-                      <Copy className="w-4 h-4 cursor-pointer" onClick={() => handleCopy(payment.transactionId)} />
-                    </TableCell>
-                   
-                    <TableCell className="max-w-[100px]">
-                      <div className="font-medium text-sm">{formatAmount(payment.amount)}</div>
-                    </TableCell>
-                    <TableCell className="max-w-[100px]">
-                      <div className="flex items-center gap-1">
-                        <CreditCard className="w-4 h-4" />
-                        <span className="text-sm truncate">
+                    <TableCell className="py-4">
+                      <div className="flex items-center gap-2">
+                        <CreditCard className="w-4 h-4 text-gray-500" />
+                        <span className="text-sm font-medium">
                           {payment.cardType || payment.paymentMethod || "SSL"}
                         </span>
                       </div>
                     </TableCell>
-                    <TableCell className="max-w-[100px]">{getStatusBadge(payment.status)}</TableCell>
-                    <TableCell className="max-w-[120px]">
-                      <div className="text-sm">
-                        {format(new Date(payment.createdAt), "MMM dd, yyyy")}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {format(new Date(payment.createdAt), "hh:mm a")}
+
+                    <TableCell className="py-4">
+                      {getStatusBadge(payment.status)}
+                    </TableCell>
+
+                    <TableCell className="py-4">
+                      <div className="space-y-1">
+                        <div className="text-sm font-medium">
+                          {format(new Date(payment.createdAt), "MMM dd, yyyy")}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {format(new Date(payment.createdAt), "hh:mm a")}
+                        </div>
                       </div>
                     </TableCell>
-                    <TableCell className="max-w-[100px]">{getCheckingBadge(payment.checking)}</TableCell>
-                    <TableCell className="max-w-[120px]">
-                      <div className="flex items-center gap-1">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => onViewUserHistory(payment.user?._id)}
-                          className="p-2"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </Button>
+
+                    <TableCell className="py-4">
+                      {getCheckingBadge(payment.checking)}
+                    </TableCell>
+
+                    <TableCell className="py-4">
+                      <div className="flex items-center justify-center gap-1">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => onViewPaymentDetails(payment._id)}
+                              className="h-8 w-8 p-0 hover:bg-blue-50 hover:border-blue-200"
+                            >
+                              <FileText className="w-4 h-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            View Payment Details
+                          </TooltipContent>
+                        </Tooltip>
+                        
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => onViewUserHistory(payment.user?._id)}
+                              className="h-8 w-8 p-0 hover:bg-purple-50 hover:border-purple-200"
+                            >
+                              <User className="w-4 h-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            View User History
+                          </TooltipContent>
+                        </Tooltip>
+
                         {!payment.checking && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => onMarkChecked(payment._id)}
-                            disabled={isMarkingChecked}
-                            className="p-2"
-                          >
-                            <Check className="w-4 h-4" />
-                          </Button>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => onMarkChecked(payment._id)}
+                                disabled={isMarkingChecked}
+                                className="h-8 w-8 p-0 hover:bg-green-50 hover:border-green-200"
+                              >
+                                <Check className="w-4 h-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              Mark as Reviewed
+                            </TooltipContent>
+                          </Tooltip>
                         )}
                       </div>
                     </TableCell>
@@ -304,6 +360,7 @@ export const PaymentTable = ({
               )}
             </TableBody>
           </Table>
+          </div>
         </div>
       </TooltipProvider>
     </div>

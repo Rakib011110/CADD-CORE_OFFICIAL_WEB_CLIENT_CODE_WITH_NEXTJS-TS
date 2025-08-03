@@ -23,16 +23,17 @@ const navigationSections = [
   {
     title: "📚 Payment Management",
     links: [
+      {
+        label: "📊 Payment History",
+        href: "/dashboard/payments/success-payments",
+        color: "",
+      },
        {
         label: "💳 Payment Management",
         href: "/dashboard/payments/payment-management",
         color: "",
       },
-      {
-        label: "📊 Payment History",
-        href: "/dashboard/payments/payment-history",
-        color: "",
-      },
+      
       {
         label: "📇 Manage Coupon",
         href: "/dashboard/payments/manage-coupon",
