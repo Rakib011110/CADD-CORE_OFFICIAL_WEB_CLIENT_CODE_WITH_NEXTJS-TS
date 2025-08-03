@@ -24,7 +24,7 @@ import {
   ChevronRight,
   TrendingUp,
   Calendar,
-  Users,
+
   CreditCard,
   FileText,
   User,
@@ -34,7 +34,7 @@ import {
   Clock,
   UserPlus,
   BookOpen,
-  Star
+  Activity
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
@@ -263,133 +263,157 @@ const SuccessPaymentPage = () => {
 
   return (
     <TooltipProvider>
-      <div className="p-3 sm:p-6 bg-gray-50 min-h-screen">
+      <div className="p-6 bg-gray-50 min-h-screen">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
-          <div className="mb-6 sm:mb-8">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-4">
+          <div className="mb-8">
+            <div className="flex items-center gap-4 mb-4">
               <Button
                 variant="outline"
                 onClick={() => router.back()}
-                className="flex items-center gap-2 w-fit"
+                className="flex items-center gap-2"
               >
                 <ArrowLeft className="w-4 h-4" />
-                <span className="hidden sm:inline">Back</span>
+                Back
               </Button>
-              <div className="flex-1">
-                <h1 className="text-2xl sm:text-3xl font-bold text-green-900 mb-2 flex items-center gap-3">
-                  <CheckCircle className="w-6 h-6 sm:w-8 sm:h-8 text-green-600" />
-                  <span className="truncate">Successful Payments</span>
+              <div>
+                <h1 className="text-3xl font-bold text-green-900 mb-2 flex items-center gap-3">
+                  <CheckCircle className="w-8 h-8 text-green-600" />
+                  Successful Payments
                 </h1>
-                <p className="text-sm sm:text-base text-gray-600">View and manage all completed payment transactions</p>
+                <p className="text-gray-600">View and manage all completed payment transactions</p>
               </div>
             </div>
 
-            {/* Recent Payment Notifications */}
-            <Card className="mb-8 border-green-200 bg-gradient-to-r from-green-50 to-emerald-50">
-              <CardHeader className="pb-4">
-                <CardTitle className="flex items-center gap-2 text-green-800">
-                  <Bell className="w-5 h-5 text-green-600" />
-                  Recent Student Admissions & Payments
-                  <Badge variant="outline" className="ml-2 bg-green-100 text-green-700 border-green-300">
-                    Live
-                  </Badge>
-                </CardTitle>
-                <p className="text-sm text-green-600">Latest successful enrollments and payments</p>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  {/* Summary Stats */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-white p-4 rounded-lg border border-green-200 shadow-sm">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm font-medium text-gray-600">Total Revenue</p>
-                          <p className="text-xl font-bold text-green-700">{formatAmount(stats.totalAmount)}</p>
-                        </div>
-                        <DollarSign className="w-6 h-6 text-green-600" />
+            {/* Statistics Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              <StatCard
+                title="Total Revenue"
+                value={formatAmount(stats.totalAmount)}
+                icon={DollarSign}
+                color="text-green-900"
+                description="All time successful payments"
+              />
+              <StatCard
+                title="Total Payments"
+                value={stats.totalPayments.toLocaleString()}
+                icon={CheckCircle}
+                color="text-blue-900"
+                description="Completed transactions"
+              />
+              <StatCard
+                title="Today's Revenue"
+                value={formatAmount(stats.todayAmount)}
+                icon={TrendingUp}
+                color="text-purple-900"
+                description={`${stats.todayPayments} payments today`}
+              />
+              
+              {/* Recent Payment Notifications StatCard */}
+              <Card className="hover:shadow-lg transition-shadow bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
+                <CardContent className="p-4">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <div className="relative">
+                        <Bell className="w-6 h-6 text-green-600" />
+                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-green-800">Recent Admissions</p>
+                        <p className="text-xs text-green-600">Live updates</p>
                       </div>
                     </div>
-                    <div className="bg-white p-4 rounded-lg border border-green-200 shadow-sm">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm font-medium text-gray-600">Total Students</p>
-                          <p className="text-xl font-bold text-blue-700">{stats.totalPayments}</p>
-                        </div>
-                        <Users className="w-6 h-6 text-blue-600" />
-                      </div>
-                    </div>
+                    <Badge variant="outline" className="bg-green-100 text-green-700 border-green-300 text-xs animate-pulse">
+                      Live
+                    </Badge>
                   </div>
-
-                  {/* Recent Notifications */}
-                  <div className="bg-white p-4 rounded-lg border border-green-200 shadow-sm">
-                    <h4 className="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                      <UserPlus className="w-4 h-4 text-green-600" />
-                      Recent Admissions
-                    </h4>
-                    <div className="space-y-3 max-h-32 overflow-y-auto">
-                      {filteredPayments.slice(0, 3).map((payment, index) => (
-                        <div key={payment._id} className="flex items-start gap-3 p-2 hover:bg-gray-50 rounded-md transition-colors">
-                          <div className="flex-shrink-0 mt-1">
-                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-xs font-medium text-gray-900 truncate">
-                              {payment.user?.name} enrolled in {payment.course?.title}
-                            </p>
-                            <div className="flex items-center gap-2 mt-1">
-                              <span className="text-xs font-semibold text-green-600">
-                                {formatAmount(payment.amount)}
-                              </span>
-                              <span className="text-xs text-gray-500 flex items-center gap-1">
-                                <Clock className="w-3 h-3" />
-                                {formatDistanceToNow(new Date(payment.createdAt), { addSuffix: true })}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="flex-shrink-0">
-                            <CheckCircle className="w-4 h-4 text-green-500" />
+                  
+                  <div className="space-y-2 max-h-32 overflow-y-auto">
+                    {filteredPayments.slice(0, 3).map((payment, index) => (
+                      <div
+                        key={payment._id}
+                        className={`flex items-start gap-2 p-2 rounded-md bg-white/70 border border-green-100 hover:bg-white transition-all duration-300 ${
+                          index === 0 ? 'animate-pulse' : ''
+                        }`}
+                      >
+                        <div className="flex-shrink-0 mt-1">
+                          <div className="relative">
+                            <UserPlus className="w-4 h-4 text-green-600" />
+                            {index === 0 && (
+                              <div className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full animate-ping"></div>
+                            )}
                           </div>
                         </div>
-                      ))}
-                      {filteredPayments.length === 0 && (
-                        <div className="text-center py-4 text-gray-500">
-                          <UserPlus className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                          <p className="text-xs">No recent admissions</p>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-medium text-gray-900 truncate">
+                            {payment.user?.name?.split(" ").slice(0, 2).join(" ")}
+                          </p>
+                          <p className="text-xs text-gray-600 truncate">
+                            {payment.course?.title}
+                          </p>
+                          <div className="flex items-center justify-between mt-1">
+                            <span className="text-xs font-bold text-green-700">
+                              {formatAmount(payment.amount)}
+                            </span>
+                            <span className="text-xs text-gray-500 flex items-center gap-1">
+                              <Clock className="w-3 h-3" />
+                              {formatDistanceToNow(new Date(payment.createdAt), { addSuffix: true })}
+                            </span>
+                          </div>
                         </div>
-                      )}
-                    </div>
-                    {filteredPayments.length > 3 && (
-                      <div className="mt-3 pt-2 border-t border-gray-100">
-                        <p className="text-xs text-gray-500 text-center">
-                          +{filteredPayments.length - 3} more students enrolled
-                        </p>
+                        <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+                      </div>
+                    ))}
+                    
+                    {filteredPayments.length === 0 && (
+                      <div className="text-center py-3 text-gray-500">
+                        <Activity className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                        <p className="text-xs">No recent activity</p>
                       </div>
                     )}
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                  
+                  {filteredPayments.length > 3 && (
+                    <div className="mt-3 pt-2 border-t border-green-200">
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs text-green-700 font-medium">
+                          +{filteredPayments.length - 3} more students
+                        </p>
+                        <div className="flex items-center gap-1">
+                          <div className="w-1 h-1 bg-green-500 rounded-full animate-pulse"></div>
+                          <div className="w-1 h-1 bg-green-500 rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
+                          <div className="w-1 h-1 bg-green-500 rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+              
+            </div>
+
+
+            
           </div>
 
           {/* Filters Section */}
-          <Card className="mb-4 sm:mb-6">
-            <CardHeader className="pb-3 sm:pb-4">
-              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-                <Filter className="w-4 h-4 sm:w-5 sm:h-5" />
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Filter className="w-5 h-5" />
                 Filters
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* Search Filter */}
-                <div className="relative sm:col-span-2 lg:col-span-1">
+                <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                   <Input
-                    placeholder="Search by name, email, phone..."
+                    placeholder="Search by name, email, phone, transaction ID, course..."
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
-                    className="pl-10 text-sm"
+                    className="pl-10"
                   />
                   {searchInput && (
                     <button
@@ -403,8 +427,8 @@ const SuccessPaymentPage = () => {
 
                 {/* Payment Method Filter */}
                 <Select value={filters.paymentMethod} onValueChange={(value) => handleFilterChange('paymentMethod', value)}>
-                  <SelectTrigger className="text-sm">
-                    <SelectValue placeholder="Payment method" />
+                  <SelectTrigger>
+                    <SelectValue placeholder="Filter by payment method" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Methods</SelectItem>
@@ -421,8 +445,8 @@ const SuccessPaymentPage = () => {
 
                 {/* Date Range Filter */}
                 <Select value={filters.dateRange} onValueChange={(value) => handleFilterChange('dateRange', value)}>
-                  <SelectTrigger className="text-sm">
-                    <SelectValue placeholder="Date range" />
+                  <SelectTrigger>
+                    <SelectValue placeholder="Filter by date" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Time</SelectItem>
@@ -434,15 +458,15 @@ const SuccessPaymentPage = () => {
               </div>
 
               {/* Clear Filters Button and Search Results */}
-              <div className="mt-3 sm:mt-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+              <div className="mt-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
                 {filters.search && (
-                  <div className="text-xs sm:text-sm text-gray-600">
+                  <div className="text-sm text-gray-600">
                     Found {filteredPayments.length} result{filteredPayments.length !== 1 ? 's' : ''} for "{filters.search}"
                   </div>
                 )}
                 <div className="flex gap-2">
                   {(searchInput || filters.paymentMethod !== 'all' || filters.dateRange !== 'all') && (
-                    <Button variant="outline" onClick={clearFilters} size="sm" className="text-xs sm:text-sm">
+                    <Button variant="outline" onClick={clearFilters} size="sm">
                       Clear All Filters
                     </Button>
                   )}
@@ -453,74 +477,90 @@ const SuccessPaymentPage = () => {
 
           {/* Payments Table */}
           <Card className="overflow-hidden">
-            <CardHeader className="pb-3 sm:pb-4">
-              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-4">
-                <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
-                  <span className="truncate">Successful Payment Transactions</span>
+            <CardHeader>
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+                <CardTitle className="flex items-center gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  Successful Payment Transactions
                 </CardTitle>
                 <div className="flex flex-col sm:flex-row gap-2">
-                  <span className="text-xs sm:text-sm text-gray-600 order-2 sm:order-1">
+                  <span className="text-sm text-gray-600">
                     Showing {startIndex + 1}-{Math.min(startIndex + itemsPerPage, filteredPayments.length)} of {filteredPayments.length} results
                   </span>
-                  <Button variant="outline" className="flex items-center gap-2 text-xs sm:text-sm order-1 sm:order-2" size="sm">
-                    <Download className="w-3 h-3 sm:w-4 sm:h-4" />
-                    <span className="hidden sm:inline">Export</span>
+                  <Button variant="outline" className="flex items-center gap-2">
+                    <Download className="w-4 h-4" />
+                    Export
                   </Button>
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="p-0">
+            <CardContent>
               {filteredPayments.length === 0 && !isLoading ? (
-                <div className="text-center py-8 sm:py-12 px-4">
-                  <CheckCircle className="w-12 h-12 sm:w-16 sm:h-16 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">No successful payments found</h3>
-                  <p className="text-sm text-gray-500 mb-4">
+                <div className="text-center py-12">
+                  <CheckCircle className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">No successful payments found</h3>
+                  <p className="text-gray-500 mb-4">
                     {searchInput || filters.paymentMethod !== 'all' || filters.dateRange !== 'all'
                       ? "Try adjusting your filters to find what you're looking for."
                       : "No successful payments available yet."}
                   </p>
                   {(searchInput || filters.paymentMethod !== 'all' || filters.dateRange !== 'all') && (
-                    <Button variant="outline" onClick={clearFilters} size="sm">
+                    <Button variant="outline" onClick={clearFilters}>
                       Clear All Filters
                     </Button>
                   )}
                 </div>
               ) : (
                 <>
-                  <div className="overflow-x-auto">
+                  <div className="rounded-md border">
                     <Table>
                       <TableHeader>
                         <TableRow className="bg-green-50">
-                          <TableHead className="font-semibold text-gray-900 text-xs sm:text-sm min-w-[140px]">User Details</TableHead>
-                          <TableHead className="font-semibold text-gray-900 text-xs sm:text-sm min-w-[120px] hidden sm:table-cell">Course</TableHead>
-                          <TableHead className="font-semibold text-gray-900 text-xs sm:text-sm min-w-[100px] hidden md:table-cell">Transaction ID</TableHead>
-                          <TableHead className="font-semibold text-gray-900 text-xs sm:text-sm min-w-[80px]">Amount</TableHead>
-                          <TableHead className="font-semibold text-gray-900 text-xs sm:text-sm min-w-[70px] hidden lg:table-cell">Method</TableHead>
-                          <TableHead className="font-semibold text-gray-900 text-xs sm:text-sm min-w-[80px] hidden sm:table-cell">Date</TableHead>
-                          <TableHead className="font-semibold text-gray-900 text-center text-xs sm:text-sm min-w-[80px]">Actions</TableHead>
+                          <TableHead className="font-semibold text-gray-900">User Details</TableHead>
+                          <TableHead className="font-semibold text-gray-900">Course</TableHead>
+                          <TableHead className="font-semibold text-gray-900">Transaction ID</TableHead>
+                          <TableHead className="font-semibold text-gray-900">Amount</TableHead>
+                          <TableHead className="font-semibold text-gray-900">Method</TableHead>
+                          <TableHead className="font-semibold text-gray-900">Date</TableHead>
+                          <TableHead className="font-semibold text-gray-900 text-center">Actions</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {isLoading ? (
                           <TableRow>
-                            <TableCell colSpan={7} className="text-center py-8 sm:py-12">
+                            <TableCell colSpan={7} className="text-center py-12">
                               <div className="flex items-center justify-center">
-                                <div className="animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-green-600"></div>
-                                <span className="ml-2 text-sm text-gray-500">Loading payments...</span>
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+                                <span className="ml-2 text-gray-500">Loading payments...</span>
                               </div>
                             </TableCell>
                           </TableRow>
                         ) : (
                           paginatedPayments.map((payment, index) => (
-                            <TableRow key={payment._id} className={index % 2 === 0 ? "bg-white" : "bg-green-50/30"}>
-                              <TableCell className="py-3 sm:py-4">
+                            <TableRow 
+                              key={payment._id} 
+                              className={
+                                payment.checking 
+                                  ? "bg-blue-50 border-l-4 border-l-blue-500 hover:bg-blue-100 transition-colors" // Reviewed payments - blue theme
+                                  : index % 2 === 0 
+                                    ? "bg-white hover:bg-gray-50 transition-colors" // Normal unreviewed - white
+                                    : "bg-green-50/30 hover:bg-green-100/50 transition-colors" // Normal unreviewed - light green
+                              }
+                            >
+                              <TableCell className="py-4">
                                 <div className="space-y-1">
                                   <div className="flex items-center gap-2">
+                                    {payment.checking && (
+                                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" title="Reviewed"></div>
+                                    )}
                                     <Tooltip>
                                       <TooltipTrigger asChild>
                                         <span
-                                          className="font-medium cursor-pointer hover:text-green-600 transition-colors text-xs sm:text-sm truncate max-w-[100px] sm:max-w-none"
+                                          className={`font-medium cursor-pointer transition-colors ${
+                                            payment.checking 
+                                              ? "text-blue-700 hover:text-blue-800" 
+                                              : "hover:text-green-600"
+                                          }`}
                                           onClick={() => handleCopy(payment.user?.name || "")}
                                         >
                                           {payment.user?.name?.split(" ").slice(0, 2).join(" ")}
@@ -528,10 +568,15 @@ const SuccessPaymentPage = () => {
                                       </TooltipTrigger>
                                       <TooltipContent>
                                         Click to copy: {payment.user?.name}
+                                        {payment.checking && " (Reviewed)"}
                                       </TooltipContent>
                                     </Tooltip>
                                     <Copy 
-                                      className="w-3 h-3 cursor-pointer text-gray-400 hover:text-gray-600 hidden sm:block" 
+                                      className={`w-3 h-3 cursor-pointer transition-colors ${
+                                        payment.checking 
+                                          ? "text-blue-400 hover:text-blue-600" 
+                                          : "text-gray-400 hover:text-gray-600"
+                                      }`}
                                       onClick={() => handleCopy(payment.user?.name || "")} 
                                     />
                                   </div>
@@ -539,7 +584,11 @@ const SuccessPaymentPage = () => {
                                     <Tooltip>
                                       <TooltipTrigger asChild>
                                         <span
-                                          className="text-xs text-gray-500 cursor-pointer hover:text-green-600 transition-colors truncate max-w-[100px] sm:max-w-none"
+                                          className={`text-sm cursor-pointer transition-colors ${
+                                            payment.checking 
+                                              ? "text-blue-600 hover:text-blue-700" 
+                                              : "text-gray-500 hover:text-green-600"
+                                          }`}
                                           onClick={() => handleCopy(payment.user?.email || "")}
                                         >
                                           {payment.user?.email}
@@ -550,20 +599,23 @@ const SuccessPaymentPage = () => {
                                       </TooltipContent>
                                     </Tooltip>
                                     <Copy 
-                                      className="w-3 h-3 cursor-pointer text-gray-400 hover:text-gray-600 hidden sm:block" 
+                                      className={`w-3 h-3 cursor-pointer transition-colors ${
+                                        payment.checking 
+                                          ? "text-blue-400 hover:text-blue-600" 
+                                          : "text-gray-400 hover:text-gray-600"
+                                      }`}
                                       onClick={() => handleCopy(payment.user?.email || "")} 
                                     />
-                                  </div>
-                                  <div className="flex items-center gap-2 sm:hidden">
-                                    <span className="text-xs text-gray-500 truncate">
-                                      {payment.course?.title}
-                                    </span>
                                   </div>
                                   <div className="flex items-center gap-2">
                                     <Tooltip>
                                       <TooltipTrigger asChild>
                                         <span
-                                          className="text-xs text-gray-500 cursor-pointer hover:text-green-600 transition-colors"
+                                          className={`text-sm cursor-pointer transition-colors ${
+                                            payment.checking 
+                                              ? "text-blue-600 hover:text-blue-700" 
+                                              : "text-gray-500 hover:text-green-600"
+                                          }`}
                                           onClick={() => handleCopy(payment.user?.mobileNumber || "")}
                                         >
                                           {payment.user?.mobileNumber}
@@ -574,19 +626,27 @@ const SuccessPaymentPage = () => {
                                       </TooltipContent>
                                     </Tooltip>
                                     <Copy 
-                                      className="w-3 h-3 cursor-pointer text-gray-400 hover:text-gray-600 hidden sm:block" 
+                                      className={`w-3 h-3 cursor-pointer transition-colors ${
+                                        payment.checking 
+                                          ? "text-blue-400 hover:text-blue-600" 
+                                          : "text-gray-400 hover:text-gray-600"
+                                      }`}
                                       onClick={() => handleCopy(payment.user?.mobileNumber || "")} 
                                     />
                                   </div>
                                 </div>
                               </TableCell>
 
-                              <TableCell className="py-3 sm:py-4 hidden sm:table-cell">
+                              <TableCell className="py-4">
                                 <div className="flex items-center gap-2">
                                   <Tooltip>
                                     <TooltipTrigger asChild>
                                       <span
-                                        className="font-medium cursor-pointer hover:text-green-600 transition-colors max-w-[120px] lg:max-w-[150px] truncate text-xs sm:text-sm"
+                                        className={`font-medium cursor-pointer transition-colors max-w-[150px] truncate ${
+                                          payment.checking 
+                                            ? "text-blue-700 hover:text-blue-800" 
+                                            : "hover:text-green-600"
+                                        }`}
                                         onClick={() => handleCopy(payment.course?.title || "")}
                                       >
                                         {payment.course?.title}
@@ -597,21 +657,29 @@ const SuccessPaymentPage = () => {
                                     </TooltipContent>
                                   </Tooltip>
                                   <Copy 
-                                    className="w-3 h-3 cursor-pointer text-gray-400 hover:text-gray-600" 
+                                    className={`w-3 h-3 cursor-pointer transition-colors ${
+                                      payment.checking 
+                                        ? "text-blue-400 hover:text-blue-600" 
+                                        : "text-gray-400 hover:text-gray-600"
+                                    }`}
                                     onClick={() => handleCopy(payment.course?.title || "")} 
                                   />
                                 </div>
                               </TableCell>
 
-                              <TableCell className="py-3 sm:py-4 hidden md:table-cell">
+                              <TableCell className="py-4">
                                 <div className="flex items-center gap-2">
                                   <Tooltip>
                                     <TooltipTrigger asChild>
                                       <code
-                                        className="text-xs bg-green-100 px-2 py-1 rounded cursor-pointer hover:bg-green-200 transition-colors"
+                                        className={`text-xs px-2 py-1 rounded cursor-pointer transition-colors ${
+                                          payment.checking 
+                                            ? "bg-blue-100 text-blue-800 hover:bg-blue-200" 
+                                            : "bg-green-100 hover:bg-green-200"
+                                        }`}
                                         onClick={() => handleCopy(payment.transactionId)}
                                       >
-                                        {payment.transactionId.slice(0, 8)}...
+                                        {payment.transactionId.slice(0, 12)}...
                                       </code>
                                     </TooltipTrigger>
                                     <TooltipContent>
@@ -619,30 +687,36 @@ const SuccessPaymentPage = () => {
                                     </TooltipContent>
                                   </Tooltip>
                                   <Copy 
-                                    className="w-3 h-3 cursor-pointer text-gray-400 hover:text-gray-600" 
+                                    className={`w-3 h-3 cursor-pointer transition-colors ${
+                                      payment.checking 
+                                        ? "text-blue-400 hover:text-blue-600" 
+                                        : "text-gray-400 hover:text-gray-600"
+                                    }`}
                                     onClick={() => handleCopy(payment.transactionId)} 
                                   />
                                 </div>
                               </TableCell>
 
-                              <TableCell className="py-3 sm:py-4">
-                                <div className="font-bold text-green-700 text-sm sm:text-lg">
+                              <TableCell className="py-4">
+                                <div className={`font-bold text-lg ${
+                                  payment.checking ? "text-blue-700" : "text-green-700"
+                                }`}>
                                   {formatAmount(payment.amount)}
                                 </div>
                               </TableCell>
 
-                              <TableCell className="py-3 sm:py-4 hidden lg:table-cell">
+                              <TableCell className="py-4">
                                 <div className="flex items-center gap-2">
-                                  <CreditCard className="w-3 h-3 sm:w-4 sm:h-4 text-gray-500" />
-                                  <span className="text-xs sm:text-sm font-medium">
+                                  <CreditCard className="w-4 h-4 text-gray-500" />
+                                  <span className="text-sm font-medium">
                                     {payment.cardType || payment.paymentMethod || "SSL"}
                                   </span>
                                 </div>
                               </TableCell>
 
-                              <TableCell className="py-3 sm:py-4 hidden sm:table-cell">
+                              <TableCell className="py-4">
                                 <div className="space-y-1">
-                                  <div className="text-xs sm:text-sm font-medium flex items-center gap-1">
+                                  <div className="text-sm font-medium flex items-center gap-1">
                                     <Calendar className="w-3 h-3" />
                                     {format(new Date(payment.createdAt), "MMM dd, yyyy")}
                                   </div>
@@ -652,7 +726,7 @@ const SuccessPaymentPage = () => {
                                 </div>
                               </TableCell>
 
-                              <TableCell className="py-3 sm:py-4">
+                              <TableCell className="py-4">
                                 <div className="flex items-center justify-center gap-1">
                                   <Tooltip>
                                     <TooltipTrigger asChild>
@@ -660,31 +734,28 @@ const SuccessPaymentPage = () => {
                                         variant="outline"
                                         size="sm"
                                         onClick={() => handleViewPaymentDetails(payment._id)}
-                                        className="h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-green-50 hover:border-green-200"
+                                        className={`h-8 w-8 p-0 transition-colors ${
+                                          payment.checking 
+                                            ? "hover:bg-blue-50 hover:border-blue-200 border-blue-300" 
+                                            : "hover:bg-green-50 hover:border-green-200"
+                                        }`}
                                       >
-                                        <FileText className="w-3 h-3 sm:w-4 sm:h-4" />
+                                        <FileText className={`w-4 h-4 ${
+                                          payment.checking ? "text-blue-600" : "text-gray-600"
+                                        }`} />
                                       </Button>
                                     </TooltipTrigger>
                                     <TooltipContent>
-                                      View Payment Details
+                                      View Payment Details {payment.checking && "(Reviewed)"}
                                     </TooltipContent>
                                   </Tooltip>
                                   
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => handleViewUserHistory(payment.user?._id)}
-                                        className="h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-blue-50 hover:border-blue-200"
-                                      >
-                                        <User className="w-3 h-3 sm:w-4 sm:h-4" />
-                                      </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      View User History
-                                    </TooltipContent>
-                                  </Tooltip>
+                                  {payment.checking && (
+                                    <div className="flex items-center ml-2">
+                                      <CheckCircle className="w-4 h-4 text-blue-500" />
+                                      <span className="sr-only">Reviewed</span>
+                                    </div>
+                                  )}
                                 </div>
                               </TableCell>
                             </TableRow>
@@ -696,24 +767,24 @@ const SuccessPaymentPage = () => {
 
                   {/* Pagination */}
                   {totalPages > 1 && (
-                    <div className="mt-4 sm:mt-6 px-4 pb-4 sm:px-6 sm:pb-6 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
-                      <div className="text-xs sm:text-sm text-gray-700 order-2 sm:order-1">
+                    <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+                      <div className="text-sm text-gray-700">
                         Page {currentPage} of {totalPages}
                       </div>
-                      <div className="flex items-center gap-1 sm:gap-2 order-1 sm:order-2">
+                      <div className="flex items-center gap-2">
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                           disabled={currentPage === 1}
-                          className="flex items-center gap-1 h-8 px-2 sm:px-3"
+                          className="flex items-center gap-1"
                         >
-                          <ChevronLeft className="w-3 h-3 sm:w-4 sm:h-4" />
-                          <span className="hidden sm:inline text-xs">Previous</span>
+                          <ChevronLeft className="w-4 h-4" />
+                          <span className="hidden sm:inline">Previous</span>
                         </Button>
                         
                         {/* Page numbers */}
-                        <div className="hidden md:flex gap-1">
+                        <div className="hidden sm:flex gap-1">
                           {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                             let pageNum;
                             if (totalPages <= 5) {
@@ -732,7 +803,7 @@ const SuccessPaymentPage = () => {
                                 variant={currentPage === pageNum ? "default" : "outline"}
                                 size="sm"
                                 onClick={() => setCurrentPage(pageNum)}
-                                className="w-8 h-8 p-0 text-xs"
+                                className="w-8 h-8 p-0"
                               >
                                 {pageNum}
                               </Button>
@@ -740,20 +811,15 @@ const SuccessPaymentPage = () => {
                           })}
                         </div>
 
-                        {/* Mobile page indicator */}
-                        <div className="md:hidden px-3 py-1 bg-gray-100 rounded text-xs">
-                          {currentPage}/{totalPages}
-                        </div>
-
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                           disabled={currentPage === totalPages}
-                          className="flex items-center gap-1 h-8 px-2 sm:px-3"
+                          className="flex items-center gap-1"
                         >
-                          <span className="hidden sm:inline text-xs">Next</span>
-                          <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4" />
+                          <span className="hidden sm:inline">Next</span>
+                          <ChevronRight className="w-4 h-4" />
                         </Button>
                       </div>
                     </div>

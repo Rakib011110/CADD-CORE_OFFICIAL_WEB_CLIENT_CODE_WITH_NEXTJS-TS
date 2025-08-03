@@ -52,9 +52,10 @@ const paymentApi = baseApi.injectEndpoints({
 
     // 🔧 Admin: Mark payment as checked
     updatePayment: builder.mutation({
-      query: (id: string) => ({
+      query: ({ id, ...updateData }) => ({
         url: `/payments/update/${id}`,
-        method: 'PUT',
+        method: 'PATCH',
+        body: updateData,
       }),
     }),
 

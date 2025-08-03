@@ -107,7 +107,10 @@ const PaymentDetailsPage = () => {
 
   const handleMarkAsChecked = async () => {
     try {
-      await markAsChecked({ id: paymentId } as any).unwrap();
+      await markAsChecked({
+        id: paymentId,
+        checking: true
+      }).unwrap();
       toast.success("Payment marked as checked successfully!");
       refetch();
     } catch (error: any) {
