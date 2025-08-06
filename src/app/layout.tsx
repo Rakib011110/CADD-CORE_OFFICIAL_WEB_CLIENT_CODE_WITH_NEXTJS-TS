@@ -107,6 +107,57 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        {/* Cookiebot */}
+        <Script
+          id="Cookiebot"
+          src="https://consent.cookiebot.com/uc.js"
+          data-cbid="03fabdb1-3f08-4e20-bc9f-05537f1f72f2"
+          data-blockingmode="auto"
+          strategy="beforeInteractive"
+        />
+
+        {/* Google Consent Mode v2 - Initialize before GTM */}
+        <Script
+          id="google-consent-mode"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              
+              // Default consent mode settings
+              gtag('consent', 'default', {
+                'ad_storage': 'denied',
+                'ad_user_data': 'denied',
+                'ad_personalization': 'denied',
+                'analytics_storage': 'denied',
+                'functionality_storage': 'granted',
+                'personalization_storage': 'denied',
+                'security_storage': 'granted',
+                'wait_for_update': 500,
+              });
+              
+              // Enable ads data redaction
+              gtag('set', 'ads_data_redaction', true);
+            `,
+          }}
+        />
+
+        {/* Google Tag Manager */}
+        <Script
+          id="google-tag-manager"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+              new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+              j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+              'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+              })(window,document,'script','dataLayer','GTM-556K9KF3');
+            `,
+          }}
+        />
+
         {/* Google Ads (gtag.js) */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=AW-17390510702"
@@ -165,6 +216,16 @@ export default function RootLayout({
             style={{ display: 'none' }}
             src="https://www.facebook.com/tr?id=408403910510266&ev=PageView&noscript=1"
           />
+        </noscript>
+
+        {/* Google Tag Manager (noscript) */}
+        <noscript>
+          <iframe
+            src="https://www.googletagmanager.com/ns.html?id=GTM-556K9KF3"
+            height="0"
+            width="0"
+            style={{ display: 'none', visibility: 'hidden' }}
+          ></iframe>
         </noscript>
 
         <Providers>{children}</Providers>

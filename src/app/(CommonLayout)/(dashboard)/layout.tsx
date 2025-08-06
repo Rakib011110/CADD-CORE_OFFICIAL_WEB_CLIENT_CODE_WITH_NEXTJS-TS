@@ -39,7 +39,12 @@ const navigationSections = [
         icon: "💰",
         color: "",
       },
-      
+       {
+        label: "Installment Plan",
+        href: "/dashboard/payments/installment-plan",
+        icon: "💰",
+        color: "",
+      },
       {
         label: "Manage Coupon",
         href: "/dashboard/payments/manage-coupon",
@@ -77,12 +82,7 @@ const navigationSections = [
         icon: "🕒",
         color: "",
       },
-      {
-        label: "Installment Plan",
-        href: "/dashboard/payments/installment-plan",
-        icon: "💰",
-        color: "",
-      },
+     
      
     ], 
   },
