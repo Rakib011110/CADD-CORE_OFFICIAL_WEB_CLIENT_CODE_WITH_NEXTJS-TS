@@ -25,10 +25,18 @@ import {
   Copy,
   User,
   FileText,
+  Edit3,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/UI/select";
 import {
   useUpdatePaymentMutation,
   useGetAllPaymentsQuery,
@@ -54,13 +62,50 @@ interface Payment {
     title: string;
   };
   amount: number;
-  status: "pending" | "completed" | "failed" | "cancelled";
+  status: "pending" | "completed" | "failed" | "cancelled" | "refund";
   cardType?: string;
   paymentMethod?: string;
   checking: boolean;
   createdAt: string;
   updatedAt: string;
 }
+
+// --------- Payment Status Update Component ----------
+const PaymentStatusUpdate = ({ 
+  payment, 
+  onStatusUpdate, 
+  isUpdating 
+}: { 
+  payment: Payment; 
+  onStatusUpdate: (paymentId: string, newStatus: Payment["status"]) => void;
+  isUpdating: boolean;
+}) => {
+  const [selectedStatus, setSelectedStatus] = useState<Payment["status"]>(payment.status);
+
+  const handleStatusChange = (newStatus: Payment["status"]) => {
+    setSelectedStatus(newStatus);
+    onStatusUpdate(payment._id, newStatus);
+  };
+
+  return (
+    <Select 
+      value={selectedStatus} 
+      onValueChange={handleStatusChange}
+      disabled={isUpdating}
+    >
+      <SelectTrigger className="w-32 h-8">
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="pending">Pending</SelectItem>
+        <SelectItem value="completed">Completed</SelectItem>
+        <SelectItem value="failed">Failed</SelectItem>
+        <SelectItem value="cancelled">Cancelled</SelectItem>
+        <SelectItem value="refund">Refund</SelectItem>
+      </SelectContent>
+    </Select>
+  );
+};
 
 // --------- Table Section Component ----------
 export const PaymentTable = ({
@@ -69,14 +114,18 @@ export const PaymentTable = ({
   onMarkChecked,
   onViewPaymentDetails,
   onViewUserHistory,
+  onStatusUpdate,
   isMarkingChecked,
+  isUpdatingStatus,
 }: {
   payments: Payment[];
   isLoading: boolean;
   onMarkChecked: (id: string) => void;
   onViewPaymentDetails: (paymentId: string) => void;
   onViewUserHistory: (userId: string) => void;
+  onStatusUpdate: (paymentId: string, newStatus: string) => void;
   isMarkingChecked: boolean;
+  isUpdatingStatus: boolean;
 }) => {
   const getStatusBadge = (status: string) => {
     const statusColors = {
@@ -84,6 +133,7 @@ export const PaymentTable = ({
       pending: "bg-yellow-100 text-yellow-800",
       failed: "bg-red-100 text-red-800",
       cancelled: "bg-gray-100 text-gray-800",
+      refund: "bg-purple-100 text-purple-800",
     };
     return (
       <Badge className={statusColors[status as keyof typeof statusColors] || "bg-gray-100"}>
@@ -133,15 +183,16 @@ export const PaymentTable = ({
                   <TableHead className="font-semibold text-gray-900 min-w-[100px]">Amount</TableHead>
                   <TableHead className="font-semibold text-gray-900 min-w-[100px]">Method</TableHead>
                   <TableHead className="font-semibold text-gray-900 min-w-[100px]">Status</TableHead>
+                  <TableHead className="font-semibold text-gray-900 min-w-[140px]">Status Update</TableHead>
                   <TableHead className="font-semibold text-gray-900 min-w-[120px]">Date</TableHead>
                   <TableHead className="font-semibold text-gray-900 min-w-[100px]">Review</TableHead>
-                  <TableHead className="font-semibold text-gray-900 text-center min-w-[140px]">Actions</TableHead>
+                  <TableHead className="font-semibold text-gray-900 text-center min-w-[140px]">Details</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={9} className="text-center py-12">
+                  <TableCell colSpan={10} className="text-center py-12">
                     <div className="flex items-center justify-center">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                       <span className="ml-2 text-gray-500">Loading payments...</span>
@@ -150,7 +201,7 @@ export const PaymentTable = ({
                 </TableRow>
               ) : payments.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={9} className="text-center py-12">
+                  <TableCell colSpan={10} className="text-center py-12">
                     <div className="flex flex-col items-center">
                       <AlertCircle className="w-12 h-12 text-gray-400 mb-2" />
                       <span className="text-gray-500 font-medium">No payments found</span>
@@ -287,6 +338,14 @@ export const PaymentTable = ({
                     </TableCell>
 
                     <TableCell className="py-4">
+                      <PaymentStatusUpdate 
+                        payment={payment} 
+                        onStatusUpdate={onStatusUpdate}
+                        isUpdating={isUpdatingStatus}
+                      />
+                    </TableCell>
+
+                    <TableCell className="py-4">
                       <div className="space-y-1">
                         <div className="text-sm font-medium">
                           {format(new Date(payment.createdAt), "MMM dd, yyyy")}
@@ -307,11 +366,11 @@ export const PaymentTable = ({
                           <TooltipTrigger asChild>
                             <Button
                               variant="outline"
-                              size="sm"
+                              size="lg"
                               onClick={() => onViewPaymentDetails(payment._id)}
                               className="h-8 w-8 p-0 hover:bg-blue-50 hover:border-blue-200"
                             >
-                              <FileText className="w-4 h-4" />
+                              <FileText className="w-6 h-6" />
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
@@ -319,40 +378,9 @@ export const PaymentTable = ({
                           </TooltipContent>
                         </Tooltip>
                         
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => onViewUserHistory(payment.user?._id)}
-                              className="h-8 w-8 p-0 hover:bg-purple-50 hover:border-purple-200"
-                            >
-                              <User className="w-4 h-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            View User History
-                          </TooltipContent>
-                        </Tooltip>
+                      
 
-                        {!payment.checking && (
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => onMarkChecked(payment._id)}
-                                disabled={isMarkingChecked}
-                                className="h-8 w-8 p-0 hover:bg-green-50 hover:border-green-200"
-                              >
-                                <Check className="w-4 h-4" />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              Mark as Reviewed
-                            </TooltipContent>
-                          </Tooltip>
-                        )}
+                       
                       </div>
                     </TableCell>
                   </TableRow>

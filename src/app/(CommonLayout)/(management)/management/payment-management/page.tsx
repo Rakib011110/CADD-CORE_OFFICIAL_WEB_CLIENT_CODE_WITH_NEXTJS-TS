@@ -49,7 +49,7 @@ interface Payment {
     title: string;
   };
   amount: number;
-  status: 'pending' | 'completed' | 'failed' | 'cancelled';
+  status: 'pending' | 'completed' | 'failed' | 'cancelled' | 'refund';
   cardType?: string;
   paymentMethod?: string;
   checking: boolean;
@@ -79,6 +79,7 @@ const PaymentManagement = () => {
 
   const { data: paymentsData, isLoading, refetch } = useGetAllPaymentsQuery(undefined);
   const [markAsChecked, { isLoading: isMarkingChecked }] = useUpdatePaymentMutation();
+  const [updatePaymentStatus, { isLoading: isUpdatingStatus }] = useUpdatePaymentMutation();
 
   const payments: Payment[] = paymentsData?.data || [];
 
@@ -100,6 +101,8 @@ const PaymentManagement = () => {
       filtered = filtered.filter((p: Payment) => p.status === "completed");
     } else if (activeTab === "failed") {
       filtered = filtered.filter((p: Payment) => p.status === "failed");
+    } else if (activeTab === "refunds") {
+      filtered = filtered.filter((p: Payment) => p.status === "refund");
     }
 
     // Search filter
@@ -177,6 +180,19 @@ const PaymentManagement = () => {
     }
   };
 
+  const handleStatusUpdate = async (paymentId: string, newStatus: string) => {
+    try {
+      await updatePaymentStatus({ 
+        id: paymentId, 
+        status: newStatus 
+      } as any).unwrap();
+      toast.success(`Payment status updated to ${newStatus} successfully!`);
+      refetch();
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Failed to update payment status");
+    }
+  };
+
   const handleViewUserHistory = (userId: string) => {
     router.push(`/dashboard/payments/user-history/${userId}`);
   };
@@ -246,6 +262,7 @@ const PaymentManagement = () => {
                   <SelectItem value="completed">Completed</SelectItem>
                   <SelectItem value="failed">Failed</SelectItem>
                   <SelectItem value="cancelled">Cancelled</SelectItem>
+                  <SelectItem value="refund">Refund</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -304,7 +321,7 @@ const PaymentManagement = () => {
           </CardHeader>
           <CardContent>
             <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-              <TabsList className="grid w-full grid-cols-4 mb-6">
+              <TabsList className="grid w-full grid-cols-5 mb-6">
                 <TabsTrigger value="recent">
                   Recent ({payments.filter((p) => !p.checking).length})
                 </TabsTrigger>
@@ -313,6 +330,9 @@ const PaymentManagement = () => {
                 </TabsTrigger>
                 <TabsTrigger value="failed">
                   Failed ({payments.filter((p) => p.status === "failed").length})
+                </TabsTrigger>
+                <TabsTrigger value="refunds">
+                  Refunds ({payments.filter((p) => p.status === "refund").length})
                 </TabsTrigger>
                 <TabsTrigger value="all">
                   All ({payments.length})
@@ -325,7 +345,9 @@ const PaymentManagement = () => {
                   isLoading={isLoading}
                   onMarkChecked={handleMarkAsChecked}
                   onViewUserHistory={handleViewUserHistory}
+                  onStatusUpdate={handleStatusUpdate}
                   isMarkingChecked={isMarkingChecked}
+                  isUpdatingStatus={isUpdatingStatus}
                 />
 
                 {/* Pagination */}

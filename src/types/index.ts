@@ -18,7 +18,7 @@ export interface IPayment {
   user: any;
   course: any;
   amount: number;
-  status: 'pending' | 'completed' | 'failed';
+  status: 'pending' | 'completed' | 'failed' | 'cancelled' | 'refund';
   createdAt?: Date;
   updatedAt?: Date;
 }

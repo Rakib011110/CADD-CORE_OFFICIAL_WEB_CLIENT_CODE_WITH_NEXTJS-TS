@@ -61,7 +61,7 @@ interface Payment {
     title: string;
   };
   amount: number;
-  status: 'pending' | 'completed' | 'failed' | 'cancelled';
+  status: 'pending' | 'completed' | 'failed' | 'cancelled' | 'refund';
   cardType?: string;
   paymentMethod?: string;
   checking: boolean;

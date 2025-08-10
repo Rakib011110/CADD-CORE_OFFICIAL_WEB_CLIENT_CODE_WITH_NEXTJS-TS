@@ -45,7 +45,7 @@ interface Payment {
     title: string;
   };
   amount: number;
-  status: 'pending' | 'completed' | 'failed' | 'cancelled';
+  status: 'pending' | 'completed' | 'failed' | 'cancelled' | 'refund';
   cardType?: string;
   cardIssuer?: string;
   paymentMethod?: string;
@@ -85,7 +85,8 @@ const UserPaymentHistory = () => {
       completed: { color: 'bg-green-100 text-green-800', icon: Check },
       pending: { color: 'bg-yellow-100 text-yellow-800', icon: Clock },
       failed: { color: 'bg-red-100 text-red-800', icon: X },
-      cancelled: { color: 'bg-gray-100 text-gray-800', icon: X }
+      cancelled: { color: 'bg-gray-100 text-gray-800', icon: X },
+      refund: { color: 'bg-purple-100 text-purple-800', icon: ArrowLeft }
     };
 
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;

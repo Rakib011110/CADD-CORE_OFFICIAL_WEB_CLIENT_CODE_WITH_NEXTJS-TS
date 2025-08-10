@@ -30,7 +30,7 @@ interface Payment {
   };
   
   amount: number;
-  status: "pending" | "completed" | "failed" | "cancelled";
+  status: "pending" | "completed" | "failed" | "cancelled" | "refund";
   cardType?: string;
   paymentMethod?: string;
   checking: boolean;
@@ -86,7 +86,7 @@ export const PaymentStats = ({ payments }: { payments: Payment[] }) => {
     const pendingPayments = payments.filter((p) => p.status === "pending").length;
     const failedPayments = payments.filter((p) => p.status === "failed").length;
     const cancelledPayments = payments.filter((p) => p.status === "cancelled").length;
-    
+
     // Calculate completed revenue (only from completed payments)
     const completedRevenue = payments
       .filter((p) => p.status === "completed")

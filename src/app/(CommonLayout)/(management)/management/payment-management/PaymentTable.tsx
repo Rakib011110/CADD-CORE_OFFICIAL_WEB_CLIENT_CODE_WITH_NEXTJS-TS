@@ -23,10 +23,18 @@ import {
   AlertCircle,
   XCircle,
   Copy,
+  Edit3,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/UI/select";
 import {
   useUpdatePaymentMutation,
   useGetAllPaymentsQuery,
@@ -52,7 +60,7 @@ interface Payment {
     title: string;
   };
   amount: number;
-  status: "pending" | "completed" | "failed" | "cancelled";
+  status: "pending" | "completed" | "failed" | "cancelled" | "refund";
   cardType?: string;
   paymentMethod?: string;
   checking: boolean;
@@ -60,19 +68,60 @@ interface Payment {
   updatedAt: string;
 }
 
+// --------- Payment Status Update Component ----------
+const PaymentStatusUpdate = ({ 
+  payment, 
+  onStatusUpdate, 
+  isUpdating 
+}: { 
+  payment: Payment; 
+  onStatusUpdate: (paymentId: string, newStatus: string) => void;
+  isUpdating: boolean;
+}) => {
+  const [selectedStatus, setSelectedStatus] = useState(payment.status);
+
+  const handleStatusChange = (newStatus: Payment["status"]) => {
+    setSelectedStatus(newStatus);
+    onStatusUpdate(payment._id, newStatus);
+  };
+
+  return (
+    <Select 
+      value={selectedStatus} 
+      onValueChange={handleStatusChange}
+      disabled={isUpdating}
+    >
+      <SelectTrigger className="w-32 h-8">
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="pending">Pending</SelectItem>
+        <SelectItem value="completed">Completed</SelectItem>
+        <SelectItem value="failed">Failed</SelectItem>
+        <SelectItem value="cancelled">Cancelled</SelectItem>
+        <SelectItem value="refund">Refund</SelectItem>
+      </SelectContent>
+    </Select>
+  );
+};
+
 // --------- Table Section Component ----------
 export const PaymentTable = ({
   payments,
   isLoading,
   onMarkChecked,
   onViewUserHistory,
+  onStatusUpdate,
   isMarkingChecked,
+  isUpdatingStatus,
 }: {
   payments: Payment[];
   isLoading: boolean;
   onMarkChecked: (id: string) => void;
   onViewUserHistory: (userId: string) => void;
+  onStatusUpdate: (paymentId: string, newStatus: string) => void;
   isMarkingChecked: boolean;
+  isUpdatingStatus: boolean;
 }) => {
   const getStatusBadge = (status: string) => {
     const statusColors = {
@@ -80,6 +129,7 @@ export const PaymentTable = ({
       pending: "bg-yellow-100 text-yellow-800",
       failed: "bg-red-100 text-red-800",
       cancelled: "bg-gray-100 text-gray-800",
+      refund: "bg-purple-100 text-purple-800",
     };
     return (
       <Badge className={statusColors[status as keyof typeof statusColors] || "bg-gray-100"}>
@@ -128,6 +178,7 @@ export const PaymentTable = ({
                 <TableHead className="min-w-[100px]">Amount</TableHead>
                 <TableHead className="min-w-[100px]">Method</TableHead>
                 <TableHead className="min-w-[100px]">Status</TableHead>
+                <TableHead className="min-w-[140px]">Status Update</TableHead>
                 <TableHead className="min-w-[120px]">Date</TableHead>
                 <TableHead className="min-w-[100px]">Review</TableHead>
                 <TableHead className="min-w-[120px]">Actions</TableHead>
@@ -136,13 +187,13 @@ export const PaymentTable = ({
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={9} className="text-center py-8 text-gray-500">
+                  <TableCell colSpan={10} className="text-center py-8 text-gray-500">
                     Loading...
                   </TableCell>
                 </TableRow>
               ) : payments.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={9} className="text-center py-8 text-gray-500">
+                  <TableCell colSpan={10} className="text-center py-8 text-gray-500">
                     No payments found.
                   </TableCell>
                 </TableRow>
@@ -267,6 +318,13 @@ export const PaymentTable = ({
                       </div>
                     </TableCell>
                     <TableCell className="max-w-[100px]">{getStatusBadge(payment.status)}</TableCell>
+                    <TableCell className="max-w-[140px]">
+                      <PaymentStatusUpdate 
+                        payment={payment} 
+                        onStatusUpdate={onStatusUpdate}
+                        isUpdating={isUpdatingStatus}
+                      />
+                    </TableCell>
                     <TableCell className="max-w-[120px]">
                       <div className="text-sm">
                         {format(new Date(payment.createdAt), "MMM dd, yyyy")}
