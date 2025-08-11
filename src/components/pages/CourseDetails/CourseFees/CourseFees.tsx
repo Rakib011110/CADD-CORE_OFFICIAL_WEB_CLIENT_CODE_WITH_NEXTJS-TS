@@ -242,7 +242,7 @@ export default function CourseFees({ course }: CourseFeesProps) {
     <div id="course-fees" className="p-4 sm:p-8 font-sans">
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-5 gap-8">
         {/* Left Column: Payment Details */}
-        <div className="lg:col-span-3 bg-white rounded-xl shadow-2xl p-6 sm:p-8 space-y-6">
+        <div className="lg:col-span-3 bg-white rounded-xl shadow-md p-6 sm:p-8 space-y-6">
           <h2 className="text-3xl font-bold text-gray-800 border-b pb-4">
             কোর্স ফি এবং পেমেন্ট
           </h2>
@@ -359,7 +359,7 @@ export default function CourseFees({ course }: CourseFeesProps) {
 
         {/* Right Column: Actions & Installments */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white rounded-xl shadow-2xl p-6 sm:p-8">
+          <div className="bg-white rounded-xl shadow-md p-6 sm:p-8">
             <h3 className="text-xl font-bold text-gray-800 mb-4">
               ইন্সটলমেন্ট এর বিবরণ
             </h3>
@@ -404,7 +404,7 @@ export default function CourseFees({ course }: CourseFeesProps) {
             )}
           </div>
 
-          <div className="bg-white rounded-xl shadow-2xl p-6 sm:p-8 space-y-4">
+          <div className="bg-white rounded-xl shadow-md p-6 sm:p-8 space-y-4">
               <div className="flex  items-center justify-center gap-2 mb-4 text-xs ">
                           <Link
                             href="/privecy-policy"
