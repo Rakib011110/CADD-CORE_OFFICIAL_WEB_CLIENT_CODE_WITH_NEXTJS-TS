@@ -20,7 +20,6 @@ import {
   Phone, 
   CreditCard, 
   Calendar, 
-  TrendingUp, 
   DollarSign,
   Check,
   X,
@@ -389,5 +388,5 @@ const UserPaymentHistory = () => {
     </div>
   );
 };
-
+// 
 export default UserPaymentHistory;

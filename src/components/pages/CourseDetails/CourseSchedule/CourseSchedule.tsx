@@ -64,7 +64,7 @@ export default function CourseSchedule({ course }: { course: any }) {
   ];
 
   return (
-    <div className="max-w-6xl mx-auto p-6 bg-white rounded-xl border border-gray-100 shadow-sm">
+    <div className="max-w-6xl mx-auto p-6 mb-10 bg-white rounded-xl border border-gray-100 shadow-sm">
       {/* Header Section */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
