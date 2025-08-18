@@ -46,7 +46,7 @@ export default function Navbar() {
       <Link href="/" className="w-36">
         <motion.div whileHover={{ scale: 1.05 }} className="cursor-pointer">
           <img
-            src="https://cdn-ilbhfhh.nitrocdn.com/GQAjASDcQJAOSFnCNbjHAwgJDnuIafbo/assets/images/optimized/rev-f913869/caddcore.net/wp-content/uploads/2023/03/cropped-cadd-01.png"
+            src="https://res.cloudinary.com/dalpf8iip/image/upload/v1755492733/Cadd_core_logo_white_png_v3fdci.png"
             alt="Logo"
           />
         </motion.div>

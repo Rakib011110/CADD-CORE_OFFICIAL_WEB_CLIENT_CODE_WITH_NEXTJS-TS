@@ -402,6 +402,9 @@ export default function CourseFees({ course }: CourseFeesProps) {
                 </p>
               </div>
             )}
+
+
+            
           </div>
 
           <div className="bg-white rounded-xl shadow-md p-6 sm:p-8 space-y-4">
