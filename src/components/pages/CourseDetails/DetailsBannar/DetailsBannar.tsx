@@ -7,6 +7,7 @@ import { useUser } from "@/context/user.provider";
 import EnrollModal from "../EnrollCourse/EnrollModal";
 import { useState } from "react";
 import { Link as ScrollLink } from "react-scroll";
+import Link from "next/link";
 
 export default function DetailsBannar({ course }: { course: TCourse }) {
   const { user } = useUser();
@@ -37,7 +38,7 @@ export default function DetailsBannar({ course }: { course: TCourse }) {
               {/* White Card */}
               <div className="backdrop-filter backdrop-blur-sm  rounded-md shadow-lg p-6 md:p-8">
                 {/* SubTitle */}
-                <h4 className="text-sm md:text-base text-red-500 font-semibold mb-2">
+                <h4 className="text-sm md:text-base bg-white p-1 rounded-md w-fit text-red-500 font-semibold mb-2">
                   {/* {banner.subTitle} */}
                   ইঞ্জিনিয়ারিং এক্সপার্টদের সাথে ক্যারিয়ার গড়ুন
                 </h4>
@@ -95,7 +96,6 @@ export default function DetailsBannar({ course }: { course: TCourse }) {
       <span>{course.courseIncludes.projects}</span>
     </div>
   )}
-
   {/* Experience Letter */}
   {course?.courseIncludes?.experienceLetter && (
     <div className="flex items-center gap-2 border-l-4 border-red-500 pl-2">
@@ -135,10 +135,13 @@ export default function DetailsBannar({ course }: { course: TCourse }) {
                     duration={800}
                     offset={-100}
                   >
-                    <button className="w-full sm:w-auto bg-white/10 border border-white/20 hover:bg-white/20 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300">
+                    <button className="w-full sm:w-auto bg-gray-950 border border-white/20 hover:bg-white/20 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300">
                       কোর্স ফি দেখুন
                     </button>
                   </ScrollLink>
+                    <button className="w-full sm:w-auto flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg font-semibold transition-transform duration-300 hover:scale-105 shadow-lg shadow-red-500/20">
+                     <Link href="https://docs.google.com/forms/d/e/1FAIpQLScZysZu-d44Md-KbsIPXOX-wuoobxWbcBaXN04ITkgWYNR6Fw/viewform">  জয়েন ফ্রি সেমিনার  </Link>
+                    </button>
                 </div>
 
                   <div className="payment-section">
