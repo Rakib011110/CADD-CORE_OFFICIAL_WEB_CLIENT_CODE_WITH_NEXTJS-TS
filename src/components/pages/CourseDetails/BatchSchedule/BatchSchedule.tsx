@@ -1,10 +1,8 @@
 "use client"
 
 import React, { useState, useEffect } from 'react';
-import Link from "next/link";
-import { Calendar, MapPin, Clock, Users, ArrowRight, Hourglass } from "lucide-react";
+import { Calendar, MapPin, Clock, Users, Hourglass } from "lucide-react";
 
-// You can replace this with your actual TCourse type definition
 export type TCourse = {
   schedule: {
     startingDate: string;

@@ -25,6 +25,7 @@ import Image from "next/image";
 import { AuthModal } from "@/components/auth";
 import { TermsAndConditionsModal } from "../../Payments/TermsAndConditionsModal/TermsAndConditionsModal";
 import Link from "next/link";
+import { string } from "zod";
 
 // --- Interfaces (ensure these match your API response structures) ---
 interface APIInstallmentPlan {
@@ -40,6 +41,7 @@ interface Course {
   title: string;
   courseFee: number;
   schedule: {
+    days: string;
     startingDate: string;
   };
 }
@@ -289,7 +291,7 @@ export default function CourseFees({ course }: CourseFeesProps) {
             <div className="flex items-center gap-3 text-gray-600">
               <CalendarDays className="h-5 w-5 text-red-500" />
               <span className="font-medium">
-                কোর্স শুরু: {formatDate(course.schedule.startingDate)}
+                কোর্স শুরু: {formatDate(course.schedule.startingDate)} <span> ( { course?.schedule?.days || 'TBD'} )</span>
               </span>
             </div>
           </div>
