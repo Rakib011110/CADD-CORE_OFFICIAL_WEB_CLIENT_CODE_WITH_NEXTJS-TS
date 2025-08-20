@@ -34,11 +34,15 @@ export default function CreateIndustrialCourses() {
       overviewDescription: "",
       videoUrl: ""
     },
-    courseIncludes: {
-      duration: "",
-      weeklyLiveClasses: "",
-      weeklyClassHours: ""
-    },
+     courseIncludes: {
+    duration: "",
+    liveSessions: "",
+    certificate: "",
+    onJobTraining: "",
+    projects: "",
+    experienceLetter: ""
+  },
+
     topicsCovered: [{ topicTitle: "", topicDescription: "" }],
     softwaresTaught: [{ softwareTitle: "", photoUrl: "" }],
     demoCertificate: [{ title: "", photoUrl: "" }],

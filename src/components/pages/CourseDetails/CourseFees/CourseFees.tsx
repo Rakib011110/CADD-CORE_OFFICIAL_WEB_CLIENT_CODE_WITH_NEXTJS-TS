@@ -25,7 +25,6 @@ import Image from "next/image";
 import { AuthModal } from "@/components/auth";
 import { TermsAndConditionsModal } from "../../Payments/TermsAndConditionsModal/TermsAndConditionsModal";
 import Link from "next/link";
-import { string } from "zod";
 
 // --- Interfaces (ensure these match your API response structures) ---
 interface APIInstallmentPlan {

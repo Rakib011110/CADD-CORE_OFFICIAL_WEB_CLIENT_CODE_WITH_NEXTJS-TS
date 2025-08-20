@@ -267,9 +267,12 @@ export default function UpdateMastersCourses({
           {/* --- Course Includes --- */}
           {renderSectionHeader('Course Includes')}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div><Label>Total Duration</Label><Input value={formData.courseIncludes?.duration || ''} onChange={e => handleNestedChange('courseIncludes', 'duration', e.target.value)} placeholder="e.g., 3 months" /></div>
-            <div><Label>Weekly Live Classes</Label><Input value={formData.courseIncludes?.weeklyLiveClasses || ''} onChange={e => handleNestedChange('courseIncludes', 'weeklyLiveClasses', e.target.value)} placeholder="e.g., 2 classes" /></div>
-            <div><Label>Weekly Class Hours</Label><Input value={formData.courseIncludes?.weeklyClassHours || ''} onChange={e => handleNestedChange('courseIncludes', 'weeklyClassHours', e.target.value)} placeholder="e.g., 4 hours" /></div>
+            <div><Label>Duration</Label><Input value={formData.courseIncludes?.duration || ''} onChange={e => handleNestedChange('courseIncludes', 'duration', e.target.value)} placeholder="e.g., 3 months" /></div>
+            <div><Label>Live Sessions</Label><Input value={formData.courseIncludes?.liveSessions || ''} onChange={e => handleNestedChange('courseIncludes', 'liveSessions', e.target.value)} placeholder="e.g., 24 sessions" /></div>
+            <div><Label>Certificate</Label><Input value={formData.courseIncludes?.certificate || ''} onChange={e => handleNestedChange('courseIncludes', 'certificate', e.target.value)} placeholder="e.g., Industry Recognized Certificate" /></div>
+            <div><Label>On Job Training</Label><Input value={formData.courseIncludes?.onJobTraining || ''} onChange={e => handleNestedChange('courseIncludes', 'onJobTraining', e.target.value)} placeholder="e.g., 2 months training" /></div>
+            <div><Label>Projects</Label><Input value={formData.courseIncludes?.projects || ''} onChange={e => handleNestedChange('courseIncludes', 'projects', e.target.value)} placeholder="e.g., 5 industry projects" /></div>
+            <div><Label>Experience Letter</Label><Input value={formData.courseIncludes?.experienceLetter || ''} onChange={e => handleNestedChange('courseIncludes', 'experienceLetter', e.target.value)} placeholder="e.g., Work experience certificate" /></div>
           </div>
 
           {/* --- Topics Covered --- */}

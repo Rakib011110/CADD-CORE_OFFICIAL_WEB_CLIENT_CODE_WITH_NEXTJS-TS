@@ -287,17 +287,38 @@ export default function UpdateCourse({
           className="w-full border p-2 rounded"
         />
         <Input
-          name="weeklyLiveClasses"
-          value={localForm.courseIncludes?.weeklyLiveClasses || ""}
+          name="liveSessions"
+          value={localForm.courseIncludes?.liveSessions || ""}
           onChange={handleCourseIncludesChange}
-          placeholder="Weekly Live Classes"
+          placeholder="Live Sessions"
           className="w-full border p-2 rounded"
         />
         <Input
-          name="weeklyClassHours"
-          value={localForm.courseIncludes?.weeklyClassHours || ""}
+          name="certificate"
+          value={localForm.courseIncludes?.certificate || ""}
           onChange={handleCourseIncludesChange}
-          placeholder="Weekly Class Hours"
+          placeholder="Certificate"
+          className="w-full border p-2 rounded"
+        />
+        <Input
+          name="onJobTraining"
+          value={localForm.courseIncludes?.onJobTraining || ""}
+          onChange={handleCourseIncludesChange}
+          placeholder="On Job Training"
+          className="w-full border p-2 rounded"
+        />
+        <Input
+          name="projects"
+          value={localForm.courseIncludes?.projects || ""}
+          onChange={handleCourseIncludesChange}
+          placeholder="Projects"
+          className="w-full border p-2 rounded"
+        />
+        <Input
+          name="experienceLetter"
+          value={localForm.courseIncludes?.experienceLetter || ""}
+          onChange={handleCourseIncludesChange}
+          placeholder="Experience Letter"
           className="w-full border p-2 rounded"
         />
 

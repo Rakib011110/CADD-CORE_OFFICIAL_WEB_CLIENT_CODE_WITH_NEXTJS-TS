@@ -24,8 +24,11 @@ export type TCourse = {
 
   courseIncludes: {
     duration: string;
-    weeklyLiveClasses: string;
-    weeklyClassHours: string;
+    liveSessions?: string;
+    certificate?: string;
+    onJobTraining?: string;
+    projects?: string;
+    experienceLetter?: string;
   };
 
   topicsCovered: { topicTitle: string; topicDescription: string }[];

@@ -14,7 +14,10 @@ const CourseCard: React.FC<TCourse> = ({
   photoUrl,
   slug,
   softwaresTaught,
-}) => {
+}) => 
+  { 
+
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}

@@ -264,7 +264,7 @@ export default function UpdateIndustrialCourses({
                   placeholder="3 months"
                 />
               </div>
-              <div>
+              {/* <div>
                 <Label>Weekly Live Classes</Label>
                 <Input
                   type="text"
@@ -272,8 +272,8 @@ export default function UpdateIndustrialCourses({
                   onChange={e => handleNestedChange('courseIncludes', 'weeklyLiveClasses', e.target.value)}
                   placeholder="2 classes"
                 />
-              </div>
-              <div>
+              </div> */}
+              {/* <div>
                 <Label>Weekly Class Hours</Label>
                 <Input
                   type="text"
@@ -281,7 +281,7 @@ export default function UpdateIndustrialCourses({
                   onChange={e => handleNestedChange('courseIncludes', 'weeklyClassHours', e.target.value)}
                   placeholder="4 hours"
                 />
-              </div>
+              </div> */}
             </div>
           </div>
 

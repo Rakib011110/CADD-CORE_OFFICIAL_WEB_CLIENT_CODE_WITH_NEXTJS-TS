@@ -2,7 +2,7 @@
 import { useState } from "react";
 import CoursesBanner from "@/components/pages/@courses/CourseBanner";
 import CourseCard from "@/components/UI/CourseCard/CourseCard";
-import { Category } from "@/lib/courses";
+import { Category, TCourse } from "@/lib/courses";
 import { useGetAllCourseQuery } from "@/redux/api/courseApi";
 import LoadingSpinner from "@/components/UI/LoadingSpinner/LoadingSpinner";
 
@@ -76,7 +76,7 @@ export default function AllCourses() {
                 <LoadingSpinner />
               </div>
             ) : filteredCourses.length > 0 ? (
-              filteredCourses.map((course: any) => (
+              filteredCourses.map((course: TCourse) => (
                 <CourseCard key={course._id} {...course} />
               ))
             ) : (

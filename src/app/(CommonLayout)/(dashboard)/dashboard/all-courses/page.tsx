@@ -34,8 +34,11 @@ export default function CourseForm() {
     },
     courseIncludes: {
       duration: "",
-      weeklyLiveClasses: "",
-      weeklyClassHours: ""
+      liveSessions: "",
+      certificate: "",
+      onJobTraining: "",
+      projects: "",
+      experienceLetter: ""
     },
     topicsCovered: [{ topicTitle: "", topicDescription: "" }],
     softwaresTaught: [{ softwareTitle: "", photoUrl: "" }],
@@ -257,12 +260,24 @@ const handleSubmit = async (e:any) => {
                   <Input type="text" name="courseIncludes.duration" id="courseIncludes.duration" placeholder="Enter duration" onChange={(e) => handleNestedChange("courseIncludes", "duration", e.target.value)} required />
                 </div>
                 <div>
-                  <Label htmlFor="courseIncludes.weeklyLiveClasses">Weekly Live Classes</Label>
-                  <Input type="text" name="courseIncludes.weeklyLiveClasses" id="courseIncludes.weeklyLiveClasses" placeholder="Enter weekly live classes" onChange={(e) => handleNestedChange("courseIncludes", "weeklyLiveClasses", e.target.value)} required />
+                  <Label htmlFor="courseIncludes.liveSessions">Live Sessions</Label>
+                  <Input type="text" name="courseIncludes.liveSessions" id="courseIncludes.liveSessions" placeholder="Enter live sessions" onChange={(e) => handleNestedChange("courseIncludes", "liveSessions", e.target.value)} />
                 </div>
                 <div>
-                  <Label htmlFor="courseIncludes.weeklyClassHours">Weekly Class Hours</Label>
-                  <Input type="text" name="courseIncludes.weeklyClassHours" id="courseIncludes.weeklyClassHours" placeholder="Enter weekly class hours" onChange={(e) => handleNestedChange("courseIncludes", "weeklyClassHours", e.target.value)} required />
+                  <Label htmlFor="courseIncludes.certificate">Certificate</Label>
+                  <Input type="text" name="courseIncludes.certificate" id="courseIncludes.certificate" placeholder="Enter certificate details" onChange={(e) => handleNestedChange("courseIncludes", "certificate", e.target.value)} />
+                </div>
+                <div>
+                  <Label htmlFor="courseIncludes.onJobTraining">On Job Training</Label>
+                  <Input type="text" name="courseIncludes.onJobTraining" id="courseIncludes.onJobTraining" placeholder="Enter on job training details" onChange={(e) => handleNestedChange("courseIncludes", "onJobTraining", e.target.value)} />
+                </div>
+                <div>
+                  <Label htmlFor="courseIncludes.projects">Projects</Label>
+                  <Input type="text" name="courseIncludes.projects" id="courseIncludes.projects" placeholder="Enter projects details" onChange={(e) => handleNestedChange("courseIncludes", "projects", e.target.value)} />
+                </div>
+                <div>
+                  <Label htmlFor="courseIncludes.experienceLetter">Experience Letter</Label>
+                  <Input type="text" name="courseIncludes.experienceLetter" id="courseIncludes.experienceLetter" placeholder="Enter experience letter details" onChange={(e) => handleNestedChange("courseIncludes", "experienceLetter", e.target.value)} />
                 </div>
               </div>
             </div>
