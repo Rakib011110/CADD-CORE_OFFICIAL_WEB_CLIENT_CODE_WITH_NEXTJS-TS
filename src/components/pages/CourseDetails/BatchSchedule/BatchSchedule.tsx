@@ -113,7 +113,7 @@ export default function BatchSchedule({ course  }: { course?: TCourse }) {
                             {/* Countdown Timer Section */}
                             <div className="flex items-center text-red-600 mb-2">
                                 <Hourglass size={20} />
-                                <h3 className="ml-2 text-base font-semibold uppercase tracking-wider">Batch Starts In</h3>
+                                <h3 className="ml-2 text-base font-semibold uppercase tracking-wider">Online Batch Starts In</h3>
                             </div>
                             
                             {isClient ? (

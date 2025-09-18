@@ -265,7 +265,7 @@ export default function AdminLayout({ children }: {children: React.ReactNode}) {
   };
 
   return (
-    <div className="min-h-screen flex bg-white">
+    <div  suppressHydrationWarning={true} className="min-h-screen flex bg-white">
       {/* Mobile Header with Hamburger - Only show when main navbar is not visible */}
       {isMobile && (
         <div className="fixed top-0 left-0 right-0 z-40 bg-gray-950 border-b-2 border-red-500 p-4">

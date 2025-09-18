@@ -20,9 +20,8 @@ import useSmoothScroll from "@/hooks/useSmoothScroll";
 
 import CourseSchedule from "@/components/pages/CourseDetails/CourseSchedule/CourseSchedule";
 import RevitSection from "@/components/pages/CourseDetails/RevitSectionProps/RevitSectionProps"; // Corrected import path based on your snippet
-import ProjectShowcase from "@/components/pages/CourseDetails/ProjectShowcase/ProjectShowcase";
-import CoursePaymentPage from "@/components/pages/CourseDetails/CourseFees/CourseFees";
 import CourseFees from "@/components/pages/CourseDetails/CourseFees/CourseFees";
+import OfflineBatchSchedule from "@/components/pages/CourseDetails/OflineBatchSchedule/OflineBatchSchedule";
 
 export default function CourseDetails() {
   useSmoothScroll();
@@ -53,6 +52,7 @@ export default function CourseDetails() {
   // Define the specific slug for conditional rendering
   const RCCrequiredSlug = "professional-autocad-mastercourse";
   const RccshowRevitSection = slug === RCCrequiredSlug;
+  const AutocadRequiredSlug = "professional-autocad-mastercourse";
 
   return (
     <div style={{ fontFamily: "banglaFont" }} className="font-serif ">
@@ -73,9 +73,12 @@ export default function CourseDetails() {
         className="text-justify font-sans">
         <BatchSchedule course={course?.data} />
 
+
         <div>
           <CourseSchedule course={course?.data} />
         </div>
+
+  {AutocadRequiredSlug && <OfflineBatchSchedule />}
 
         <div className="" id="mastercourse-overview">
           <MastercourseOverview course={course?.data} />
