@@ -49,10 +49,19 @@ export default function CourseDetails() {
   // Define the specific slug for conditional rendering
   const requiredSlug = "professional-architectural-bim-modeling-mastercourse";
   const showRevitSection = slug === requiredSlug;
+
+
   // Define the specific slug for conditional rendering
   const RCCrequiredSlug = "professional-autocad-mastercourse";
   const RccshowRevitSection = slug === RCCrequiredSlug;
+
+
   const AutocadRequiredSlug = "professional-autocad-mastercourse";
+  const showAutocadSection = slug === AutocadRequiredSlug;
+
+
+
+
 
   return (
     <div style={{ fontFamily: "banglaFont" }} className="font-serif ">
@@ -78,7 +87,7 @@ export default function CourseDetails() {
           <CourseSchedule course={course?.data} />
         </div>
 
-  {AutocadRequiredSlug && <OfflineBatchSchedule />}
+  {showAutocadSection && <OfflineBatchSchedule />}
 
         <div className="" id="mastercourse-overview">
           <MastercourseOverview course={course?.data} />
