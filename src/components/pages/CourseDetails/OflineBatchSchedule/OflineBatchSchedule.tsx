@@ -82,7 +82,7 @@ export default function OfflineBatchSchedule() {
                   <div className="text-center">
                     <p className="text-red-700 text-xs font-semibold mb-1">সম্পূর্ণ পেমেন্ট একসাথে</p>
                     <p className="text-lg font-bold text-red-600 mb-1">৳৯,৬০০</p>
-                    <p className="text-red-700 text-xs">পূর্ণ পরিশোধ করলে সাশ্রয় হবে ৳২,৪০০</p>
+                    <p className="text-red-700 text-xs">সম্পূর্ণ  পরিশোধ করলে সাশ্রয় হবে ৳২,৪০০</p>
                   </div>
                 </div>
               </div>
