@@ -59,6 +59,9 @@ export default function CourseDetails() {
   const AutocadRequiredSlug = "professional-autocad-mastercourse";
   const showAutocadSection = slug === AutocadRequiredSlug;
 
+  // Hide support section for Primavera P6 course
+  const hideSupportForPrimavera = slug === "project-management-primavera-p6";
+
 
 
 
@@ -118,9 +121,17 @@ export default function CourseDetails() {
           <CourseForWhom />
         </div>
 
-        <div id="student-support">
-          <SupportAndTraining />
-        </div>
+        
+        
+        {!hideSupportForPrimavera && (
+          <div id="student-support">
+            <SupportAndTraining />
+          </div>
+        )}
+
+
+
+
         <div id="experienced-advisors">
           <ExpertPanel course={course?.data} />
         </div>
