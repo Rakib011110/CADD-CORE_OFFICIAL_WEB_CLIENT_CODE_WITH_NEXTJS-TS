@@ -1,41 +1,40 @@
+
 import { TCourse } from "@/lib/courses";
 import Image from "next/image";
+import { FaCheckCircle } from "react-icons/fa";
 
 export default function SoftwareTaught({ course }: { course: TCourse }) {
   return (
-    <div id="software-taught" className="bg-gray-50">
+  <div id="software-taught" className="bg-gradient-to-b  ">
       <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-10">
         {/* Section Header */}
-        <div className="text-center mb-12 mt-10" >
-          <h2 className="text-4xl font-extrabold text-gray-900 tracking-tight">
+        <div className="text-center ">
+          <h2 className="text-4xl sm:text-5xl  font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-red-600 via-red-500 to-red-400 mb-2 ">
             যে সকল সফটওয়্যার শেখানো হবে
-          </h2> 
-
-
-          
-          <div className="mt-4 flex justify-center">
-            <span className="inline-block w-24 h-1.5 bg-gradient-to-r from-red-500 to-amber-500 rounded-full"></span>
+          </h2>
+          <div className="flex justify-center mb-4">
+            <span className="block w-28 h-1.5 rounded-full bg-gradient-to-r from-red-600 to-red-400"></span>
           </div>
-          <p className="mt-4 max-w-2xl mx-auto text-lg text-gray-600">
+          <p className="mt-2 max-w-2xl mx-auto text-lg text-gray-700">
             কোর্সে ব্যবহৃত প্রফেশনাল সফটওয়্যার সমূহ
           </p>
         </div>
 
         {/* Software Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
           {course.softwaresTaught?.map((software, index) => (
             <div
               key={index}
-              className="flex flex-col content-center mx-auto items-center text-center p-6 bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
+              className="flex flex-col items-center text-center p-7 bg-gradient-to-br from-white via-red-50 to-red-100 rounded-2xl border border-gray-200 shadow-md hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 hover:border-red-500 relative"
             >
-              <div className="relative w-full h-28 mb-6 flex items-center justify-center">
+              <div className="relative w-24 h-24 mb-6 flex items-center justify-center">
                 {software.photoUrl ? (
                   <Image
                     src={software.photoUrl}
                     alt={software.softwareTitle}
-                    width={160}
-                    height={160}
-                    className="object-contain w-full h-full"
+                    width={96}
+                    height={96}
+                    className="object-contain w-full h-full drop-shadow-md"
                   />
                 ) : (
                   <div className="h-full w-full flex items-center justify-center bg-gray-100 text-gray-400 rounded-lg">
@@ -55,10 +54,14 @@ export default function SoftwareTaught({ course }: { course: TCourse }) {
                     </svg>
                   </div>
                 )}
+                <span className="absolute -top-3 -right-3 bg-red-500 text-white rounded-full p-2 shadow-lg">
+                  <FaCheckCircle size={20} />
+                </span>
               </div>
-              <h4 className="text-xl font-semibold text-gray-800">
+              <h4 className="text-lg font-bold text-gray-800 mb-1">
                 {software.softwareTitle}
               </h4>
+              <span className="text-xs text-gray-500">Professional Tool</span>
             </div>
           ))}
         </div>

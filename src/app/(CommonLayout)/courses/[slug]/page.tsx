@@ -67,7 +67,7 @@ export default function CourseDetails() {
 
 
   return (
-    <div style={{ fontFamily: "banglaFont" }} className="font-serif ">
+    <div style={{ fontFamily: "banglaFont" }} className="font-serif bg-gradient-to-b from-[#fff7f8] to-white ">
 
 
 
@@ -138,9 +138,9 @@ export default function CourseDetails() {
         <div id="certificate-verification">
           <OurCertificate course={course?.data} />
         </div>
-        <div className="mt-10">
+        {/* <div className="mt-10">
           <CertificateVerification />
-        </div>
+        </div> */}
 
         <div id="certificate-verification">
           <Certificate course={course?.data} />

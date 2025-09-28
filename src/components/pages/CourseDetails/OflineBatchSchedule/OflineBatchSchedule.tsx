@@ -18,43 +18,29 @@ export default function OfflineBatchSchedule() {
           <div className="grid lg:grid-cols-2 gap-4 mb-4">
 
             {/* Schedule Details Card */}
-            <div className="bg-gray-50 rounded-md p-3 border border-gray-200 hover:shadow-sm transition-all duration-300">
-              <div className="flex items-center mb-3">
+            <div className="bg-gray-50 rounded-md p-3 border  border-gray-200 hover:shadow-sm transition-all duration-300">
+              <div className="flex items-center mb-3 ">
                 <div className="w-2 h-2 bg-red-500 rounded-full mr-2"></div>
                 <h3 className="text-base font-bold text-black">ক্লাস সূচি</h3>
               </div>
-   <div className="flex items-center justify-between p-2 bg-black rounded border border-gray-100">
-                  <span className="text-white text-md font-medium">শুরুর তারিখ:</span>
-                  <span className="text-white font-medium text-md">৩ নভেম্বর, ২০২৫</span>
+   <div className="flex items-center justify-between p-3 bg-black rounded border border-gray-100">
+                  <span className="text-white text-lg mt-2 font-medium">শুরুর তারিখ:</span>
+                  <span className="text-white font-medium text-lg mt-2">৩ নভেম্বর, ২০২৫</span>
                 </div>
               <div className="space-y-2">
                 {/* Days */}
-                <div className="flex items-center justify-between p-2 bg-black rounded border border-gray-100">
-                  <span className="text-white text-md font-medium">দিন:</span>
-                  <span className="text-white font-medium text-md">সোমবার ও বৃহস্পতিবার</span>
+                <div className="flex items-center justify-between p-3 bg-black rounded border border-gray-100">
+                  <span className="text-white text-lg mt-2 font-medium">দিন:</span>
+                  <span className="text-white font-medium text-lg mt-2">সোমবার ও বৃহস্পতিবার</span>
                 </div>
 
                 {/* Time */}
-                <div className="flex items-center justify-between p-2 bg-black rounded border border-gray-950">
-                  <span className="text-white text-md font-medium">সময়:</span>
-                  <span className="text-white font-medium text-md">সন্ধ্যা ৬টা - রাত ৮টা</span>
+                <div className="flex items-center justify-between p-3 bg-black rounded border border-gray-950">
+                  <span className="text-white text-lg mt-2 font-medium">সময়:</span>
+                  <span className="text-white font-medium text-lg mt-2">সন্ধ্যা ৬টা - রাত ৮টা</span>
                 </div> 
 
-                 <div className=" mt-4 ">
-            <button className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold py-2 px-6 rounded-md transition-all duration-300 transform hover:scale-105 hover:shadow-md text-sm">
-        <a  href="https://docs.google.com/forms/d/e/1FAIpQLSe27ZcsU6VdsyYPMD4JO5VwW4d9CI3_HtTG8YRxyo43gyzGWA/viewform"
-                target="_blank">
-         
-            পেমেন্ট করুন
-        
-        </a> 
-
-        
-            </button>
-            <p className="text-gray-500 text-xs mt-3 ">
-              নিরাপদ পেমেন্ট • সহজ কিস্তি সুবিধা 
-            </p>
-          </div>
+              
               </div>
             </div>
 
@@ -84,7 +70,23 @@ export default function OfflineBatchSchedule() {
                     <p className="text-lg font-bold text-red-600 mb-1">৳৯,৬০০</p>
                     <p className="text-red-700 text-xs">সম্পূর্ণ  পরিশোধ করলে সাশ্রয় হবে ৳২,৪০০</p>
                   </div>
+                  
                 </div>
+                   <div className=" mt-4  text-center">
+            <button className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold py-2 px-6 rounded-md transition-all duration-300 transform hover:scale-105 hover:shadow-md text-sm">
+        <a  href="https://docs.google.com/forms/d/e/1FAIpQLSe27ZcsU6VdsyYPMD4JO5VwW4d9CI3_HtTG8YRxyo43gyzGWA/viewform"
+                target="_blank">
+         
+            পেমেন্ট করুন
+        
+        </a> 
+
+        
+            </button>
+            <p className="text-gray-500 text-xs mt-3 ">
+              নিরাপদ পেমেন্ট • সহজ কিস্তি সুবিধা 
+            </p>
+          </div>
               </div>
             </div>
           </div>

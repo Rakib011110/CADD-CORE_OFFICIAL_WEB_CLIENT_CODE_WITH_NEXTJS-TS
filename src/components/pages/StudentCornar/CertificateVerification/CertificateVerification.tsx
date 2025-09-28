@@ -31,7 +31,7 @@ export default function CertificateVerification() {
   };
 
   return (
-    <div className="bg-[#cef4ff] w-full h-56 flex items-center justify-center">
+    <div className=" flex items-center justify-center">
       <div className="text-center">
         <h1 className="text-2xl font-semibold">সার্টিফিকেট ভেরিফিকেশন</h1>
         <Button onClick={() => setShowModal(true)} className="bg-red-600 mt-3">
@@ -46,14 +46,14 @@ export default function CertificateVerification() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+            className="fixed inset-0 bg-red-100 bg-opacity-10 flex justify-center items-center z-50"
           >
             <motion.div
               initial={{ scale: 0.8, y: -50 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.8, y: -50 }}
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              className="bg-white p-6 rounded shadow-lg w-full max-w-lg relative"
+              className="bg-white p-6  shadow-lg  rounded-2xl w-full max-w-lg relative"
             >
               <button
                 onClick={closeModal}
@@ -66,7 +66,7 @@ export default function CertificateVerification() {
                 🔍 Search Certificate by Student ID
               </h2>
 
-              <div className="flex gap-2 mb-4">
+              <div className="flex  gap-2 mb-4">
                 <input
                   type="text"
                   placeholder="Enter Student ID"
