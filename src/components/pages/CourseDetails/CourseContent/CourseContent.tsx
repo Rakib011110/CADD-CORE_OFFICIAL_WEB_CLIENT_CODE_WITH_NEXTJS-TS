@@ -106,6 +106,9 @@ export default function CourseContentList({ course }: { course: TCourse }) {
                     </div>
                   </div>
 
+
+
+
                   {/* Chevron Icon */}
                   <motion.div
                     animate={{

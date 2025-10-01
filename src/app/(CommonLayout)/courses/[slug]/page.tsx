@@ -22,6 +22,8 @@ import CourseSchedule from "@/components/pages/CourseDetails/CourseSchedule/Cour
 import RevitSection from "@/components/pages/CourseDetails/RevitSectionProps/RevitSectionProps"; // Corrected import path based on your snippet
 import CourseFees from "@/components/pages/CourseDetails/CourseFees/CourseFees";
 import OfflineBatchSchedule from "@/components/pages/CourseDetails/OflineBatchSchedule/OflineBatchSchedule";
+import OfflineBatchBIM from "@/components/pages/CourseDetails/OflineBatchSchedule/offlineBatchBIM";
+import OfflineBatchStructural from "@/components/pages/CourseDetails/OflineBatchSchedule/offlineBatchStructural ";
 
 export default function CourseDetails() {
   useSmoothScroll();
@@ -59,6 +61,12 @@ export default function CourseDetails() {
   const AutocadRequiredSlug = "professional-autocad-mastercourse";
   const showAutocadSection = slug === AutocadRequiredSlug;
 
+  const BimRequiredSlug = "professional-architectural-bim-modeling-mastercourse";
+  const showBimSection = slug === BimRequiredSlug;
+
+  const StructuralRequiredSlug = "rcc-building-structural-analysis-design-mastercourse";
+  const showStructuralSection = slug === StructuralRequiredSlug;
+
   // Hide support section for Primavera P6 course
   const hideSupportForPrimavera = slug === "project-management-primavera-p6";
 
@@ -91,6 +99,8 @@ export default function CourseDetails() {
         </div>
 
   {showAutocadSection && <OfflineBatchSchedule />}
+  {showBimSection && <OfflineBatchBIM />}
+  {showStructuralSection && <OfflineBatchStructural />}
 
         <div className="" id="mastercourse-overview">
           <MastercourseOverview course={course?.data} />
