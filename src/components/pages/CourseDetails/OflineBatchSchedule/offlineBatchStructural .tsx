@@ -7,7 +7,7 @@ export default function OfflineBatchSchedule() {
         {/* Header with Gradient */}
         <div className="bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-3">
           <div className="text-center">
-            <h2 className="text-xl font-bold mb-1">অফলাইন ব্যাচ এর সময়সূচী</h2>
+            <h2 className="text-xl font-bold mb-1">অফলাইন কর্পোরেট ব্যাচ এর সময়সূচী</h2>
             <p className="text-red-100 text-xs">আমাদের পূর্ণাঙ্গ প্রশিক্ষণ প্রোগ্রামে যোগ দিন</p>
           </div>
         </div>
@@ -25,19 +25,19 @@ export default function OfflineBatchSchedule() {
               </div>
    <div className="flex items-center justify-between p-3 bg-black rounded border border-gray-100">
                   <span className="text-white text-lg mt-2 font-medium">শুরুর তারিখ:</span>
-                  <span className="text-white font-medium text-lg mt-2">শীঘ্রই শুরু হবে</span>
+                  <span className="text-white font-medium text-lg mt-2">৭ নভেম্বর, ২০২৫</span>
                 </div>
               <div className="space-y-2">
                 {/* Days */}
                 <div className="flex items-center justify-between p-3 bg-black rounded border border-gray-100">
                   <span className="text-white text-lg mt-2 font-medium">দিন:</span>
-                  <span className="text-white font-medium text-lg mt-2">শীঘ্রই শুরু হবে</span>
+                  <span className="text-white font-medium text-lg mt-2">শুক্রবার</span>
                 </div>
 
                 {/* Time */}
                 <div className="flex items-center justify-between p-3 bg-black rounded border border-gray-950">
                   <span className="text-white text-lg mt-2 font-medium">সময়:</span>
-                  <span className="text-white font-medium text-lg mt-2">শীঘ্রই শুরু হবে</span>
+                  <span className="text-white font-medium text-lg mt-2">৮:৩০ থেকে ১২:৩০</span>
                 </div> 
 
               
