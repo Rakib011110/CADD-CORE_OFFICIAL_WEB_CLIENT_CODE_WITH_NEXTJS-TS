@@ -39,6 +39,11 @@ const CourseCard: React.FC<TCourse> = ({
               fill
               className="object-cover transition-transform duration-500 ease-in-out group-hover:scale-105"
             />
+            {/* Live Badge */}
+            <div className="absolute top-3 right-3 bg-red-600 text-white px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1 animate-pulse">
+              <div className="w-2 h-2 bg-white rounded-full animate-ping"></div>
+              LIVE
+            </div>
           </div>
 
           {/* 2. Content Section - We keep the padding here, where it's needed. */}
