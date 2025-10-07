@@ -40,6 +40,12 @@ const navigationSections = [
         color: "",
       },
        {
+        label: "Payment Analytics",
+        href: "/dashboard/payments/payment-analytics",
+        icon: "💰",
+        color: "",
+      },
+       {
         label: "Installment Plan",
         href: "/dashboard/payments/installment-plan",
         icon: "💰",
