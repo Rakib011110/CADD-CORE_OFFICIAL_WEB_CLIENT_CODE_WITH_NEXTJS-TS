@@ -12,11 +12,13 @@ import { BookOpen, FileText, Users, GraduationCap, Briefcase, FileStack, ArrowUp
 import { Skeleton } from "@/components/UI/skeleton";
 import { motion } from "framer-motion";
 import { Progress } from "@/components/UI/progress";
-import { useGetAllPaymentsQuery } from "@/redux/api/payment/paymentApi";
+import { CompactPaymentAnalytics } from "@/components/pages/Payments/MANAGEPAYMENT/CompactPaymentAnalytics";
 import { useGetAllJobsQuery } from "@/redux/api/jobsApi/jobAPi";
 import { useGetAllJobApplicationsQuery } from "@/redux/api/jobsApi/jobApplicationApi";
 import { TCourse } from "@/lib/courses";
 import { IPayment } from "@/types";
+import { useGetAllPaymentsQuery } from "@/redux/api/payment/paymentApi";
+import PaymentAnalyticsPage from "./payments/payment-analytics/page";
 
 const safeFormatDate = (dateString: string | undefined | null, formatString: string) => {
   if (!dateString) return "N/A";
@@ -96,12 +98,11 @@ export default function Dashboard() {
   
   ];
 
-  const recentCourses = courses?.data?.slice(0, 5).map((course: any) => ({
+  const recentCourses = courses?.data?.map((course: any) => ({
     id: course._id || course.id,
     title: course.title || "Untitled Course",
     date: safeFormatDate(course?.createdAt, "MMM dd, yyyy"),
-    status: "Active",
-    students: Math.floor(Math.random() * 50) + 10 // Mock data for students count
+    status: "Active"
   }));
 
   // Filter completed payments and get recent enrollments
@@ -152,30 +153,29 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        {/* Enhanced Stats Grid */}
+        {/* Compact Stats Grid */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="grid gap-6 mb-8 sm:grid-cols-2 lg:grid-cols-3"
+          className="grid gap-4 mb-6 sm:grid-cols-2 lg:grid-cols-3"
         >
           {stats.map((stat, index) => (
             <motion.div key={index} variants={itemVariants}>
-              <Card className={`hover:shadow-lg transition-all duration-300 border-0 shadow-md ${stat.bgColor} ${stat.borderColor} border-l-4`}>
-                <CardContent className="p-6">
+              <Card className={`hover:shadow-md transition-all duration-300 hover:-translate-y-1 border-0 shadow-sm ${stat.bgColor} ${stat.borderColor} border-l-4`}>
+                <CardContent className="p-4">
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
-                      <p className="text-sm font-semibold text-slate-600 uppercase tracking-wide">{stat.title}</p>
-                      <h3 className="text-3xl font-bold mt-2 text-slate-900">{stat.value}</h3>
-                      <div className="mt-4 flex items-center">
-                        <Badge variant="secondary" className={`${stat.bgColor} ${stat.color} border-0 px-2 py-1 text-xs font-semibold`}>
+                      <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide">{stat.title}</p>
+                      <h3 className="text-2xl font-bold mt-1 text-slate-900">{stat.value}</h3>
+                      <div className="mt-2 flex items-center">
+                        <Badge variant="secondary" className={`${stat.bgColor} ${stat.color} border-0 px-2 py-0.5 text-xs font-semibold`}>
                           <TrendingUp className="h-3 w-3 mr-1" />
                           {stat.change}
                         </Badge>
-                        <span className="text-xs text-slate-500 ml-2">vs last month</span>
                       </div>
                     </div>
-                    <div className={`h-14 w-14 rounded-xl ${stat.bgColor} flex items-center justify-center ${stat.color}`}>
+                    <div className={`h-10 w-10 rounded-lg ${stat.bgColor} flex items-center justify-center ${stat.color}`}>
                       {stat.icon}
                     </div>
                   </div>
@@ -185,204 +185,169 @@ export default function Dashboard() {
           ))}
         </motion.div>
 
-        {/* Enhanced Activity Section */}
-        <div className="grid gap-8 lg:grid-cols-2">
-          {/* Enhanced Courses Table */}
+        {/* Compact Payment Analytics */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="mb-6"
+        >
+          <PaymentAnalyticsPage  />
+        </motion.div>
+
+        {/* Compact Activity Section */}
+        <div className="grid gap-4 lg:grid-cols-2 mb-6">
+          {/* Compact Recent Courses */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
-              <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-100">
-                <CardTitle className="flex items-center text-lg font-bold text-slate-900">
-                  <div className="h-8 w-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                    <BookOpen className="h-5 w-5 text-blue-600" />
+            <Card className="border-0 shadow-md hover:shadow-lg transition-shadow duration-300">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center text-sm font-bold text-slate-900">
+                  <div className="p-1.5 bg-blue-100 rounded-md mr-2">
+                    <BookOpen className="h-4 w-4 text-blue-600" />
                   </div>
                   Recent Courses
                 </CardTitle>
-                <CardDescription className="text-slate-600">Latest courses added to the platform</CardDescription>
               </CardHeader>
               <CardContent className="p-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="border-slate-200">
-                      <TableHead className="font-semibold text-slate-700">Course Title</TableHead>
-                      <TableHead className="font-semibold text-slate-700">Students</TableHead>
-                      <TableHead className="text-right font-semibold text-slate-700">Status</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {recentCourses?.map((course: any, index: number) => (
-                      <TableRow key={index} className="hover:bg-slate-50 transition-colors duration-200">
-                        <TableCell className="font-medium text-slate-900 py-4">
-                          <div>
-                            <p className="font-semibold">{course.title}</p>
-                            <p className="text-sm text-slate-500">Added {course.date}</p>
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-slate-600">
-                          <div className="flex items-center">
-                            <Users className="h-4 w-4 mr-2 text-slate-400" />
-                            {course.students}
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200 font-semibold">
-                            <CheckCircle className="h-3 w-3 mr-1" />
-                            Active
-                          </Badge>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                <div className="space-y-1 max-h-80 overflow-y-auto">
+                  {recentCourses?.map((course: any, index: number) => (
+                    <div key={index} className="flex items-center justify-between p-3 hover:bg-slate-50 transition-colors duration-200 border-b border-slate-100 last:border-b-0">
+                      <div className="flex items-center space-x-3 flex-1 min-w-0">
+                        <div className="h-8 w-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <BookOpen className="h-4 w-4 text-blue-600" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="font-medium text-slate-900 text-sm truncate">{course.title}</p>
+                          <p className="text-xs text-slate-500">{course.date}</p>
+                        </div>
+                      </div>
+                      <div className="flex-shrink-0">
+                        <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200 text-xs px-2 py-0.5">
+                          Active
+                        </Badge>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </CardContent>
             </Card>
           </motion.div>
 
-          {/* Enhanced Recently Enrolled Students */}
-         <motion.div
+          {/* Compact Recent Enrollments */}
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
           >
-            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
-              <CardHeader className="bg-gradient-to-r from-emerald-50 to-green-50 border-b border-emerald-100">
-                <CardTitle className="flex items-center text-lg font-bold text-slate-900">
-                  <div className="h-8 w-8 bg-emerald-100 rounded-lg flex items-center justify-center mr-3">
-                    <GraduationCap className="h-5 w-5 text-emerald-600" />
+            <Card className="border-0 shadow-md hover:shadow-lg transition-shadow duration-300">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center text-sm font-bold text-slate-900">
+                  <div className="p-1.5 bg-emerald-100 rounded-md mr-2">
+                    <GraduationCap className="h-4 w-4 text-emerald-600" />
                   </div>
                   Recent Enrollments
                 </CardTitle>
-                <CardDescription className="text-slate-600">New student enrollments and registrations (most recent first)</CardDescription>
               </CardHeader>
               <CardContent className="p-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="border-slate-200">
-                      <TableHead className="font-semibold text-slate-700">Student</TableHead>
-                      <TableHead className="font-semibold text-slate-700">Phone</TableHead>
-                      <TableHead className="font-semibold text-slate-700">Course</TableHead>
-                      <TableHead className="text-right font-semibold text-slate-700">Status</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {recentEnrollments?.length > 0 ? (
-                      recentEnrollments.map((enrollment: any, index: number) => (
-                        <TableRow key={index} className="hover:bg-slate-50 transition-colors duration-200">
-                          <TableCell className="py-4">
-                            <div className="flex items-center space-x-3">
-                              <Avatar className="h-10 w-10 border-2 border-emerald-100">
-                                <AvatarFallback className="bg-gradient-to-br from-emerald-100 to-emerald-200 text-emerald-700 font-semibold text-sm">
-                                  {enrollment.studentName?.charAt(0)?.toUpperCase() || 'S'}
-                                </AvatarFallback>
-                              </Avatar>
-                              <div>
-                                <p className="font-semibold text-slate-900">{enrollment.studentName}</p>
-                                <p className="text-sm text-slate-500">{enrollment.timeAgo}</p>
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-slate-600">
-                            <div className="flex items-center">
-                              <span className="text-sm font-medium">{enrollment.mobileNumber}</span>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-slate-600">
-                            <div>
-                              <p className="font-medium">{enrollment.course}</p>
-                              <p className="text-sm text-slate-500">Enrolled {enrollment.enrollDate}</p>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <Badge variant="default" className="bg-emerald-100 text-emerald-700 border-emerald-200 font-semibold">
-                              <CheckCircle className="h-3 w-3 mr-1" />
-                              {enrollment.status}
-                            </Badge>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    ) : (
-                      <TableRow>
-                        <TableCell colSpan={4} className="text-center py-8 text-slate-500">
-                          <div className="flex flex-col items-center">
-                            <GraduationCap className="h-12 w-12 text-slate-300 mb-3" />
-                            <p className="font-medium">No recent enrollments</p>
-                            <p className="text-sm">New enrollments will appear here</p>
+                <div className="space-y-1">
+                  {recentEnrollments?.slice(0, 4).length > 0 ? (
+                    recentEnrollments.slice(0, 4).map((enrollment: any, index: number) => (
+                      <div key={index} className="flex items-center justify-between p-3 hover:bg-slate-50 transition-colors duration-200 border-b border-slate-100 last:border-b-0">
+                        <div className="flex items-center space-x-3 flex-1 min-w-0">
+                          <Avatar className="h-8 w-8 border border-emerald-100 flex-shrink-0">
+                            <AvatarFallback className="bg-emerald-100 text-emerald-700 font-semibold text-xs">
+                              {enrollment.studentName?.charAt(0)?.toUpperCase() || 'S'}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="min-w-0 flex-1">
+                            <p className="font-medium text-slate-900 text-sm truncate">{enrollment.studentName}</p>
+                            <p className="text-xs text-slate-500 truncate">{enrollment.course}</p>
                           </div>
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
+                        </div>
+                        <div className="flex flex-col items-end space-y-1 flex-shrink-0">
+                          <Badge variant="default" className="bg-emerald-100 text-emerald-700 border-emerald-200 text-xs px-2 py-0.5">
+                            Enrolled
+                          </Badge>
+                          <span className="text-xs text-slate-500">{enrollment.enrollDate}</span>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-8 text-slate-500">
+                      <GraduationCap className="h-8 w-8 text-slate-300 mb-2" />
+                      <p className="font-medium text-sm">No recent enrollments</p>
+                      <p className="text-xs">New enrollments will appear here</p>
+                    </div>
+                  )}
+                </div>
               </CardContent>
             </Card>
           </motion.div>
-
         </div>
 
-        {/* Enhanced Jobs Overview */}
+        {/* Compact Jobs Overview */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
-          className="mt-8"
         >
-          <Card className="border-0 shadow-lg">
-            <CardHeader className="bg-gradient-to-r from-slate-50 to-gray-50 border-b border-slate-200">
-              <CardTitle className="flex items-center text-xl font-bold text-slate-900">
-                <div className="h-8 w-8 bg-slate-100 rounded-lg flex items-center justify-center mr-3">
-                  <Briefcase className="h-5 w-5 text-slate-600" />
+          <Card className="border-0 shadow-md">
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center text-base font-bold text-slate-900">
+                <div className="p-1.5 bg-slate-100 rounded-md mr-2">
+                  <Briefcase className="h-4 w-4 text-slate-600" />
                 </div>
-                Jobs & Career Overview
+                Jobs Overview
               </CardTitle>
-              <CardDescription className="text-slate-600">Employment opportunities and application insights</CardDescription>
             </CardHeader>
-            <CardContent className="p-8">
-              <div className="grid gap-6 md:grid-cols-3">
-                <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 border border-emerald-200 rounded-xl p-6 hover:shadow-md transition-shadow duration-300">
+            <CardContent className="pt-0">
+              <div className="grid gap-3 md:grid-cols-3">
+                <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 border border-emerald-200 rounded-lg p-4 hover:shadow-sm transition-shadow duration-300">
                   <div className="flex justify-between items-start">
                     <div>
-                      <p className="text-sm font-semibold text-emerald-700 uppercase tracking-wide">Active Jobs</p>
-                      <h3 className="text-3xl font-bold mt-2 text-emerald-900">{jobs?.data?.length || 0}</h3>
-                      <p className="text-sm text-emerald-600 mt-1">Available positions</p>
+                      <p className="text-xs font-semibold text-emerald-700 uppercase tracking-wide">Active Jobs</p>
+                      <h3 className="text-xl font-bold mt-1 text-emerald-900">{jobs?.data?.length || 0}</h3>
+                      <p className="text-xs text-emerald-600 mt-1">Available positions</p>
                     </div>
-                    <div className="h-12 w-12 rounded-xl bg-emerald-200 flex items-center justify-center">
-                      <Briefcase className="h-6 w-6 text-emerald-700" />
+                    <div className="h-8 w-8 rounded-lg bg-emerald-200 flex items-center justify-center">
+                      <Briefcase className="h-4 w-4 text-emerald-700" />
                     </div>
                   </div>
-                  <Progress value={75} className="h-3 mt-4" />
+                  <Progress value={75} className="h-2 mt-3" />
                   <p className="text-xs text-emerald-600 mt-2">75% growth rate</p>
                 </div>
 
-                <div className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-xl p-6 hover:shadow-md transition-shadow duration-300">
+                <div className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-4 hover:shadow-sm transition-shadow duration-300">
                   <div className="flex justify-between items-start">
                     <div>
-                      <p className="text-sm font-semibold text-blue-700 uppercase tracking-wide">Applications</p>
-                      <h3 className="text-3xl font-bold mt-2 text-blue-900">{applications?.data?.length || 0}</h3>
-                      <p className="text-sm text-blue-600 mt-1">Total submissions</p>
+                      <p className="text-xs font-semibold text-blue-700 uppercase tracking-wide">Applications</p>
+                      <h3 className="text-xl font-bold mt-1 text-blue-900">{applications?.data?.length || 0}</h3>
+                      <p className="text-xs text-blue-600 mt-1">Total submissions</p>
                     </div>
-                    <div className="h-12 w-12 rounded-xl bg-blue-200 flex items-center justify-center">
-                      <FileStack className="h-6 w-6 text-blue-700" />
+                    <div className="h-8 w-8 rounded-lg bg-blue-200 flex items-center justify-center">
+                      <FileStack className="h-4 w-4 text-blue-700" />
                     </div>
                   </div>
-                  <Progress value={60} className="h-3 mt-4" />
+                  <Progress value={60} className="h-2 mt-3" />
                   <p className="text-xs text-blue-600 mt-2">60% response rate</p>
                 </div>
 
-                <div className="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 rounded-xl p-6 hover:shadow-md transition-shadow duration-300">
+                <div className="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 rounded-lg p-4 hover:shadow-sm transition-shadow duration-300">
                   <div className="flex justify-between items-start">
                     <div>
-                      <p className="text-sm font-semibold text-purple-700 uppercase tracking-wide">Success Rate</p>
-                      <h3 className="text-3xl font-bold mt-2 text-purple-900">24%</h3>
-                      <p className="text-sm text-purple-600 mt-1">Hiring success</p>
+                      <p className="text-xs font-semibold text-purple-700 uppercase tracking-wide">Success Rate</p>
+                      <h3 className="text-xl font-bold mt-1 text-purple-900">24%</h3>
+                      <p className="text-xs text-purple-600 mt-1">Hiring success</p>
                     </div>
-                    <div className="h-12 w-12 rounded-xl bg-purple-200 flex items-center justify-center">
-                      <TrendingUp className="h-6 w-6 text-purple-700" />
+                    <div className="h-8 w-8 rounded-lg bg-purple-200 flex items-center justify-center">
+                      <TrendingUp className="h-4 w-4 text-purple-700" />
                     </div>
                   </div>
-                  <Progress value={24} className="h-3 mt-4" />
+                  <Progress value={24} className="h-2 mt-3" />
                   <p className="text-xs text-purple-600 mt-2">Above industry average</p>
                 </div>
               </div>

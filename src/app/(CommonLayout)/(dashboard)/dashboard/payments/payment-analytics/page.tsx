@@ -939,8 +939,8 @@ const PaymentAnalyticsPage = () => {
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                      <PieChartIcon className="w-5 h-5 text-blue-600" />
-                      Payment Methods Distribution
+                      <CreditCard className="w-5 h-5 text-blue-600" />
+                      Payment Methods Distribution (by Card Type)
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -948,19 +948,21 @@ const PaymentAnalyticsPage = () => {
                       <PieChart>
                         <Pie
                           data={(() => {
-                            const sslCount = successfulPayments.filter(p => !p.cardType && !p.paymentMethod).length;
-                            const cardCount = successfulPayments.filter(p => p.cardType).length;
-                            const mobileBankingCount = successfulPayments.filter(p => 
-                              p.paymentMethod && ['bkash', 'nagad', 'rocket', 'upay'].some(method => 
-                                p.paymentMethod?.toLowerCase().includes(method)
-                              )
-                            ).length;
+                            const cardTypeMap = new Map();
                             
-                            return [
-                              { name: 'SSLCommerz Gateway', value: sslCount, color: '#3B82F6' },
-                              { name: 'Credit/Debit Card', value: cardCount, color: '#10B981' },
-                              { name: 'Mobile Banking', value: mobileBankingCount, color: '#F59E0B' }
-                            ].filter(item => item.value > 0);
+                            successfulPayments.forEach(payment => {
+                              const cardType = payment.cardType || 'SSLCommerz Gateway';
+                              cardTypeMap.set(cardType, (cardTypeMap.get(cardType) || 0) + 1);
+                            });
+                            
+                            const colors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4', '#84CC16', '#F97316'];
+                            const data = Array.from(cardTypeMap.entries()).map(([type, count], index) => ({
+                              name: type,
+                              value: count,
+                              color: colors[index % colors.length]
+                            }));
+                            
+                            return data;
                           })()}
                           cx="50%"
                           cy="50%"
@@ -970,75 +972,31 @@ const PaymentAnalyticsPage = () => {
                           dataKey="value"
                         >
                           {(() => {
-                            const sslCount = successfulPayments.filter(p => !p.cardType && !p.paymentMethod).length;
-                            const cardCount = successfulPayments.filter(p => p.cardType).length;
-                            const mobileBankingCount = successfulPayments.filter(p => 
-                              p.paymentMethod && ['bkash', 'nagad', 'rocket', 'upay'].some(method => 
-                                p.paymentMethod?.toLowerCase().includes(method)
-                              )
-                            ).length;
+                            const cardTypeMap = new Map();
                             
-                            return [
-                              { name: 'SSLCommerz Gateway', value: sslCount, color: '#3B82F6' },
-                              { name: 'Credit/Debit Card', value: cardCount, color: '#10B981' },
-                              { name: 'Mobile Banking', value: mobileBankingCount, color: '#F59E0B' }
-                            ].filter(item => item.value > 0);
-                          })().map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} />
-                          ))}
+                            successfulPayments.forEach(payment => {
+                              const cardType = payment.cardType || 'SSLCommerz Gateway';
+                              cardTypeMap.set(cardType, (cardTypeMap.get(cardType) || 0) + 1);
+                            });
+                            
+                            const colors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4', '#84CC16', '#F97316'];
+                            return Array.from(cardTypeMap.entries()).map(([type, count], index) => (
+                              <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+                            ));
+                          })()}
                         </Pie>
                         <RechartsTooltip 
                           formatter={(value: any, name: any) => [
                             `${value} transactions`,
                             name
                           ]}
-                          labelFormatter={(label: any) => `Payment Method: ${label}`}
+                          labelFormatter={(label: any) => `Card Type: ${label}`}
                         />
                       </PieChart>
                     </ResponsiveContainer>
                     
-                    {/* Payment Method Legend */}
-                    <div className="mt-4 space-y-2">
-                      {(() => {
-                        const sslCount = successfulPayments.filter(p => !p.cardType && !p.paymentMethod).length;
-                        const cardCount = successfulPayments.filter(p => p.cardType).length;
-                        const mobileBankingCount = successfulPayments.filter(p => 
-                          p.paymentMethod && ['bkash', 'nagad', 'rocket', 'upay'].some(method => 
-                            p.paymentMethod?.toLowerCase().includes(method)
-                          )
-                        ).length;
-                        
-                        return [
-                          { name: 'SSLCommerz Gateway', value: sslCount, color: '#3B82F6', description: 'Default payment gateway' },
-                          { name: 'Credit/Debit Card', value: cardCount, color: '#10B981', description: 'Visa, Mastercard, etc.' },
-                          { name: 'Mobile Banking', value: mobileBankingCount, color: '#F59E0B', description: 'bKash, Nagad, Rocket, Upay' }
-                        ].filter(item => item.value > 0);
-                      })().map((method, index) => (
-                        <div key={index} className="flex items-center justify-between text-sm">
-                          <div className="flex items-center gap-2">
-                            <div 
-                              className="w-3 h-3 rounded-full" 
-                              style={{ backgroundColor: method.color }}
-                            ></div>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <span className="font-medium cursor-help hover:text-blue-600">
-                                  {method.name}
-                                </span>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <div>
-                                  <div className="font-medium">{method.name}</div>
-                                  <div className="text-xs text-gray-500">{method.description}</div>
-                                  <div className="text-xs">{method.value} transactions</div>
-                                </div>
-                              </TooltipContent>
-                            </Tooltip>
-                          </div>
-                          <span className="text-gray-600">{method.value}</span>
-                        </div>
-                      ))}
-                    </div>
+                    
+                   
                   </CardContent>
                 </Card>
               </div>

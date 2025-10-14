@@ -4,19 +4,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/UI/card";
 import { useMemo } from "react";
 import {
   Download,
-  Eye,
-  Check,
-  Clock,
-  CreditCard,
-  DollarSign,
-  AlertCircle,
-  XCircle,
-  TrendingUp,
-  Pause,
   FileText,
   Calendar,
   CalendarDays,
   CalendarRange,
+  TrendingUp,
+  Check,
+  Pause,
+  XCircle,
+  AlertCircle,
+  DollarSign,
 } from "lucide-react";
 
 interface Payment {
@@ -32,7 +29,7 @@ interface Payment {
     _id: string;
     title: string;
   };
-  
+
   amount: number;
   status: "pending" | "completed" | "failed" | "cancelled" | "refund";
   cardType?: string;
@@ -53,30 +50,26 @@ interface StatCardProps {
   trend?: 'up' | 'down' | 'neutral';
 }
 
-// --------- Enhanced Stats Card Component ----------
-const StatCard = ({ title, value, icon: Icon, color, bgColor, percentage, trend }: StatCardProps) => (
-  <Card className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-0 shadow-md">
-    <CardContent className="p-6">
+// --------- Compact Stats Card Component ----------
+const CompactStatCard = ({ title, value, icon: Icon, color, bgColor, percentage, trend }: StatCardProps) => (
+  <Card className="group hover:shadow-md transition-all duration-300 hover:-translate-y-1 border-0 shadow-sm">
+    <CardContent className="p-4">
       <div className="flex items-center justify-between">
         <div className="flex-1">
-          <p className="text-sm font-medium text-gray-600 mb-1">{title}</p>
-          <p className="text-2xl font-bold text-gray-900 group-hover:text-gray-700 transition-colors duration-200">
+          <p className="text-xs font-medium text-gray-600 mb-1">{title}</p>
+          <p className="text-xl font-bold text-gray-900 group-hover:text-gray-700 transition-colors duration-200">
             {value}
           </p>
           {percentage !== undefined && (
-            <div className="flex items-center mt-2">
-              <span className={`text-xs font-medium ${
-                trend === 'up' ? 'text-green-600' : 
-                trend === 'down' ? 'text-red-600' : 'text-gray-500'
-              }`}>
+            <div className="flex items-center mt-1">
+              <span className={`text-xs font-medium ${trend === 'up' ? 'text-green-600' : trend === 'down' ? 'text-red-600' : 'text-gray-500'}`}>
                 {trend === 'up' ? '↗' : trend === 'down' ? '↘' : '→'} {percentage}%
               </span>
-              <span className="text-xs text-gray-500 ml-1">vs last month</span>
             </div>
           )}
         </div>
-        <div className={`${bgColor} p-3 rounded-full group-hover:scale-110 transition-transform duration-300`}>
-          <Icon className={`w-6 h-6 ${color}`} />
+        <div className={`${bgColor} p-2 rounded-lg group-hover:scale-110 transition-transform duration-300`}>
+          <Icon className={`w-4 h-4 ${color}`} />
         </div>
       </div>
     </CardContent>
@@ -123,7 +116,7 @@ const convertToCSV = (payments: Payment[]): string => {
     payment.amount.toString(),
     payment.status,
     'SSLCommerz',
-    payment.bankTransactionId || payment.transactionId, // Use bankTransactionId if available, fallback to transactionId
+    payment.bankTransactionId || payment.transactionId,
     payment.cardType || 'N/A',
     payment.cardType ? `${payment.cardType} Card` : 'N/A',
     new Date(payment.createdAt).toLocaleString('en-GB', {
@@ -164,7 +157,7 @@ const downloadCSV = (csvContent: string, filename: string) => {
   document.body.removeChild(link);
 };
 
-const ExportButton = ({ title, icon: Icon, onClick, color }: {
+const CompactExportButton = ({ title, icon: Icon, onClick, color }: {
   title: string;
   icon: React.ComponentType<any>;
   onClick: () => void;
@@ -172,15 +165,15 @@ const ExportButton = ({ title, icon: Icon, onClick, color }: {
 }) => (
   <button
     onClick={onClick}
-    className={`flex items-center justify-center gap-2 px-4 py-3 ${color} text-white rounded-lg font-medium hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg text-xs min-h-[44px] w-full`}
+    className={`flex items-center justify-center gap-1 px-3 py-2 ${color} text-white rounded-md font-medium hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-sm hover:shadow-md text-xs min-h-[36px] w-full`}
   >
-    <Icon className="w-4 h-4" />
+    <Icon className="w-3 h-3" />
     <span className="text-center">{title}</span>
   </button>
 );
 
-// --------- Enhanced Stats Section Component ----------
-export const PaymentStats = ({ payments }: { payments: Payment[] }) => {
+// --------- Compact Payment Analytics Component ----------
+export const CompactPaymentAnalytics = ({ payments }: { payments: Payment[] }) => {
   const stats = useMemo(() => {
     const totalPayments = payments.length;
     const completedPayments = payments.filter((p) => p.status === "completed").length;
@@ -250,114 +243,105 @@ export const PaymentStats = ({ payments }: { payments: Payment[] }) => {
   };
 
   return (
-    <div className="mb-8">
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold text-gray-900">Payment Overview</h2>
-        <p className="text-sm text-gray-600">Real-time payment statistics and insights</p>
-      </div>
+    <Card className="border-0 shadow-md bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center text-base font-bold text-gray-900">
+          <div className="p-1.5 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-md mr-2">
+            <FileText className="w-4 h-4 text-white" />
+          </div>
+          Payment Analytics
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="pt-0">
+        {/* Compact Stats Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
+          <CompactStatCard
+            title="Revenue"
+            value={`৳${stats.completedRevenue.toLocaleString()}`}
+            icon={TrendingUp}
+            color="text-green-600"
+            bgColor="bg-green-50"
+            percentage={12.4}
+            trend="up"
+          />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-       
-        <StatCard
-          title="Completed Revenue"
-          value={`৳${stats.completedRevenue.toLocaleString()}`}
-          icon={TrendingUp}
-          color="text-green-600"
-          bgColor="bg-green-50"
-          percentage={12.4}
-          trend="up"
-        />
-        
-        <StatCard
-          title="Completed"
-          value={stats.completedPayments.toLocaleString()}
-          icon={Check}
-          color="text-green-600"
-          bgColor="bg-green-50"
-          percentage={18.9}
-          trend="up"
-        />
-        
-        <StatCard
-          title="Pending"
-          value={stats.pendingPayments.toLocaleString()}
-          icon={Pause}
-          color="text-yellow-600"
-          bgColor="bg-yellow-50"
-          percentage={-5.1}
-          trend="down"
-        />
-        
-        <StatCard
-          title="Failed"
-          value={stats.failedPayments.toLocaleString()}
-          icon={XCircle}
-          color="text-red-600"
-          bgColor="bg-red-50"
-          percentage={-2.8}
-          trend="down"
-        /> 
+          <CompactStatCard
+            title="Completed"
+            value={stats.completedPayments.toLocaleString()}
+            icon={Check}
+            color="text-green-600"
+            bgColor="bg-green-50"
+            percentage={18.9}
+            trend="up"
+          />
 
+          <CompactStatCard
+            title="Pending"
+            value={stats.pendingPayments.toLocaleString()}
+            icon={Pause}
+            color="text-yellow-600"
+            bgColor="bg-yellow-50"
+            percentage={-5.1}
+            trend="down"
+          />
 
- <StatCard
-          title="Cancelled"
-          value={stats.cancelledPayments.toLocaleString()}
-          icon={AlertCircle}
-          color="text-orange-600"
-          bgColor="bg-orange-50"
-        />
+          <CompactStatCard
+            title="Failed"
+            value={stats.failedPayments.toLocaleString()}
+            icon={XCircle}
+            color="text-red-600"
+            bgColor="bg-red-50"
+            percentage={-2.8}
+            trend="down"
+          />
 
-      </div>
+          <CompactStatCard
+            title="Cancelled"
+            value={stats.cancelledPayments.toLocaleString()}
+            icon={AlertCircle}
+            color="text-orange-600"
+            bgColor="bg-orange-50"
+          />
+        </div>
 
-      {/* Export Section - Moved to bottom and made smaller */}
-      <Card className="mt-6 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 border border-blue-200 shadow-lg rounded-lg overflow-hidden">
-        <CardContent className="p-4">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg">
-                <FileText className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-gray-900">📊 Export Completed Payments</h3>
-                <p className="text-sm text-gray-600">Download CSV reports</p>
-              </div>
+        {/* Compact Export Section */}
+        <div className="bg-white/50 rounded-lg p-3 border border-blue-100">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Download className="w-4 h-4 text-blue-600" />
+              <span className="text-sm font-semibold text-gray-900">Export Reports</span>
             </div>
-            <div className="text-right">
-              <p className="text-xs text-gray-500">Completed Records</p>
-              <p className="text-lg font-bold text-blue-600">{stats.completedPayments.toLocaleString()}</p>
-            </div>
+            <span className="text-xs text-gray-500">{stats.completedPayments} records</span>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <ExportButton
-              title="Last 24h"
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+            <CompactExportButton
+              title="24h"
               icon={Calendar}
               onClick={handleExportLastDay}
               color="bg-gradient-to-r from-black to-gray-800 hover:from-gray-800 hover:to-black shadow-gray-400"
             />
-            <ExportButton
-              title="Last 7 Days"
+            <CompactExportButton
+              title="7 Days"
               icon={CalendarDays}
               onClick={handleExportLast7Days}
               color="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 shadow-red-400"
             />
-            <ExportButton
-              title="Last 30 Days"
+            <CompactExportButton
+              title="30 Days"
               icon={CalendarRange}
               onClick={handleExportLastMonth}
               color="bg-gradient-to-r from-black to-gray-800 hover:from-gray-800 hover:to-black shadow-gray-400"
             />
-            <ExportButton
+            <CompactExportButton
               title="All Time"
               icon={Download}
               onClick={handleExportAll}
               color="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 shadow-red-400"
             />
           </div>
-        </CardContent>
-      </Card>
-
-      
-    </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 };

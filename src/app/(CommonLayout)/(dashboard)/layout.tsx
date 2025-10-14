@@ -4,25 +4,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 
 const navigationSections = [
-  {
-    title: "� Users Management",
-    icon: "👥",
-    links: [
-      {
-        label: "Create New User",
-        href: "/dashboard/register",
-        icon: "👤",
-        color: "",
-      },
-      {
-        label: "Manage All Users",
-        href: "/dashboard/manage-all-users",
-        icon: "👥",
-        color: "",
-      },
-     
-    ],
-  },
+ 
   {
     title: "� Payment Management",
     icon: "💳",
@@ -222,6 +204,25 @@ const navigationSections = [
      
     ],
   },
+   {
+    title: "� Users Management",
+    icon: "👥",
+    links: [
+      {
+        label: "Create New User",
+        href: "/dashboard/register",
+        icon: "👤",
+        color: "",
+      },
+      {
+        label: "Manage All Users",
+        href: "/dashboard/manage-all-users",
+        icon: "👥",
+        color: "",
+      },
+     
+    ],
+  },
   {
     title: "📆 Events & Engagements",
     icon: "📆",
@@ -379,7 +380,9 @@ export default function AdminLayout({ children }: {children: React.ReactNode}) {
                 {/* Dashboard Title - only show when expanded */}
                 <AnimatePresence>
                   {sidebarExpanded && (
-                    <motion.h1 
+                  <Link href="/dashboard" className="block mt-4">
+
+  <motion.h1 
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
@@ -388,6 +391,8 @@ export default function AdminLayout({ children }: {children: React.ReactNode}) {
                     >
                       Admin Dashboard
                     </motion.h1>
+
+                  </Link>
                   )}
                 </AnimatePresence>
               </div>
