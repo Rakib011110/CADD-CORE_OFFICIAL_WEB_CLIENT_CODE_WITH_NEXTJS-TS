@@ -15,7 +15,6 @@ import {
   useGetStudentApplicationsQuery,
 } from "@/redux/api/ceritificatesApplicationApi";
 import { CertificateApplication } from "@/types";
-import { motion } from "framer-motion";
 import { ProgressBar } from "../UI/CertificateProgress/CertificateProgress";
 
 
@@ -55,114 +54,99 @@ export default function StudentCertificate() {
   };
 
   return (
-  <div className="bg-blue-100 p-4">
-
-<motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.6 }}
-      className="max-w-3xl mx-auto p-4 space-y-4  rounded-2xl"
-    >
-      <div className="bg-gradient-to-r   from-red-500 via-red-600 to-red-700 rounded-2xl flex flex-col justify-center items-center shadow-lg h-36 text-white px-4 text-center">
-  <h2 className="text-2xl md:text-3xl font-extrabold">
-    Student ID দিয়ে সার্টিফিকেট খুঁজুন
-  </h2>
-  <p className="text-sm mt-2">
-    নিচে আপনার Student ID লিখে “সার্চ করুন” বাটনে ক্লিক করুন
-  </p>
-</div>
-
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="flex justify-center mt-4">
-          <Button
-            className="uppercase cursor-pointer text-white text-xl h-14 bg-red-500 px-6 py-2"
-            variant="outline"
-            onClick={() => setShowSearch((s) => !s)}
-          >
-            {showSearch ? "ফর্ম বন্ধ করুন" : "সার্টিফিকেটের জন্য আবেদন করুন"}
-          </Button>
+    <div className="bg-white p-4">
+      <div className="max-w-3xl mx-auto p-4 space-y-4 rounded-2xl">
+        <div className="bg-red-600 rounded-2xl flex flex-col justify-center items-center shadow-lg h-36 text-white px-4 text-center">
+          <h2 className="text-2xl md:text-3xl font-extrabold">
+            Student ID দিয়ে সার্টিফিকেট খুঁজুন
+          </h2>
+          <p className="text-sm mt-2">
+            নিচে আপনার Student ID লিখে "সার্চ করুন" বাটনে ক্লিক করুন
+          </p>
         </div>
 
-        {showSearch && (
-          <Card className="mt-6">
-            <CardHeader>
-              <CardTitle>স্টুডেন্ট আইডি দিয়ে সার্টিফিকেট খুঁজুন</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Input
-                placeholder="Student ID লিখুন"
-                value={studentId}
-                onChange={(e) => setStudentId(e.target.value)}
-              />
-              <Button
-                onClick={() => refetch()}
-                disabled={!studentId || isFetching}
-              >
-                {isFetching ? "অনুসন্ধান চলছে..." : "সার্চ করুন"}
-              </Button>
+        <div>
+          <div className="flex justify-center mt-4">
+            <Button
+              className="uppercase cursor-pointer text-white text-xl h-14 bg-red-600 hover:bg-red-700 px-6 py-2 border border-red-600"
+              variant="outline"
+              onClick={() => setShowSearch((s) => !s)}
+            >
+              {showSearch ? "ফর্ম বন্ধ করুন" : "সার্টিফিকেটের জন্য আবেদন করুন"}
+            </Button>
+          </div>
 
-              {applications?.length > 0 && (
-                <div className="mt-4 space-y-4">
-                  {applications.map((app: CertificateApplication) => (
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.4 }}
-                      key={app._id}
-                      className="p-4 border rounded-lg shadow-sm bg-white"
-                    >
-                      <div className="space-y-2 text-md">
-                        <p><strong>নাম:</strong> {app.studentName}</p>
-                        <p><strong>কোর্স:</strong> {app.courseName}</p>
-                        <p><strong>ইনস্ট্রাক্টর:</strong> {app.instructorName}</p>
-                        <p>
-                          <strong>স্ট্যাটাস:</strong>{" "}
-                          <span
-                            className={
-                              app.status === "approved"
-                                ? "text-green-600"
-                                : app.status === "rejected"
-                                ? "text-red-600"
-                                : "text-yellow-600"
-                            }
-                          >
-                            {app.status}
-                          </span>
-                        </p>
-                      </div>
+          {showSearch && (
+            <Card className="mt-6">
+              <CardHeader>
+                <CardTitle>স্টুডেন্ট আইডি দিয়ে সার্টিফিকেট খুঁজুন</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Input
+                  placeholder="Student ID লিখুন"
+                  value={studentId}
+                  onChange={(e) => setStudentId(e.target.value)}
+                />
+                <Button
+                  onClick={() => refetch()}
+                  disabled={!studentId || isFetching}
+                >
+                  {isFetching ? "অনুসন্ধান চলছে..." : "সার্চ করুন"}
+                </Button>
 
-                      <div className="mt-3">
-                        <ProgressBar status={app.status} issueDate={app.issueDate} />
-                      </div>
-
-                      {app.status === "pending" && (
-                        <div className="mt-4">
-                          <Button size="sm" onClick={() => onApply(app)} disabled={applying}>
-                            {applying ? "আবেদন হচ্ছে..." : "আবেদন করুন"}
-                          </Button>
+                {applications?.length > 0 && (
+                  <div className="mt-4 space-y-4">
+                    {applications.map((app: CertificateApplication) => (
+                      <div
+                        key={app._id}
+                        className="p-4 border rounded-lg shadow-sm bg-white"
+                      >
+                        <div className="space-y-2 text-md">
+                          <p><strong>নাম:</strong> {app.studentName}</p>
+                          <p><strong>কোর্স:</strong> {app.courseName}</p>
+                          <p><strong>ইনস্ট্রাক্টর:</strong> {app.instructorName}</p>
+                          <p>
+                            <strong>স্ট্যাটাস:</strong>{" "}
+                            <span
+                              className={
+                                app.status === "approved"
+                                  ? "text-black"
+                                  : app.status === "rejected"
+                                  ? "text-red-600"
+                                  : "text-black"
+                              }
+                            >
+                              {app.status}
+                            </span>
+                          </p>
                         </div>
-                      )}
-                    </motion.div>
-                  ))}
-                </div>
-              )}
 
-              {!isFetching && applications?.length === 0 && (
-                <p className="text-sm text-gray-500 text-center">
-                  কোনো সার্টিফিকেট খুঁজে পাওয়া যায়নি।
-                </p>
-              )}
-            </CardContent>
-          </Card>
-        )}
-      </motion.div>
-    </motion.div>
+                        <div className="mt-3">
+                          <ProgressBar status={app.status} issueDate={app.issueDate} />
+                        </div>
 
-  </div>
+                        {app.status === "pending" && (
+                          <div className="mt-4">
+                            <Button size="sm" onClick={() => onApply(app)} disabled={applying}>
+                              {applying ? "আবেদন হচ্ছে..." : "আবেদন করুন"}
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {!isFetching && applications?.length === 0 && (
+                  <p className="text-sm text-gray-500 text-center">
+                    কোনো সার্টিফিকেট খুঁজে পাওয়া যায়নি।
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
