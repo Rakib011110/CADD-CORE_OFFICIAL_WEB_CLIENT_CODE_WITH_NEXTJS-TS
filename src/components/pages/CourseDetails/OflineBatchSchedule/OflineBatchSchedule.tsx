@@ -28,7 +28,7 @@ export default function OfflineBatchSchedule() {
               </div>
    <div className="flex items-center justify-between p-3 bg-black rounded border border-gray-100">
                   <span className="text-white text-lg mt-2 font-medium">শুরুর তারিখ:</span>
-                  <span className="text-white font-medium font-serif text-lg mt-2">৪ ডিসেম্বর, ২০২৫</span>
+                  <span className="text-white font-medium font-serif text-lg mt-2">৬ ডিসেম্বর, ২০২৫</span>
                 </div>
               <div className="space-y-2">
                 {/* Days */}
