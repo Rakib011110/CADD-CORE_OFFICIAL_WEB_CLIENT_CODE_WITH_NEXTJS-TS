@@ -37,7 +37,7 @@ export default function OfflineBatchSchedule() {
                 {/* Time */}
                 <div className="flex items-center justify-between p-3 bg-black rounded border border-gray-950">
                   <span className="text-white text-lg mt-2 font-medium">সময়:</span>
-                  <span className="text-white font-medium text-lg mt-2">৮:৩০ থেকে ১২:৩০</span>
+                  <span className="text-white font-medium text-lg mt-2">সকাল ৮:৩০ থেকে ১২:৩০</span>
                 </div> 
 
               
