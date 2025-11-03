@@ -28,7 +28,7 @@ export default function OfflineBatchSchedule() {
               </div>
    <div className="flex items-center justify-between p-3 bg-black rounded border border-gray-100">
                   <span className="text-white text-lg mt-2 font-medium">শুরুর তারিখ:</span>
-                  <span className="text-white font-medium text-lg mt-2">৪ ডিসেম্বর, ২০२৫</span>
+                  <span className="text-white font-medium font-serif text-lg mt-2">৪ ডিসেম্বর, ২০২৫</span>
                 </div>
               <div className="space-y-2">
                 {/* Days */}
@@ -71,7 +71,6 @@ export default function OfflineBatchSchedule() {
                     <p className="text-lg font-bold text-red-600 mb-1">৳৯,৬০০</p>
                     <p className="text-red-700 text-xs">সম্পূর্ণ  পরিশোধ করলে সাশ্রয় হবে ৳২,৪০০</p>
                   </div>
-                  
                 </div>
                    <div className=" mt-4  text-center">
             <button className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold py-2 px-6 rounded-md transition-all duration-300 transform hover:scale-105 hover:shadow-md text-sm">
