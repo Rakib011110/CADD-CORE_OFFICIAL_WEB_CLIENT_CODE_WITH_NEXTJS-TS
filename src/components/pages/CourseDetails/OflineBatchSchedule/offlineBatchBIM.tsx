@@ -56,7 +56,7 @@ export default function OfflineBatchSchedule() {
                 <div className="p-3 bg-white rounded border border-gray-100">
                   <div className="text-center">
                     <p className="text-gray-600 text-xs mb-1">নিয়মিত কোর্স ফি</p>
-                    <p className="text-xl font-bold text-black">৳১৫,০০০</p>
+                    <p className="text-xl font-bold text-black">৳২০,০০০</p>
                   </div>
                 </div>
 
@@ -67,8 +67,8 @@ export default function OfflineBatchSchedule() {
                   </div>
                   <div className="text-center">
                     <p className="text-red-700 text-xs font-semibold mb-1">সম্পূর্ণ পেমেন্ট একসাথে</p>
-                    <p className="text-lg font-bold text-red-600 mb-1">৳১২,০০০</p>
-                    <p className="text-red-700 text-xs">সম্পূর্ণ পরিশোধ করলে সাশ্রয় হবে ৳৩,০০০</p>
+                    <p className="text-lg font-bold text-red-600 mb-1">৳১৬,০০০</p>
+                    <p className="text-red-700 text-xs">সম্পূর্ণ পরিশোধ করলে সাশ্রয় হবে ৳৪,০০০</p>
                   </div>
                 </div>
 
