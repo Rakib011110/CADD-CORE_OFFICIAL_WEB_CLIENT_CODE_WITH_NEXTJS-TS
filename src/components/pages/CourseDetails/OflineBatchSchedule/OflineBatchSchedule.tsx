@@ -17,24 +17,21 @@ export default function OfflineBatchSchedule() {
           {/* Schedule Information Cards */}
           <div className="grid lg:grid-cols-2 gap-4 mb-4">
 
-            {/* Schedule Details Card - November Batch */}
-          
-
-            {/* Schedule Details Card - December Batch */}
+            {/* Schedule Details Card - January Batch */}
             <div className="bg-gray-50 rounded-md p-3 border  border-gray-200 hover:shadow-sm transition-all duration-300">
               <div className="flex items-center mb-3 ">
                 <div className="w-2 h-2 bg-red-500 rounded-full mr-2"></div>
-                <h3 className="text-base font-bold text-black">ক্লাস সূচি (ডিসেম্বর ব্যাচ)</h3>
+                <h3 className="text-base font-bold text-black">ক্লাস সূচি (জানুয়ারি ব্যাচ)</h3>
               </div>
    <div className="flex items-center justify-between p-3 bg-black rounded border border-gray-100">
                   <span className="text-white text-lg mt-2 font-medium">শুরুর তারিখ:</span>
-                  <span className="text-white font-medium font-serif text-lg mt-2">৬ ডিসেম্বর, ২০২৫</span>
+                  <span className="text-white font-medium font-serif text-lg mt-2">৪ জানুয়ারি, ২০২৬</span>
                 </div>
               <div className="space-y-2">
                 {/* Days */}
                 <div className="flex items-center justify-between p-3 bg-black rounded border border-gray-100">
                   <span className="text-white text-lg mt-2 font-medium">দিন:</span>
-                  <span className="text-white font-medium text-lg mt-2">শনিবার ও মঙ্গলবার</span>
+                  <span className="text-white font-medium text-lg mt-2">রবিবার ও বুধবার</span>
                 </div>
 
                 {/* Time */}
