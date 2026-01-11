@@ -15,8 +15,8 @@ const CourseCard: React.FC<TCourse> = ({
   slug,
   softwaresTaught,
 }) => 
-  { 
-
+{ 
+  const isRecorded = slug === "professional-electrical-design-mastercourse";
 
   return (
     <motion.div
@@ -40,9 +40,9 @@ const CourseCard: React.FC<TCourse> = ({
               className="object-cover transition-transform duration-500 ease-in-out group-hover:scale-105"
             />
             {/* Live Badge */}
-            <div className="absolute top-3 right-3 bg-red-600 text-white px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1 animate-pulse">
-              <div className="w-2 h-2 bg-white rounded-full animate-ping"></div>
-              LIVE
+            <div className={`absolute top-3 right-3 ${isRecorded ? 'bg-blue-600' : 'bg-red-600'} text-white px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1 ${isRecorded ? '' : 'animate-pulse'}`}>
+              {!isRecorded && <div className="w-2 h-2 bg-white rounded-full animate-ping"></div>}
+              {isRecorded ? 'RECORDED' : 'LIVE'}
             </div>
           </div>
 
