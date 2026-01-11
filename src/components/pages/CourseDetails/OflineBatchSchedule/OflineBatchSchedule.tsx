@@ -21,17 +21,17 @@ export default function OfflineBatchSchedule() {
             <div className="bg-gray-50 rounded-md p-3 border  border-gray-200 hover:shadow-sm transition-all duration-300">
               <div className="flex items-center mb-3 ">
                 <div className="w-2 h-2 bg-red-500 rounded-full mr-2"></div>
-                <h3 className="text-base font-bold text-black">ক্লাস সূচি (জানুয়ারি ব্যাচ)</h3>
+                <h3 className="text-base font-bold text-black">ক্লাস সূচি (ফেব্রুয়ারি ব্যাচ)</h3>
               </div>
    <div className="flex items-center justify-between p-3 bg-black rounded border border-gray-100">
                   <span className="text-white text-lg mt-2 font-medium">শুরুর তারিখ:</span>
-                  <span className="text-white font-medium font-serif text-lg mt-2">৪ জানুয়ারি, ২০২৬</span>
+                  <span className="text-white font-medium font-serif text-lg mt-2">৫ ফেব্রুয়ারি, ২০২৬</span>
                 </div>
               <div className="space-y-2">
                 {/* Days */}
                 <div className="flex items-center justify-between p-3 bg-black rounded border border-gray-100">
                   <span className="text-white text-lg mt-2 font-medium">দিন:</span>
-                  <span className="text-white font-medium text-lg mt-2">রবিবার ও বুধবার</span>
+                  <span className="text-white font-medium text-lg mt-2">সোমবার ও বৃহস্পতিবার</span>
                 </div>
 
                 {/* Time */}
