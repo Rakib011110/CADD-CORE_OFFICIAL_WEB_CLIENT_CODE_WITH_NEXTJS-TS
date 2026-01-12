@@ -49,6 +49,7 @@ export default function BatchSchedule({ course  }: { course?: TCourse }) {
         seconds: 0,
     });
     const [isClient, setIsClient] = useState(false);
+    const [isBatchRunning, setIsBatchRunning] = useState(false);
 
     // This effect runs once on mount to confirm we are on the client side.
     useEffect(() => {
@@ -71,9 +72,11 @@ export default function BatchSchedule({ course  }: { course?: TCourse }) {
                     minutes: Math.floor((difference / 1000 / 60) % 60),
                     seconds: Math.floor((difference / 1000) % 60),
                 });
+                setIsBatchRunning(false);
             } else {
                 // If the date has passed, clear the interval and set time to 0.
                 setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+                setIsBatchRunning(true);
                 clearInterval(timer);
             }
         }, 1000);
@@ -113,7 +116,7 @@ export default function BatchSchedule({ course  }: { course?: TCourse }) {
                             {/* Countdown Timer Section */}
                             <div className="flex items-center text-red-600 mb-2">
                                 <Hourglass size={20} />
-                                <h3 className="ml-2 text-base font-semibold uppercase tracking-wider">Online Batch Starts In</h3>
+                                <h3 className="ml-2 text-base font-semibold uppercase tracking-wider"> Batch Starts In</h3>
                             </div>
                             
                             {isClient ? (
@@ -139,8 +142,8 @@ export default function BatchSchedule({ course  }: { course?: TCourse }) {
   {[
     {
       icon: <Calendar className="w-5 h-5 text-red-500" />,
-      label: "Starting Date",
-      value: formattedStartDate
+      label: isBatchRunning ? "Batch Status" : "Starting Date",
+      value: isBatchRunning ? "Batch is Running - Enroll Now!" : formattedStartDate
     },
     {
       icon: <Users className="w-5 h-5 text-red-500" />,

@@ -69,8 +69,30 @@ export default function CourseFees({ course }: CourseFeesProps) {
     useInitiatePaymentMutation();
 
   // --- STATE ---
-  const installmentPlans: APIInstallmentPlan[] =
+  // নির্দিষ্ট কোর্সগুলির জন্য installments ফিল্টার করা
+  const courseTitlesWithOnlyFullPayment = [
+    "প্রফেশনাল মেকানিক্যাল ক্যাড মাস্টারকোর্স",
+    "প্রফেশনাল ইলেকট্রিক্যাল ডিজাইন মাস্টারকোর্স",
+    "mechanical-cad-master-course",
+    "professional-electrical-design-mastercourse",
+    "মেকানিক্যাল",
+    "ইলেকট্রিক্যাল"
+  ];
+  
+  const shouldHideInstallments = courseTitlesWithOnlyFullPayment.some(
+    (courseTitle) => 
+      course._id?.toLowerCase().includes(courseTitle.toLowerCase()) ||
+      course.title?.toLowerCase().includes(courseTitle.toLowerCase())
+  );
+  
+  const allInstallmentPlans: APIInstallmentPlan[] =
     installmentPlansResponse?.data || [];
+  
+  // যদি নির্দিষ্ট কোর্স হয়, শুধুমাত্র Full Payment (1 installment) দেখাবো
+  const installmentPlans: APIInstallmentPlan[] = shouldHideInstallments
+    ? allInstallmentPlans.filter(plan => plan.installments === 1)
+    : allInstallmentPlans;
+    
   const [selectedPlanName, setSelectedPlanName] = useState<string | null>(null);
   const [finalPayableAmount, setFinalPayableAmount] = useState(
     course.courseFee
