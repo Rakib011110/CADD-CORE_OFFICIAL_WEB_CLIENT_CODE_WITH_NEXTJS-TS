@@ -100,7 +100,7 @@ export default function CourseDetails() {
 
   {showAutocadSection && <OfflineBatchSchedule />}
   {showBimSection && <OfflineBatchBIM />}
-  {showStructuralSection && <OfflineBatchStructural />}
+  {/* {showStructuralSection && <OfflineBatchStructural />} */}
 
         <div className="" id="mastercourse-overview">
           <MastercourseOverview course={course?.data} />
