@@ -3,12 +3,7 @@
 import { useState } from "react";
 import { Input } from "@/components/UI/input";
 import { Button } from "@/components/UI/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/UI/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/UI/card";
 import { toast } from "sonner";
 import {
   useApplyCertificateMutation,
@@ -16,7 +11,6 @@ import {
 } from "@/redux/api/ceritificatesApplicationApi";
 import { CertificateApplication } from "@/types";
 import { ProgressBar } from "../UI/CertificateProgress/CertificateProgress";
-
 
 export default function StudentCertificate() {
   const [studentId, setStudentId] = useState("");
@@ -32,7 +26,8 @@ export default function StudentCertificate() {
 
   const applications = response?.data || [];
 
-  const [applyCertificate, { isLoading: applying }] = useApplyCertificateMutation();
+  const [applyCertificate, { isLoading: applying }] =
+    useApplyCertificateMutation();
 
   const onApply = async (app: any) => {
     try {
@@ -72,7 +67,7 @@ export default function StudentCertificate() {
               variant="outline"
               onClick={() => setShowSearch((s) => !s)}
             >
-              {showSearch ? "ফর্ম বন্ধ করুন" : "সার্টিফিকেটের জন্য আবেদন করুন"}
+              {showSearch ? "ফর্ম বন্ধ করুন" : "সার্টিফিকেট ভেরিফিকেশন"}
             </Button>
           </div>
 
@@ -102,9 +97,15 @@ export default function StudentCertificate() {
                         className="p-4 border rounded-lg shadow-sm bg-white"
                       >
                         <div className="space-y-2 text-md">
-                          <p><strong>নাম:</strong> {app.studentName}</p>
-                          <p><strong>কোর্স:</strong> {app.courseName}</p>
-                          <p><strong>ইনস্ট্রাক্টর:</strong> {app.instructorName}</p>
+                          <p>
+                            <strong>নাম:</strong> {app.studentName}
+                          </p>
+                          <p>
+                            <strong>কোর্স:</strong> {app.courseName}
+                          </p>
+                          <p>
+                            <strong>ইনস্ট্রাক্টর:</strong> {app.instructorName}
+                          </p>
                           <p>
                             <strong>স্ট্যাটাস:</strong>{" "}
                             <span
@@ -112,8 +113,8 @@ export default function StudentCertificate() {
                                 app.status === "approved"
                                   ? "text-black"
                                   : app.status === "rejected"
-                                  ? "text-red-600"
-                                  : "text-black"
+                                    ? "text-red-600"
+                                    : "text-black"
                               }
                             >
                               {app.status}
@@ -122,12 +123,19 @@ export default function StudentCertificate() {
                         </div>
 
                         <div className="mt-3">
-                          <ProgressBar status={app.status} issueDate={app.issueDate} />
+                          <ProgressBar
+                            status={app.status}
+                            issueDate={app.issueDate}
+                          />
                         </div>
 
                         {app.status === "pending" && (
                           <div className="mt-4">
-                            <Button size="sm" onClick={() => onApply(app)} disabled={applying}>
+                            <Button
+                              size="sm"
+                              onClick={() => onApply(app)}
+                              disabled={applying}
+                            >
                               {applying ? "আবেদন হচ্ছে..." : "আবেদন করুন"}
                             </Button>
                           </div>
