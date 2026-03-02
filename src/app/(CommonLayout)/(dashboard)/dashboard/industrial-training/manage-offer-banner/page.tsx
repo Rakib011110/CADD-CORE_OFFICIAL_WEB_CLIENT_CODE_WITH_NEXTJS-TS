@@ -8,7 +8,14 @@ import {
   useUpdateIndustrialOfferBannerMutation,
 } from "@/redux/api/industrialOfferBannerApi";
 import { Input } from "@/components/UI/input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/UI/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/UI/dialog";
+import { toast } from "sonner";
 
 interface Offer {
   _id: string;
@@ -40,15 +47,27 @@ const OfferTable = () => {
 
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("upload_preset", "YOUR_CLOUDINARY_PRESET");
+    formData.append("upload_preset", "CADDCOREWEB");
 
-    const res = await fetch("https://api.cloudinary.com/v1_1/YOUR_CLOUDINARY_NAME/image/upload", {
-      method: "POST",
-      body: formData,
-    });
+    try {
+      const res = await fetch(
+        "https://api.cloudinary.com/v1_1/dbkwiwoll/image/upload",
+        {
+          method: "POST",
+          body: formData,
+        },
+      );
 
-    const uploadData = await res.json();
-    setForm((prev) => ({ ...prev, photoUrl: uploadData.secure_url }));
+      const uploadData = await res.json();
+      if (res.ok) {
+        setForm((prev) => ({ ...prev, photoUrl: uploadData.secure_url }));
+        toast.success("Image uploaded successfully!");
+      } else {
+        toast.error(`Image upload failed: ${uploadData.error?.message}`);
+      }
+    } catch (error) {
+      toast.error("Image upload failed.");
+    }
   };
 
   const handleEdit = (offer: Offer) => {
@@ -65,15 +84,28 @@ const OfferTable = () => {
   const handleUpdate = async () => {
     if (!editingOffer) return;
 
-    await updateOffer({ id: editingOffer._id, body: form });
-    setEditingOffer(null);
-    refetch();
+    try {
+      await updateOffer({
+        id: editingOffer._id,
+        industrialData: form,
+      }).unwrap();
+      toast.success("Offer updated successfully!");
+      setEditingOffer(null);
+      refetch();
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Failed to update offer.");
+    }
   };
 
   const handleDelete = async (id: string) => {
     if (confirm("Are you sure you want to delete?")) {
-      await deleteOffer(id);
-      refetch();
+      try {
+        await deleteOffer(id).unwrap();
+        toast.success("Offer deleted successfully!");
+        refetch();
+      } catch (error: any) {
+        toast.error("Failed to delete offer.");
+      }
     }
   };
 
@@ -103,11 +135,18 @@ const OfferTable = () => {
                   />
                 </td>
                 <td className="p-3 flex gap-2">
-                  <Dialog>
+                  <Dialog
+                    open={editingOffer?._id === offer._id}
+                    onOpenChange={(isOpen) => {
+                      if (isOpen) {
+                        handleEdit(offer);
+                      } else {
+                        setEditingOffer(null);
+                      }
+                    }}
+                  >
                     <DialogTrigger asChild>
-                      <Button size="sm" onClick={() => handleEdit(offer)}>
-                        Edit
-                      </Button>
+                      <Button size="sm">Edit</Button>
                     </DialogTrigger>
                     <DialogContent>
                       <DialogHeader>
@@ -116,23 +155,31 @@ const OfferTable = () => {
                       <div className="flex flex-col gap-4 mt-4">
                         <Input
                           value={form.title}
-                          onChange={(e) => setForm({ ...form, title: e.target.value })}
+                          onChange={(e) =>
+                            setForm({ ...form, title: e.target.value })
+                          }
                           placeholder="Title"
                         />
                         <Input
                           value={form.description}
-                          onChange={(e) => setForm({ ...form, description: e.target.value })}
+                          onChange={(e) =>
+                            setForm({ ...form, description: e.target.value })
+                          }
                           placeholder="Description"
                         />
                         <Input
                           value={form.date}
                           type="date"
-                          onChange={(e) => setForm({ ...form, date: e.target.value })}
+                          onChange={(e) =>
+                            setForm({ ...form, date: e.target.value })
+                          }
                         />
                         <Input
                           value={form.time}
                           type="time"
-                          onChange={(e) => setForm({ ...form, time: e.target.value })}
+                          onChange={(e) =>
+                            setForm({ ...form, time: e.target.value })
+                          }
                         />
                         <Input type="file" onChange={handleUpload} />
                         {form.photoUrl && (
