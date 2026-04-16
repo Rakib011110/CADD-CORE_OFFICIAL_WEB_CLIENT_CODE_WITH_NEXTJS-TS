@@ -17,16 +17,16 @@ export default function OfflineBatchSchedule() {
           {/* Schedule Information Cards */}
           <div className="grid lg:grid-cols-2 gap-4 mb-4">
 
-            {/* Schedule Details Card - January Batch */}
+            {/* Schedule Details Card - May Batch */}
             <div className="bg-gray-50 rounded-md p-3 border  border-gray-200 hover:shadow-sm transition-all duration-300">
               <div className="flex items-center mb-3 ">
                 <div className="w-2 h-2 bg-red-500 rounded-full mr-2"></div>
                 <h3 className="text-base font-bold text-black">ক্লাস সূচি (মে ব্যাচ)</h3>
               </div>
-   <div className="flex items-center justify-between p-3 bg-black rounded border border-gray-100">
-                  <span className="text-white text-lg mt-2 font-medium">শুরুর তারিখ:</span>
-                  <span className="text-white font-medium font-serif text-lg mt-2">৩ মে ২৬</span>
-                </div>
+              <div className="flex items-center justify-between p-3 bg-black rounded border border-gray-100">
+                <span className="text-white text-lg mt-2 font-medium">শুরুর তারিখ:</span>
+                <span className="text-white font-medium font-serif text-lg mt-2">৩ মে ২৬</span>
+              </div>
               <div className="space-y-2">
                 {/* Days */}
                 <div className="flex items-center justify-between p-3 bg-black rounded border border-gray-100">
@@ -36,13 +36,37 @@ export default function OfflineBatchSchedule() {
 
                 {/* Time */}
                 <div className="flex items-center justify-between p-3 bg-black rounded border border-gray-950">
-                  <span className="text-white text-lg mt-2 font-medium">সময়:</span>
+                  <span className="text-white text-lg mt-2 font-medium">সময়:</span>
                   <span className="text-white font-medium text-lg mt-2">সন্ধ্যা ৬টা - রাত ৮টা</span>
-                </div> 
-
-              
+                </div>
               </div>
             </div>
+
+            {/* Schedule Details Card - June Batch */}
+            <div className="bg-gray-50 rounded-md p-3 border  border-gray-200 hover:shadow-sm transition-all duration-300">
+              <div className="flex items-center mb-3 ">
+                <div className="w-2 h-2 bg-red-500 rounded-full mr-2"></div>
+                <h3 className="text-base font-bold text-black">ক্লাস সূচি (জুন ব্যাচ)</h3>
+              </div>
+              <div className="flex items-center justify-between p-3 bg-black rounded border border-gray-100">
+                <span className="text-white text-lg mt-2 font-medium">শুরুর তারিখ:</span>
+                <span className="text-white font-medium font-serif text-lg mt-2">১ জুন ২৬</span>
+              </div>
+              <div className="space-y-2">
+                {/* Days */}
+                <div className="flex items-center justify-between p-3 bg-black rounded border border-gray-100">
+                  <span className="text-white text-lg mt-2 font-medium">দিন:</span>
+                  <span className="text-white font-medium text-lg mt-2">সোমবার ও বৃহস্পতিবার</span>
+                </div>
+
+                {/* Time */}
+                <div className="flex items-center justify-between p-3 bg-black rounded border border-gray-950">
+                  <span className="text-white text-lg mt-2 font-medium">সময়:</span>
+                  <span className="text-white font-medium text-lg mt-2">সন্ধ্যা ৬টা - রাত ৮টা</span>
+                </div>
+              </div>
+            </div>
+
             <div className="bg-gray-50 rounded-md p-3 border border-gray-200 hover:shadow-sm transition-all duration-300">
               <div className="flex items-center mb-3">
                 <div className="w-2 h-2 bg-red-500 rounded-full mr-2"></div>

@@ -23,10 +23,10 @@ export default function OfflineBatchSchedule() {
                 <div className="w-2 h-2 bg-red-500 rounded-full mr-2"></div>
                 <h3 className="text-base font-bold text-black">ক্লাস সূচি</h3>
               </div>
-   <div className="flex items-center justify-between p-3 bg-black rounded border border-gray-100">
-                  <span className="text-white text-lg mt-2 font-medium">শুরুর তারিখ:</span>
-                  <span className="text-white font-medium text-lg mt-2">৫ এপ্রিল</span>
-                </div>
+              <div className="flex items-center justify-between p-3 bg-black rounded border border-gray-100">
+                <span className="text-white text-lg mt-2 font-medium">শুরুর তারিখ:</span>
+                <span className="text-white font-medium text-lg mt-2">১৯ এপ্রিল</span>
+              </div>
               <div className="space-y-2">
                 {/* Days */}
                 <div className="flex items-center justify-between p-3 bg-black rounded border border-gray-100">
