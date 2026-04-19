@@ -33,7 +33,7 @@ export default function OfflineBatchSchedule() {
                   শুরুর তারিখ:
                 </span>
                 <span className="text-white font-medium font-serif text-lg mt-2">
-                  ১ জুন ২৬
+                  ১৮ মে ২৬
                 </span>
               </div>
               <div className="space-y-2">
