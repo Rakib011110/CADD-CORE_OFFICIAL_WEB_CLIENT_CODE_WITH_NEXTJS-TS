@@ -88,7 +88,7 @@ export default function FloatingContactMenu() {
               },
               {
                 href:
-                  'https://goo.gl/maps/xyz', // short URL
+                  'https://maps.app.goo.gl/2dCYXYNeWBHn4qXW8', // short URL
                 icon: <FaMapMarkerAlt size={20} />,
                 label: 'Visit Us',
                 color: 'hover:text-red-500',

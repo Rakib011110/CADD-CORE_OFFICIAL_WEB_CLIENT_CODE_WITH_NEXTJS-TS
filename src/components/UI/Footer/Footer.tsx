@@ -154,7 +154,7 @@ export default function Footer() {
             />
           </div>
   <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center mt-8 text-gray-300 text-sm gap-2">
-        <p>© 2023 Caddcore. All rights reserved.</p>
+        <p>© 2026 Caddcore. All rights reserved.</p>
         <p>Trade License:  000257</p>
         <p>V: 1.0.0</p>
       </div>
