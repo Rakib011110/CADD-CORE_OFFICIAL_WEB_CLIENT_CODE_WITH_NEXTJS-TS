@@ -25,7 +25,7 @@ export default function OfflineBatchSchedule() {
               <div className="flex items-center mb-3 ">
                 <div className="w-2 h-2 bg-red-500 rounded-full mr-2"></div>
                 <h3 className="text-base font-bold text-black">
-                  ক্লাস সূচি (জুন ব্যাচ)
+                  ক্লাস সূচি (জুলাই ব্যাচ)
                 </h3>
               </div>
               <div className="flex items-center justify-between p-3 bg-black rounded border border-gray-100">
@@ -33,7 +33,7 @@ export default function OfflineBatchSchedule() {
                   শুরুর তারিখ:
                 </span>
                 <span className="text-white font-medium font-serif text-lg mt-2">
-                  ১৮ মে ২৬
+                  ১৬ জুলাই
                 </span>
               </div>
               <div className="space-y-2">
