@@ -1,8 +1,13 @@
 "use client"
 import Image from "next/image";
-import { Link } from "react-scroll";
+import { Link as ScrollLink } from "react-scroll";
+import NextLink from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function Footer() {
+  const pathname = usePathname();
+  const isHomepage = pathname === "/";
+
   const links = [
     { id: 1, link: "seminar-time", label: "ফ্রি সেমিনারের সময়সূচি" },
     { id: 2, link: "success-story", label: "সাকসেস স্টোরি" },
@@ -41,15 +46,24 @@ export default function Footer() {
           <ul className="text-gray-200 space-y-2 text-sm">
             {links.map(({ id, link, label }) => (
               <li key={id}>
-                <Link
-                  to={link}
-                  smooth={true}
-                  duration={500}
-                  offset={-70}
-                  className="cursor-pointer hover:text-white"
-                >
-                  {label}
-                </Link>
+                {isHomepage ? (
+                  <ScrollLink
+                    to={link}
+                    smooth={true}
+                    duration={500}
+                    offset={-70}
+                    className="cursor-pointer hover:text-white"
+                  >
+                    {label}
+                  </ScrollLink>
+                ) : (
+                  <NextLink
+                    href={`/#${link}`}
+                    className="cursor-pointer hover:text-white"
+                  >
+                    {label}
+                  </NextLink>
+                )}
               </li>
             ))}
             <li>
