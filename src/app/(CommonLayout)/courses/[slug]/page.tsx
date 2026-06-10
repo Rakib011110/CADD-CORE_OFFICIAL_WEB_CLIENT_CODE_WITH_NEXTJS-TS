@@ -76,15 +76,30 @@ export default function CourseDetails() {
 
   return (
     <div style={{ fontFamily: "banglaFont" }} className="font-serif bg-gradient-to-b from-[#fff7f8] to-white ">
-
-
-
-
-
-
-
-
-
+      {course?.data && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Course",
+              "name": course.data.title,
+              "description": course.data.description,
+              "provider": {
+                "@type": "Organization",
+                "name": "CADD CORE Training Institute",
+                "url": "https://www.caddcore.net"
+              },
+              "offers": course.data.courseFee ? {
+                "@type": "Offer",
+                "price": course.data.courseFee,
+                "priceCurrency": "BDT",
+                "category": "Paid"
+              } : undefined
+            })
+          }}
+        />
+      )}
       
       <DetailsBannar course={course?.data} />
       <CourseFees course={course.data} />

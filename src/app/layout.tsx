@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
-import "./globals.css";
-import "aos/dist/aos.css";
 import { Providers } from "@/lib/Providers";
 
 const geistSans = Geist({
@@ -103,6 +101,87 @@ export default function RootLayout({
         />
         {/* Facebook Pixel Meta Tag */}
         <meta property="fb:pixel_id" content="408403910510266" />
+        
+        {/* LocalBusiness Structured Data Markup */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "LocalBusiness",
+              "name": "CADD CORE Training Institute",
+              "image": [
+                "https://res.cloudinary.com/dalpf8iip/image/upload/v1755492733/Cadd_core_logo_white_png_v3fdci.png"
+              ],
+              "url": "https://www.caddcore.net",
+              "telephone": "+880 1611-223631",
+              "description": "CADD CORE Training Institute is an Autodesk Certified and BTEB-authorized training center established in 2014. Specializing in CAD, BIM, CAM, and engineering software training, CADD CORE has successfully trained 6,000+ students and professionals, helping them build industry-ready skills and successful careers in engineering and design sectors.",
+              "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "149/A, Baitush Sharaf Complex (5th Floor), Airport Road, Farmgate, Dhaka",
+                "addressLocality": "Dhaka",
+                "addressRegion": "Bangladesh",
+                "postalCode": "1215",
+                "addressCountry": "Bangladesh"
+              },
+              "geo": {
+                "@type": "GeoCoordinates",
+                "latitude": 23.75647999,
+                "longitude": 90.38941995267
+              },
+              "hasMap": "https://maps.app.goo.gl/GNxNwUNK44v38L6N9",
+              "openingHoursSpecification": [
+                {
+                  "@type": "OpeningHoursSpecification",
+                  "dayOfWeek": "Saturday",
+                  "opens": "09:00",
+                  "closes": "19:00"
+                },
+                {
+                  "@type": "OpeningHoursSpecification",
+                  "dayOfWeek": "Sunday",
+                  "opens": "09:00",
+                  "closes": "19:00"
+                },
+                {
+                  "@type": "OpeningHoursSpecification",
+                  "dayOfWeek": "Monday",
+                  "opens": "09:00",
+                  "closes": "19:00"
+                },
+                {
+                  "@type": "OpeningHoursSpecification",
+                  "dayOfWeek": "Tuesday",
+                  "opens": "09:00",
+                  "closes": "19:00"
+                },
+                {
+                  "@type": "OpeningHoursSpecification",
+                  "dayOfWeek": "Wednesday",
+                  "opens": "09:00",
+                  "closes": "19:00"
+                },
+                {
+                  "@type": "OpeningHoursSpecification",
+                  "dayOfWeek": "Thursday",
+                  "opens": "09:00",
+                  "closes": "19:00"
+                },
+                {
+                  "@type": "OpeningHoursSpecification",
+                  "dayOfWeek": "Friday",
+                  "opens": "09:00",
+                  "closes": "19:00"
+                }
+              ],
+              "sameAs": [
+                "https://www.facebook.com/caddcorebd",
+                "https://www.linkedin.com/company/cadd-core-ltd/",
+                "https://www.youtube.com/c/caddcorebd"
+              ]
+            })
+          }}
+        />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
