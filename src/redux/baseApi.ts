@@ -6,7 +6,6 @@ const baseApi = createApi({
   baseQuery: fetchBaseQuery({
     // baseUrl: "https://caddcoreapi-ten.vercel.app/api",
 
-// https://...caddcoreapi-ten.vercel.app
 
     baseUrl: "https://caddcoreapi-ten.vercel.app/api",
   }),     
