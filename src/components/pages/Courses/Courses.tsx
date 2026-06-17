@@ -28,19 +28,27 @@ export default function AllCourses() {
   const coursesArray = coursesResponse?.data || [];
 
   // ✅ Simplified filtering logic
-  const filteredCourses = selectedCategory === "All" 
+  const filteredCourses = selectedCategory === "All"
     ? coursesArray
     : coursesArray.filter((course: any) => {
         // Ensure categories exists and handle both string and array
         if (!course.categories) return false;
-        
+
         // Convert to array if it's a string
-        const categoryArray = Array.isArray(course.categories) 
-          ? course.categories 
+        const categoryArray = Array.isArray(course.categories)
+          ? course.categories
           : [course.categories];
-        
+
+        // Flatten any comma-separated entries (e.g. "Civil, Architectural, BIM")
+        // into individual categories and trim spaces, so a course can appear
+        // in multiple tabs regardless of how it was saved.
+        const normalizedCategories = categoryArray
+          .flatMap((c: string) => String(c).split(","))
+          .map((c: string) => c.trim())
+          .filter(Boolean);
+
         // Check if selected category exists in the array
-        return categoryArray.includes(selectedCategory);
+        return normalizedCategories.includes(selectedCategory);
       });
 
   return (
