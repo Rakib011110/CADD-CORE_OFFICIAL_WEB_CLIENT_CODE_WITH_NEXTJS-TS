@@ -49,7 +49,7 @@ FORMATTING (responses render as Markdown):
 
 async function fetchCoursesFromDB(): Promise<string> {
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api";
+    const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "https://caddcoreapi-ten.vercel.app/api";
     const res = await fetch(`${apiUrl}/courses`, {
       next: { revalidate: 300 }, // cache 5 minutes
     });
