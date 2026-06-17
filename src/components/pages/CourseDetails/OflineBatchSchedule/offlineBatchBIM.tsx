@@ -29,7 +29,7 @@ export default function OfflineBatchSchedule() {
                   শুরুর তারিখ:
                 </span>
                 <span className="text-white font-medium text-lg mt-2">
-                  ৪ জুলাই
+                  ১৬ জুলাই
                 </span>
               </div>
               <div className="space-y-2">
@@ -39,7 +39,7 @@ export default function OfflineBatchSchedule() {
                     দিন:
                   </span>
                   <span className="text-white font-medium text-lg mt-2">
-                    শনিবার ও মঙ্গলবার
+                    সোমবার ও বৃহস্পতিবার
                   </span>
                 </div>
 

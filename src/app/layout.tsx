@@ -4,6 +4,7 @@ import Script from "next/script";
 import "./globals.css";
 import "aos/dist/aos.css";
 import { Providers } from "@/lib/Providers";
+import ChatBot from "@/components/UI/ChatBot/ChatBot";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -310,6 +311,7 @@ export default function RootLayout({
         </noscript>
 
         <Providers>{children}</Providers>
+        {/* <ChatBot /> */}
       </body>
     </html>
   );

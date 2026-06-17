@@ -5,7 +5,10 @@ const baseApi = createApi({
   reducerPath: "baseApi",
   baseQuery: fetchBaseQuery({
     // baseUrl: "http://localhost:5000/api",
-    baseUrl: "https://caddcoreapi-ten.vercel.app/api",
+
+// https://...caddcoreapi-ten.vercel.app
+
+    baseUrl: "http://localhost:5000/api",
   }),     
   tagTypes: [
     "User",
