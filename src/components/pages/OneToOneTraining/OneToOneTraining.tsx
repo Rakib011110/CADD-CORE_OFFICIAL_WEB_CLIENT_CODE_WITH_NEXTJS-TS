@@ -27,11 +27,10 @@ export default function OneToOneTraining() {
   const { data: coursesResponse, isLoading } = useGetAllCourseQuery({});
 
   // Only One-to-One training courses belong on this page.
-  // Skip empty/broken docs (no title) so they never render as ghost cards.
   const oneToOneCourses = useMemo(
     () =>
       (coursesResponse?.data || []).filter(
-        (course: any) => course.courseType === "one-to-one" && course?.title?.trim()
+        (course: any) => course.courseType === "one-to-one"
       ),
     [coursesResponse]
   );
@@ -55,7 +54,7 @@ export default function OneToOneTraining() {
   return (
     <div style={{ fontFamily: "banglaFont" }}>
       {/* ---------- Banner (image) ---------- */}
-      <section className="w-full bg-white">
+      <section className="w-full bg-white border-b-4 border-gray-500">
         <img
           src={BANNER_IMG}
           alt="One to One Professional Training — CAD, BIM, Structural Design"
