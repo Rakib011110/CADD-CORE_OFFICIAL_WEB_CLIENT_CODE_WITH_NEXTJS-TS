@@ -5,6 +5,7 @@ import { Button } from "@/components/UI/button";
 import { TCourse } from "@/lib/types/TCourses";
 import { Input } from "@/components/UI/input";
 import { Textarea } from "@/components/UI/textarea";
+import { useGetInstallmentPlansQuery } from "@/redux/api/payment/useInstallmentPlansApi";
 
 import { toast } from "sonner";
 
@@ -52,6 +53,56 @@ export default function UpdateCourse({
 }: UpdateCourseProps) {
   // Local copy for inline editing
   const [localForm, setLocalForm] = useState<TCourse>(formData);
+
+  // Global installment plans used as templates for this course's plans.
+  const { data: globalPlansResponse } = useGetInstallmentPlansQuery({});
+  const globalPlans = globalPlansResponse?.data || [];
+
+  // ---- Payment plan handlers (per-course) ----
+  const loadGlobalPaymentPlans = () => {
+    if (!globalPlans.length) {
+      toast.error("কোনো গ্লোবাল প্ল্যান পাওয়া যায়নি।");
+      return;
+    }
+    setLocalForm((prev) => ({
+      ...prev,
+      paymentPlans: globalPlans.map((p: any) => ({
+        name: p.name,
+        installments: Number(p.installments) || 1,
+        discountPercent: Number(p.discountPercent) || 0,
+        isActive: p.isActive ?? true,
+      })),
+    }));
+  };
+
+  const handlePaymentPlanChange = (
+    index: number,
+    key: "name" | "installments" | "discountPercent" | "isActive",
+    value: string | number | boolean
+  ) => {
+    setLocalForm((prev) => {
+      const updated = [...(prev.paymentPlans || [])];
+      updated[index] = { ...updated[index], [key]: value };
+      return { ...prev, paymentPlans: updated };
+    });
+  };
+
+  const handleAddPaymentPlan = () => {
+    setLocalForm((prev) => ({
+      ...prev,
+      paymentPlans: [
+        ...(prev.paymentPlans || []),
+        { name: "", installments: 1, discountPercent: 0, isActive: true },
+      ],
+    }));
+  };
+
+  const handleRemovePaymentPlan = (index: number) => {
+    setLocalForm((prev) => ({
+      ...prev,
+      paymentPlans: (prev.paymentPlans || []).filter((_, i) => i !== index),
+    }));
+  };
 
   // Handler for top-level fields
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -511,6 +562,77 @@ export default function UpdateCourse({
         >
           Add Teacher
         </Button>
+
+        {/* Payment / Installment Plans (per-course) */}
+        <h3 className="text-lg font-semibold mt-4">Payment / Installment Plans</h3>
+        <p className="text-xs text-gray-600">
+          এই কোর্সের জন্য আলাদা ছাড়/কিস্তি সেট করুন।{" "}
+          <span className="font-medium">খালি রাখলে গ্লোবাল ডিফল্ট প্ল্যান প্রযোজ্য হবে।</span>
+        </p>
+        <div className="flex flex-wrap gap-2">
+          <Button type="button" variant="outline" onClick={loadGlobalPaymentPlans}>
+            গ্লোবাল প্ল্যান লোড করুন
+          </Button>
+          <Button type="button" variant="outline" onClick={handleAddPaymentPlan}>
+            Add Custom Plan
+          </Button>
+        </div>
+
+        {(localForm.paymentPlans || []).map((plan, index) => (
+          <div
+            key={index}
+            className="grid grid-cols-2 md:grid-cols-5 gap-2 items-center mb-2 border-b pb-2"
+          >
+            <Input
+              value={plan.name || ""}
+              placeholder="Name (full, 2x, 3x)"
+              onChange={(e) => handlePaymentPlanChange(index, "name", e.target.value)}
+              className="border p-2 rounded"
+            />
+            <Input
+              type="number"
+              value={plan.installments}
+              placeholder="Installments"
+              onChange={(e) =>
+                handlePaymentPlanChange(index, "installments", Number(e.target.value))
+              }
+              className="border p-2 rounded"
+            />
+            <Input
+              type="number"
+              value={plan.discountPercent}
+              placeholder="Discount %"
+              onChange={(e) =>
+                handlePaymentPlanChange(index, "discountPercent", Number(e.target.value))
+              }
+              className="border p-2 rounded"
+            />
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={plan.isActive}
+                onChange={(e) =>
+                  handlePaymentPlanChange(index, "isActive", e.target.checked)
+                }
+                className="h-4 w-4"
+              />
+              {plan.isActive ? "Active" : "Inactive"}
+            </label>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => handleRemovePaymentPlan(index)}
+            >
+              Remove
+            </Button>
+          </div>
+        ))}
+
+        {(localForm.paymentPlans || []).length === 0 && (
+          <p className="text-xs text-gray-400">
+            কোনো কাস্টম প্ল্যান নেই — গ্লোবাল ডিফল্ট প্ল্যান ব্যবহৃত হবে।
+          </p>
+        )}
 
         {/* Action Buttons */}
         <div className="flex justify-end gap-4 pt-6">

@@ -28,7 +28,7 @@ import Link from "next/link";
 
 // --- Interfaces (ensure these match your API response structures) ---
 interface APIInstallmentPlan {
-  _id: string;
+  _id?: string;
   name: string;
   installments: number;
   discountPercent: number;
@@ -39,6 +39,9 @@ interface Course {
   _id: string;
   title: string;
   courseFee: number;
+  // Per-course payment plans. When present (non-empty) these override the
+  // global installment plans for this course.
+  paymentPlans?: APIInstallmentPlan[];
   schedule: {
     days: string;
     startingDate: string;
@@ -80,18 +83,31 @@ export default function CourseFees({ course }: CourseFeesProps) {
   ];
   
   const shouldHideInstallments = courseTitlesWithOnlyFullPayment.some(
-    (courseTitle) => 
+    (courseTitle) =>
       course._id?.toLowerCase().includes(courseTitle.toLowerCase()) ||
       course.title?.toLowerCase().includes(courseTitle.toLowerCase())
   );
-  
-  const allInstallmentPlans: APIInstallmentPlan[] =
+
+  // Per-course plans take priority. If this course defines its own paymentPlans,
+  // they fully control discounts & which installments are offered.
+  const coursePaymentPlans = course.paymentPlans;
+  const hasCoursePlans =
+    Array.isArray(coursePaymentPlans) && coursePaymentPlans.length > 0;
+
+  const globalInstallmentPlans: APIInstallmentPlan[] =
     installmentPlansResponse?.data || [];
-  
-  // যদি নির্দিষ্ট কোর্স হয়, শুধুমাত্র Full Payment (1 installment) দেখাবো
-  const installmentPlans: APIInstallmentPlan[] = shouldHideInstallments
-    ? allInstallmentPlans.filter(plan => plan.installments === 1)
-    : allInstallmentPlans;
+
+  // Source of truth: course-specific plans when set, otherwise the global list.
+  const allInstallmentPlans: APIInstallmentPlan[] = hasCoursePlans
+    ? (coursePaymentPlans as APIInstallmentPlan[])
+    : globalInstallmentPlans;
+
+  // Backward-compatible hardcoded fallback only applies when the course has not
+  // been configured with its own plans yet.
+  const installmentPlans: APIInstallmentPlan[] =
+    !hasCoursePlans && shouldHideInstallments
+      ? allInstallmentPlans.filter((plan) => plan.installments === 1)
+      : allInstallmentPlans;
     
   const [selectedPlanName, setSelectedPlanName] = useState<string | null>(null);
   const [finalPayableAmount, setFinalPayableAmount] = useState(
@@ -332,7 +348,7 @@ export default function CourseFees({ course }: CourseFeesProps) {
                   (plan) =>
                     plan.isActive && (
                       <button
-                        key={plan._id}
+                        key={plan._id || plan.name}
                         onClick={() => setSelectedPlanName(plan.name)}
                         className={`p-3 text-center rounded-lg border-2 transition-all duration-200 ${
                           selectedPlanName === plan.name

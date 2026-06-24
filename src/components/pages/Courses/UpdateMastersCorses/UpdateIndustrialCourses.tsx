@@ -8,6 +8,7 @@ import { Input } from '@/components/UI/input';
 import { Label } from '@/components/UI/label';
 import { Textarea } from '@/components/UI/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/UI/select';
+import { useGetInstallmentPlansQuery } from '@/redux/api/payment/useInstallmentPlansApi';
 
 type UpdateCourseProps = {
   formData: TCourse;
@@ -25,6 +26,63 @@ export default function UpdateMastersCourses({
   handleUpdate,
 }: UpdateCourseProps) {
   const [isUploading, setIsUploading] = React.useState(false);
+
+  // Global installment plans used as templates for this course's plans.
+  const { data: globalPlansResponse } = useGetInstallmentPlansQuery({});
+  const globalPlans = globalPlansResponse?.data || [];
+
+  // ---- Payment plan handlers (per-course) ----
+  const loadGlobalPaymentPlans = useCallback(() => {
+    if (!globalPlans.length) {
+      toast.error('কোনো গ্লোবাল প্ল্যান পাওয়া যায়নি।');
+      return;
+    }
+    setFormData((prev: TCourse) => ({
+      ...prev,
+      paymentPlans: globalPlans.map((p: any) => ({
+        name: p.name,
+        installments: Number(p.installments) || 1,
+        discountPercent: Number(p.discountPercent) || 0,
+        isActive: p.isActive ?? true,
+      })),
+    }));
+    toast.success('গ্লোবাল প্ল্যান লোড হয়েছে।');
+  }, [globalPlans, setFormData]);
+
+  const handlePaymentPlanChange = useCallback(
+    (
+      index: number,
+      key: 'name' | 'installments' | 'discountPercent' | 'isActive',
+      value: string | number | boolean
+    ) => {
+      setFormData((prev: TCourse) => {
+        const updated = [...(prev.paymentPlans || [])];
+        updated[index] = { ...updated[index], [key]: value };
+        return { ...prev, paymentPlans: updated };
+      });
+    },
+    [setFormData]
+  );
+
+  const addPaymentPlan = useCallback(() => {
+    setFormData((prev: TCourse) => ({
+      ...prev,
+      paymentPlans: [
+        ...(prev.paymentPlans || []),
+        { name: '', installments: 1, discountPercent: 0, isActive: true },
+      ],
+    }));
+  }, [setFormData]);
+
+  const removePaymentPlan = useCallback(
+    (index: number) => {
+      setFormData((prev: TCourse) => ({
+        ...prev,
+        paymentPlans: (prev.paymentPlans || []).filter((_, i) => i !== index),
+      }));
+    },
+    [setFormData]
+  );
 
   // Memoized handlers to prevent unnecessary re-renders
   const uploadToCloudinary = useCallback(async (file: File) => {
@@ -387,6 +445,70 @@ export default function UpdateMastersCourses({
               )))}
           </div>
 
+
+          {/* --- Payment / Installment Plans (per-course) --- */}
+          {renderSectionHeader('Payment / Installment Plans', addPaymentPlan, 'Add Custom Plan')}
+          <p className="text-xs text-gray-600 -mt-2">
+            এই কোর্সের জন্য আলাদা ছাড়/কিস্তি সেট করুন।{' '}
+            <span className="font-medium">খালি রাখলে গ্লোবাল ডিফল্ট প্ল্যান প্রযোজ্য হবে।</span>
+          </p>
+          <div>
+            <Button type="button" variant="outline" size="sm" onClick={loadGlobalPaymentPlans}>
+              গ্লোবাল প্ল্যান লোড করুন
+            </Button>
+          </div>
+          <div className="space-y-4">
+            {(formData.paymentPlans || []).map((plan, index) =>
+              renderRemovableItem(index, () => removePaymentPlan(index), (
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                  <div>
+                    <Label>Name</Label>
+                    <Input
+                      value={plan.name || ''}
+                      placeholder="full, 2x, 3x"
+                      onChange={(e) => handlePaymentPlanChange(index, 'name', e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label>Installments</Label>
+                    <Input
+                      type="number"
+                      value={plan.installments}
+                      onChange={(e) =>
+                        handlePaymentPlanChange(index, 'installments', Number(e.target.value))
+                      }
+                    />
+                  </div>
+                  <div>
+                    <Label>Discount %</Label>
+                    <Input
+                      type="number"
+                      value={plan.discountPercent}
+                      onChange={(e) =>
+                        handlePaymentPlanChange(index, 'discountPercent', Number(e.target.value))
+                      }
+                    />
+                  </div>
+                  <label className="flex items-center gap-2 text-sm pb-2">
+                    <input
+                      type="checkbox"
+                      checked={plan.isActive}
+                      onChange={(e) =>
+                        handlePaymentPlanChange(index, 'isActive', e.target.checked)
+                      }
+                      className="h-4 w-4"
+                    />
+                    {plan.isActive ? 'Active' : 'Inactive'}
+                  </label>
+                </div>
+              ))
+            )}
+            {(formData.paymentPlans || []).length === 0 && (
+              <p className="text-xs text-gray-400">
+                কোনো কাস্টম প্ল্যান নেই — গ্লোবাল ডিফল্ট প্ল্যান ব্যবহৃত হবে।
+              </p>
+            )}
+          </div>
 
           {/* --- Action Buttons --- */}
           <div className="flex justify-end gap-4 pt-4 sticky bottom-0 bg-white py-3 border-t">

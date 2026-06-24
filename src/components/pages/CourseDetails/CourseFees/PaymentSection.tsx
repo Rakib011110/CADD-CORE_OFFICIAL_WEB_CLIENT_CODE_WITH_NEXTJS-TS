@@ -22,7 +22,7 @@ import { toast } from "sonner"; // Assuming you use sonner for toasts
 
 // --- Interfaces (ensure these match your API response structures) ---
 interface APIInstallmentPlan {
-  _id: string;
+  _id?: string;
   name: string;
   installments: number;
   discountPercent: number;
@@ -33,6 +33,8 @@ interface Course {
   _id: string;
   title: string;
   courseFee: number;
+  // Per-course plans override the global installment plans when present.
+  paymentPlans?: APIInstallmentPlan[];
   schedule: {
     startingDate: string;
   };
@@ -57,8 +59,13 @@ export function PaymentSection({ course, user }: PaymentSectionProps) {
     data: installmentPlansResponse,
     isLoading: isLoadingInstallmentPlans,
   } = useGetInstallmentPlansQuery({});
-  const installmentPlans: APIInstallmentPlan[] =
+  // Per-course plans take priority; fall back to the global plans otherwise.
+  const globalInstallmentPlans: APIInstallmentPlan[] =
     installmentPlansResponse?.data || [];
+  const installmentPlans: APIInstallmentPlan[] =
+    Array.isArray(course.paymentPlans) && course.paymentPlans.length > 0
+      ? course.paymentPlans
+      : globalInstallmentPlans;
 
   // Hook for initiating the payment process
   const [initiatePayment, { isLoading: isProcessingPayment }] =
@@ -243,7 +250,7 @@ export function PaymentSection({ course, user }: PaymentSectionProps) {
                 (plan) =>
                   plan.isActive && (
                     <button
-                      key={plan._id}
+                      key={plan._id || plan.name}
                       onClick={() => setSelectedPlanName(plan.name)}
                       className={`p-3 text-center rounded-lg border-2 transition-all duration-200 ${
                         selectedPlanName === plan.name

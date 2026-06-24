@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import Swal from 'sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
 import { Button } from '@/components/UI/button';
@@ -16,51 +16,16 @@ import {
 import {
   useGetAllCourseQuery,
   useDeleteCourseMutation,
-  useUpdateCourseMutation,
 } from '@/redux/api/courseApi';
-import UpdateIndustrialCourses from '../industrial-training/update-industrial-courses/UpdaeIndrustrialCourses';
 import { Pencil, Trash2 } from 'lucide-react';
-import { TCourse } from '@/lib/types/TCourses'; // Ensure TCourse is imported
-import UpdateMastersCourses from '@/components/pages/Courses/UpdateMastersCorses/UpdateIndustrialCourses';
 
 export default function ManageCourses() {
+  const router = useRouter();
   const { data: courses, isLoading } = useGetAllCourseQuery({});
-  const [updateCourse] = useUpdateCourseMutation();
   const [deleteCourse] = useDeleteCourseMutation();
 
-  const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
-  const [formData, setFormData] = useState<TCourse | null>(null);
-  const [originalData, setOriginalData] = useState<TCourse | null>(null);
-
-  const handleEdit = (course: TCourse) => {
-    setSelectedCourseId(course._id || null); // Assuming _id exists on your course object
-    setFormData(course);
-    setOriginalData(course);
-  };
-
-  const handleUpdate = async (updatedFields: Partial<TCourse>) => {
-    try {
-      if (selectedCourseId && formData) {
-        await updateCourse({ id: selectedCourseId, courseData: updatedFields }).unwrap();
-        await Swal.fire({
-          icon: 'success',
-          title: 'Course updated!',
-          text: 'Your changes have been saved.',
-          timer: 2000,
-          showConfirmButton: false,
-        });
-      }
-    } catch (error: any) {
-      await Swal.fire({
-        icon: 'error',
-        title: 'Update failed',
-        text: error?.data?.message || 'Could not update the course.',
-      });
-    } finally {
-      setSelectedCourseId(null);
-      setFormData(null);
-      setOriginalData(null);
-    }
+  const handleEdit = (course: any) => {
+    router.push(`/dashboard/edit-course/${course.slug}`);
   };
 
   const handleDelete = async (id: string) => {
@@ -100,7 +65,7 @@ export default function ManageCourses() {
 
   return (
     <div className="p-6">
-      <div className=''>
+      <div className="">
         <h1 className="text-2xl font-bold mb-4 ">Manage Courses</h1>
       </div>
 
@@ -139,7 +104,11 @@ export default function ManageCourses() {
                 <TableCell>{course.courseFee}</TableCell>
 
                 {/* Category */}
-                <TableCell>{course.categories}</TableCell>
+                <TableCell>
+                  {Array.isArray(course.categories)
+                    ? course.categories.join(', ')
+                    : course.categories}
+                </TableCell>
 
                 {/* Actions */}
                 <TableCell className="text-center flex gap-2 justify-center">
@@ -164,16 +133,6 @@ export default function ManageCourses() {
           </TableBody>
         </Table>
       </div>
-
-      {selectedCourseId && formData && originalData && (
-        <UpdateMastersCourses
-          formData={formData}
-          originalData={originalData}
-          setFormData={setFormData}
-          setSelectedCourse={setSelectedCourseId}
-          handleUpdate={handleUpdate}
-        />
-      )}
     </div>
   );
 }

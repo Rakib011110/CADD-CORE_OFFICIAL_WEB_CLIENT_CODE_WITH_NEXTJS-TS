@@ -11,6 +11,15 @@ export type TCourse = {
   description: string;
   courseFee: string;
 
+  // Per-course payment / installment plans.
+  // Leave empty to fall back to the global installment plans.
+  paymentPlans?: {
+    name: string;
+    installments: number;
+    discountPercent: number;
+    isActive: boolean;
+  }[];
+
   schedule: {
     startingDate: string;
     mode: string;

@@ -9,6 +9,7 @@ import { Textarea } from "@/components/UI/textarea";
 import { toast, Toaster } from "sonner";
 import { TCourse } from "@/lib/types/TCourses";
 import { useCreateCourseMutation } from "@/redux/api/courseApi";
+import { useGetInstallmentPlansQuery } from "@/redux/api/payment/useInstallmentPlansApi";
 import Image from "next/image";
 import { useCreateIndrustrialCourseMutation } from "@/redux/api/indrustrialcourseApi";
 
@@ -59,7 +60,8 @@ export default function CreateIndustrialCourses() {
     },
     learningProject: [{ title: "", description: "", photoUrl: "" }],
     freeTrainingSessions: [{ title: "", videoUrl: "" }],
-    faqs: [{ question: "", answer: "" }]
+    faqs: [{ question: "", answer: "" }],
+    paymentPlans: []
   };
   
   
@@ -190,6 +192,56 @@ export default function CreateIndustrialCourses() {
   } ));
 };
 
+
+// Global installment plans, used as templates to pre-fill this course's plans.
+const { data: globalPlansResponse } = useGetInstallmentPlansQuery({});
+const globalPlans = globalPlansResponse?.data || [];
+
+// ---- Payment plan handlers (per-course) ----
+const loadGlobalPaymentPlans = () => {
+  if (!globalPlans.length) {
+    toast.error("কোনো গ্লোবাল প্ল্যান পাওয়া যায়নি।");
+    return;
+  }
+  setFormData((prev) => ({
+    ...prev,
+    paymentPlans: globalPlans.map((p: any) => ({
+      name: p.name,
+      installments: Number(p.installments) || 1,
+      discountPercent: Number(p.discountPercent) || 0,
+      isActive: p.isActive ?? true,
+    })),
+  }));
+};
+
+const handlePaymentPlanChange = (
+  index: number,
+  key: "name" | "installments" | "discountPercent" | "isActive",
+  value: string | number | boolean
+) => {
+  setFormData((prev) => {
+    const updated = [...(prev.paymentPlans || [])];
+    updated[index] = { ...updated[index], [key]: value };
+    return { ...prev, paymentPlans: updated };
+  });
+};
+
+const handleAddPaymentPlan = () => {
+  setFormData((prev) => ({
+    ...prev,
+    paymentPlans: [
+      ...(prev.paymentPlans || []),
+      { name: "", installments: 1, discountPercent: 0, isActive: true },
+    ],
+  }));
+};
+
+const handleRemovePaymentPlan = (index: number) => {
+  setFormData((prev) => ({
+    ...prev,
+    paymentPlans: (prev.paymentPlans || []).filter((_, i) => i !== index),
+  }));
+};
 
 const [createCourse, { isLoading, error }] = useCreateIndrustrialCourseMutation();
 
@@ -917,6 +969,103 @@ Bim " onChange={handleChange} required />
               >
                 Add FAQ
               </Button>
+            </div>
+
+            {/* Payment / Installment Plans (per-course) */}
+            <div className="border p-4 rounded">
+              <h3 className="font-bold mb-1">Payment / Installment Plans</h3>
+              <p className="text-xs text-gray-600 mb-3">
+                এই কোর্সের জন্য আলাদা ছাড় বা কিস্তি সেট করতে চাইলে নিচে প্ল্যান কনফিগার করুন।
+                <span className="font-medium"> খালি রাখলে গ্লোবাল ডিফল্ট প্ল্যান প্রযোজ্য হবে।</span>
+              </p>
+
+              <div className="flex flex-wrap gap-2 mb-4">
+                <Button
+                  type="button"
+                  onClick={loadGlobalPaymentPlans}
+                  className="bg-gray-700 hover:bg-gray-800"
+                >
+                  গ্লোবাল প্ল্যান লোড করুন
+                </Button>
+                <Button
+                  type="button"
+                  onClick={handleAddPaymentPlan}
+                  className="bg-red-500 hover:bg-red-600"
+                >
+                  Add Custom Plan
+                </Button>
+              </div>
+
+              {(formData.paymentPlans || []).map((plan, index) => (
+                <div
+                  key={index}
+                  className="grid grid-cols-1 md:grid-cols-5 gap-3 items-end mb-3 border-b pb-3"
+                >
+                  <div>
+                    <Label>Name</Label>
+                    <Input
+                      type="text"
+                      value={plan.name}
+                      placeholder="e.g. full, 2x, 3x"
+                      onChange={(e) =>
+                        handlePaymentPlanChange(index, "name", e.target.value)
+                      }
+                    />
+                  </div>
+                  <div>
+                    <Label>Installments</Label>
+                    <Input
+                      type="number"
+                      value={plan.installments}
+                      onChange={(e) =>
+                        handlePaymentPlanChange(
+                          index,
+                          "installments",
+                          Number(e.target.value)
+                        )
+                      }
+                    />
+                  </div>
+                  <div>
+                    <Label>Discount %</Label>
+                    <Input
+                      type="number"
+                      value={plan.discountPercent}
+                      onChange={(e) =>
+                        handlePaymentPlanChange(
+                          index,
+                          "discountPercent",
+                          Number(e.target.value)
+                        )
+                      }
+                    />
+                  </div>
+                  <div className="flex items-center gap-2 pb-2">
+                    <input
+                      type="checkbox"
+                      checked={plan.isActive}
+                      onChange={(e) =>
+                        handlePaymentPlanChange(index, "isActive", e.target.checked)
+                      }
+                      className="h-4 w-4"
+                    />
+                    <span className="text-sm">{plan.isActive ? "Active" : "Inactive"}</span>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => handleRemovePaymentPlan(index)}
+                  >
+                    Remove
+                  </Button>
+                </div>
+              ))}
+
+              {(formData.paymentPlans || []).length === 0 && (
+                <p className="text-xs text-gray-400">
+                  কোনো কাস্টম প্ল্যান যোগ করা হয়নি — গ্লোবাল ডিফল্ট প্ল্যান ব্যবহৃত হবে।
+                </p>
+              )}
             </div>
 
             {/* Submit Button */}
