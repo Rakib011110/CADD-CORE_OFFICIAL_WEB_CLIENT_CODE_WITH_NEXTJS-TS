@@ -37,6 +37,14 @@ export default function DetailsBannar({ course }: { course: TCourse }) {
             <div className="relative z-10 max-w-5xl mx-auto px-4">
               {/* White Card */}
               <div className="backdrop-filter backdrop-blur-sm  rounded-md shadow-lg p-6 md:p-8">
+                {/* One to One Training badge — only for one-to-one courses */}
+                {course?.courseType === "one-to-one" && (
+                  <div className="inline-flex items-center gap-2 bg-gradient-to-r from-red-600 to-rose-500 text-white text-xs md:text-sm font-bold px-3 py-1.5 rounded-full shadow-md mb-3">
+                    <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                    One to One Training • অফিসে বসে ক্লাস
+                  </div>
+                )}
+
                 {/* SubTitle */}
                 <h4 className="text-sm md:text-base bg-white p-1 rounded-md w-fit text-red-500 font-semibold mb-2">
                   {/* {banner.subTitle} */}

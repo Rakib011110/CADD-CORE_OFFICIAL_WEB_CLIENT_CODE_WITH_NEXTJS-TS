@@ -16,6 +16,7 @@ export default function CourseForm() {
   const initialCourseState: TCourse = {
     title: "",
     slug: "",
+    courseType: "regular",
     categories: "",
     duration: "",
     lessons: "",
@@ -410,8 +411,28 @@ const handleDemoCertificateImageUpload = async (
 
               </div>
               <div>
+                <Label>Course Type</Label>
+                <Select
+                  value={formData.courseType}
+                  onValueChange={(value) =>
+                    setFormData((prev) => ({ ...prev, courseType: value as TCourse["courseType"] }))
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select Course Type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="regular">Regular Course</SelectItem>
+                    <SelectItem value="one-to-one">One to One Training</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-yellow-600 mt-1">
+                  ⚠️ "One to One Training" সিলেক্ট করলে কোর্সটি শুধু One-to-One পেইজে দেখাবে।
+                </p>
+              </div>
+              <div>
                 <Label htmlFor="categories">Categories</Label>
-                <Input type="text" name="categories" id="categories" placeholder="e.g. Civil, 
+                <Input type="text" name="categories" id="categories" placeholder="e.g. Civil,
 Architectural,
 Mechanical,
 Electrical,

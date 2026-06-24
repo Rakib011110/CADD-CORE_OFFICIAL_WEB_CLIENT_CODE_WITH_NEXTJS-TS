@@ -7,6 +7,7 @@ import { Button } from '@/components/UI/button';
 import { Input } from '@/components/UI/input';
 import { Label } from '@/components/UI/label';
 import { Textarea } from '@/components/UI/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/UI/select';
 
 type UpdateCourseProps = {
   formData: TCourse;
@@ -235,6 +236,19 @@ export default function UpdateMastersCourses({
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div><Label>Title</Label><Input name="title" value={formData.title || ''} onChange={handleChange} /></div>
             <div><Label>Slug</Label><Input name="slug" value={formData.slug || ''} onChange={handleChange} /></div>
+            <div>
+              <Label>Course Type</Label>
+              <Select
+                value={formData.courseType || 'regular'}
+                onValueChange={(value) => setFormData((prev: TCourse) => ({ ...prev, courseType: value }))}
+              >
+                <SelectTrigger><SelectValue placeholder="Select Course Type" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="regular">Regular Course</SelectItem>
+                  <SelectItem value="one-to-one">One to One Training</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
             <div><Label>Categories</Label><Input name="categories" value={formData.categories || ''} onChange={handleChange} /></div>
             <div><Label>Duration</Label><Input name="duration" value={formData.duration || ''} onChange={handleChange} /></div>
             <div><Label>Lessons</Label><Input name="lessons" value={formData.lessons || ''} onChange={handleChange} /></div>

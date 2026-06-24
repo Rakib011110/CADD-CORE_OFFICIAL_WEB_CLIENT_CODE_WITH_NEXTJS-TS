@@ -2,6 +2,7 @@ export type TCourse = {
   _id?: any;
   title: string;
   slug: string;
+  courseType?: "regular" | "one-to-one";
   categories: string;
   duration: string;
   lessons: string;

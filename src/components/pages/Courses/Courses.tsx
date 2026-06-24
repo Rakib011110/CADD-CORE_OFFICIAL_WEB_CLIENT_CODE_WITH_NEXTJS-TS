@@ -24,8 +24,12 @@ export default function AllCourses() {
 
   const { data: coursesResponse, error, isLoading } = useGetAllCourseQuery({});
 
-  // Always work with an array of courses
-  const coursesArray = coursesResponse?.data || [];
+  // Always work with an array of courses.
+  // - One-to-One courses are shown only on the dedicated /one-to-one-training page.
+  // - Skip empty/broken docs (no title) so they never render as ghost cards.
+  const coursesArray = (coursesResponse?.data || []).filter(
+    (course: any) => course.courseType !== "one-to-one" && course?.title?.trim()
+  );
 
   // ✅ Simplified filtering logic
   const filteredCourses = selectedCategory === "All"

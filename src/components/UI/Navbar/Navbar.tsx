@@ -12,10 +12,11 @@ import Notifications from "@/components/Notifications/Notifications";
 const navLinks = [
   { name: "হোম", path: "/" },
   { name: "কোর্স সমূহ", path: "/courses" },
-  {
-    name: "ATC® কোর্স সমূহ",
-    path: "/autodesk-authorised-training-institute-courses",
-  },
+  { name: "ওয়ান টু ওয়ান ট্রেনিং", path: "/one-to-one-training" },
+  // {
+  //   name: "ATC® কোর্স সমূহ",
+  //   path: "/autodesk-authorised-training-institute-courses",
+  // },
   {
     name: "ইন্ডাস্ট্রিয়াল এটাচমেন্ট",
     path: "/industrial-attachment-training",

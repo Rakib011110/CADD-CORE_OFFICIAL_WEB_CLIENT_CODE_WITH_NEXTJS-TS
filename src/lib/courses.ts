@@ -88,6 +88,7 @@ export type TCourse = {
   title: string;
   _id: string;
   slug: any;
+  courseType?: "regular" | "one-to-one";
   categories: Category[];
   courseBanner: string;
   batch: string;
