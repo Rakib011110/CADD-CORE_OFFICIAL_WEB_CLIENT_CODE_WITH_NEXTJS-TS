@@ -54,7 +54,7 @@ export default function OneToOneTraining() {
   return (
     <div style={{ fontFamily: "banglaFont" }}>
       {/* ---------- Banner (image) ---------- */}
-      <section className="w-full bg-white border-b-4 border-gray-500">
+      <section className="w-full bg-white border-b-4 border-gray-400">
         <img
           src={BANNER_IMG}
           alt="One to One Professional Training — CAD, BIM, Structural Design"
