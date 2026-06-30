@@ -236,6 +236,9 @@ export async function POST(req: NextRequest) {
           const errorData = await response.json().catch(() => ({}));
           lastError = errorData?.error?.message ?? `HTTP ${response.status}`;
           console.warn(`Model ${model} failed (${response.status}): ${lastError}`);
+          // Account-wide daily free-tier cap: EVERY free model shares this quota, so once
+          // it's hit there is no point trying the remaining models — stop immediately.
+          if (/per-day|free-models-per-day|daily/i.test(lastError)) break;
           // 429 = rate limited, 404 = not available, 5xx = provider issue — try next model.
           if (response.status === 429 || response.status === 404 || response.status >= 500) continue;
           // Other errors (auth, bad request) — no point retrying other models.
@@ -257,7 +260,14 @@ export async function POST(req: NextRequest) {
 
     if (!reply) {
       console.error("All models failed. Last error:", lastError);
-      return NextResponse.json({ error: "AI service unavailable" }, { status: 502 });
+      // Don't leave the user with a broken bot. Return a friendly, helpful message
+      // (as a normal reply) that points them to the hotline so they're never stuck.
+      const fallback =
+        "এই মুহূর্তে আমাদের AI সহকারী একটু ব্যস্ত আছে 🙏\n\n" +
+        "অনুগ্রহ করে একটু পরে আবার চেষ্টা করুন, অথবা সরাসরি আমাদের সাথে যোগাযোগ করুন:\n\n" +
+        "**📞 +880 1611-223631**\n" +
+        "(শনিবার – শুক্রবার, সকাল ৯টা – সন্ধ্যা ৭টা)";
+      return NextResponse.json({ reply: fallback });
     }
 
     return NextResponse.json({ reply });
