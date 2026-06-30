@@ -58,7 +58,6 @@ export const metadata: Metadata = {
     "Advanced AutoCAD training center in dhaka",
     "Advanced autocad course in dhaka",
     "Advanced autocad training course",
-    "Advanced autocad full course",
     "Advanced autocad course in bd",
   ],
 
@@ -311,7 +310,7 @@ export default function RootLayout({
         </noscript>
 
         <Providers>{children}</Providers>
-        {/* <ChatBot /> */}
+        <ChatBot />
       </body>
     </html>
   );

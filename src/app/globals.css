@@ -149,6 +149,20 @@
   animation: chatTypingBounce 1.2s infinite;
 }
 
+/* Floating action button: gentle bob + twinkling AI sparkle badge */
+@keyframes chatFabFloat {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-5px); }
+}
+.chat-fab-float {
+  animation: chatFabFloat 2.8s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .chat-fab-float {
+    animation: none;
+  }
+}
+
 @plugin "tailwindcss-animate";
 
 @custom-variant dark (&:is(.dark *));

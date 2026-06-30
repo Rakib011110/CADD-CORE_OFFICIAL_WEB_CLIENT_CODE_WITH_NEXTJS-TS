@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { MessageCircle, X, Send, Bot, User } from "lucide-react";
+import { Headset, X, Send, Bot, User } from "lucide-react";
 
 interface Message {
   role: "user" | "assistant";
@@ -34,8 +34,17 @@ export default function ChatBot() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(true);
+  const [showNudge, setShowNudge] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Dismiss the attention nudge and remember it for this browser session.
+  const dismissNudge = () => {
+    setShowNudge(false);
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("caddcore_chat_nudge", "seen");
+    }
+  };
 
   // Smooth auto-scroll to bottom on new content
   useEffect(() => {
@@ -49,6 +58,15 @@ export default function ChatBot() {
 
   useEffect(() => {
     if (isOpen) setTimeout(() => inputRef.current?.focus(), 150);
+  }, [isOpen]);
+
+  // Show a friendly attention nudge a few seconds after load so visitors notice the
+  // assistant. It appears once per browser session and not while the chat is open.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (isOpen || sessionStorage.getItem("caddcore_chat_nudge") === "seen") return;
+    const t = setTimeout(() => setShowNudge(true), 4000);
+    return () => clearTimeout(t);
   }, [isOpen]);
 
   const sendMessage = async (text?: string) => {
@@ -187,6 +205,9 @@ export default function ChatBot() {
           <div
             ref={scrollRef}
             className="chat-scroll"
+            // Stop the global Lenis smooth-scroll from hijacking the mouse wheel here,
+            // so users can scroll the chat with the wheel instead of dragging the scrollbar.
+            data-lenis-prevent
             style={{
               flex: 1,
               padding: "16px 14px",
@@ -423,41 +444,119 @@ export default function ChatBot() {
               </button>
             </div>
             <p style={{ textAlign: "center", fontSize: "10px", color: "#bbb", margin: "8px 0 0", letterSpacing: "0.3px" }}>
-              Powered by AI · CADD CORE © 2025
+              Powered by AI · CADD CORE © 2026
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* ===== Attention Nudge ===== */}
+      {!isOpen && showNudge && (
+        <div
+          className="chat-slide-up"
+          onClick={() => {
+            setIsOpen(true);
+            dismissNudge();
+          }}
+          style={{
+            marginBottom: "12px",
+            maxWidth: "260px",
+            background: "#fff",
+            borderRadius: "16px 16px 4px 16px",
+            boxShadow: "0 14px 40px rgba(0,0,0,0.18)",
+            border: "1px solid rgba(0,0,0,0.06)",
+            padding: "12px 14px",
+            display: "flex",
+            gap: "10px",
+            alignItems: "flex-start",
+            position: "relative",
+            cursor: "pointer",
+          }}
+        >
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              dismissNudge();
+            }}
+            aria-label="বন্ধ করুন"
+            style={{
+              position: "absolute",
+              top: "-8px",
+              right: "-8px",
+              width: "22px",
+              height: "22px",
+              borderRadius: "50%",
+              background: BLACK,
+              color: "#fff",
+              border: "2px solid #fff",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <X size={12} />
+          </button>
+          <div
+            style={{
+              width: "34px",
+              height: "34px",
+              borderRadius: "10px",
+              background: `linear-gradient(135deg, ${RED}, ${RED_DARK})`,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}
+          >
+            <Bot size={18} color="#fff" />
+          </div>
+          <div>
+            <p style={{ margin: 0, fontWeight: 700, fontSize: "13px", color: BLACK }}>
+              CADD CORE AI · সহায়তা
+            </p>
+            <p style={{ margin: "3px 0 0", fontSize: "12.5px", color: "#4b5563", lineHeight: 1.55 }}>
+              👋 কোর্স, ফি বা সেমিনার — যেকোনো প্রশ্ন করুন। আমি সাহায্য করতে এখানেই আছি!
             </p>
           </div>
         </div>
       )}
 
       {/* ===== Floating Toggle Button ===== */}
-      <div style={{ display: "flex", justifyContent: "flex-end", position: "relative" }}>
+      <div
+        className={!isOpen ? "chat-fab-float" : undefined}
+        style={{ display: "flex", justifyContent: "flex-end", position: "relative" }}
+      >
         {!isOpen && (
           <span
             style={{
               position: "absolute",
               inset: 0,
-              borderRadius: "16px",
+              borderRadius: "50%",
               background: RED,
-              opacity: 0.35,
-              animation: "ping 1.8s cubic-bezier(0,0,0.2,1) infinite",
+              opacity: 0.25,
+              animation: "ping 2s cubic-bezier(0,0,0.2,1) infinite",
             }}
           />
         )}
         <button
-          onClick={() => setIsOpen((p) => !p)}
+          onClick={() => {
+            setIsOpen((p) => !p);
+            dismissNudge();
+          }}
           aria-label="AI Chat"
           style={{
             position: "relative",
-            width: "58px",
-            height: "58px",
-            borderRadius: "16px",
-            background: isOpen ? BLACK : `linear-gradient(135deg, ${RED}, ${RED_DARK})`,
+            width: "60px",
+            height: "60px",
+            borderRadius: "50%",
+            background: isOpen ? BLACK : `linear-gradient(140deg, ${RED}, ${RED_DARK})`,
             border: "none",
             color: "#fff",
             cursor: "pointer",
             boxShadow: isOpen
-              ? "0 8px 24px rgba(0,0,0,0.35)"
-              : "0 8px 28px rgba(220,38,38,0.5)",
+              ? "0 10px 26px rgba(0,0,0,0.32)"
+              : "0 10px 30px rgba(220,38,38,0.45)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -466,7 +565,36 @@ export default function ChatBot() {
           onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.06)")}
           onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
         >
-          {isOpen ? <X size={24} /> : <MessageCircle size={24} />}
+          {isOpen ? (
+            <X size={24} />
+          ) : (
+            <>
+              {/* Headset = "talk to support" feel */}
+              <Headset size={27} color="#fff" />
+
+              {/* Clean "Ask AI" pill = invites the user + signals AI-powered */}
+              <span
+                style={{
+                  position: "absolute",
+                  top: "-6px",
+                  right: "-10px",
+                  background: BLACK,
+                  color: "#fff",
+                  fontSize: "9.5px",
+                  fontWeight: 800,
+                  letterSpacing: "0.3px",
+                  padding: "3px 7px",
+                  borderRadius: "999px",
+                  border: "2px solid #fff",
+                  lineHeight: 1,
+                  whiteSpace: "nowrap",
+                  boxShadow: "0 2px 6px rgba(0,0,0,0.22)",
+                }}
+              >
+                Ask AI
+              </span>
+            </>
+          )}
         </button>
       </div>
     </div>

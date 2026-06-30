@@ -13,7 +13,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 
       <main className="flex-1">{children}</main>
       <PopupBanner />
-      <FloatingContactMenu />
+      {/* <FloatingContactMenu /> */}
       <Footer />
     </div>
   );
