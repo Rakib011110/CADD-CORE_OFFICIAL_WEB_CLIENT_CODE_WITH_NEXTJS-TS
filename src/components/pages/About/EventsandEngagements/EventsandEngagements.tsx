@@ -15,11 +15,22 @@ type TEvent = {
 
 
 export default async function EventsandEngagements() {
-// const {data: events}= useGetAllEventsQuery({})
+  let events: { data?: TEvent[] } = { data: [] };
 
-
-const res = await fetch("https://caddcore-web-server-code-pi.vercel.app/api/events");
-const events = await res.json();
+  try {
+    const res = await fetch(
+      "https://caddcore-web-server-code-pi.vercel.app/api/events",
+      { next: { revalidate: 60 } }
+    );
+    if (res.ok) {
+      const contentType = res.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        events = await res.json();
+      }
+    }
+  } catch (error) {
+    console.error("Error fetching events for About page:", error);
+  }
 
   return (
     <div>
