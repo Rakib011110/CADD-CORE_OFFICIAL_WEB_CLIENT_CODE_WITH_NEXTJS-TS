@@ -3,6 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/UI/card";
 import {
   ImageUploadField,
+  RepeaterField,
   SelectField,
   TextField,
   TextareaField,
@@ -47,7 +48,10 @@ export function BasicsTab() {
             <TextField name="projects" label="Projects" placeholder="e.g. ১০ টি প্রজেক্ট" required />
           </div>
 
-          <ImageUploadField name="photoUrl" label="Course Image" required />
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <ImageUploadField name="photoUrl" label="Course Thumbnail / Card Image" required />
+            <ImageUploadField name="courseBanner" label="Default Banner Image" />
+          </div>
 
           <TextareaField
             name="description"
@@ -55,6 +59,30 @@ export function BasicsTab() {
             placeholder="Enter course description"
             rows={5}
             required
+          />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Banner Slider Images (স্লাইডার ছবি)</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="mb-4 text-xs text-gray-500">
+            কোর্সের মূল ব্যানারে একাধিক ছবি স্লাইডার হিসেবে দেখাতে এখানে ২ বা তার বেশি ছবি আপলোড করুন। ফাঁকা রাখলে ডিফল্ট ব্যানার ইমেজ দেখানো হবে।
+          </p>
+          <RepeaterField
+            name="bannerImages"
+            title="Banner Slider Slides"
+            addLabel="Add Banner Slide"
+            emptyHint="কোনো স্লাইডার ছবি যোগ করা হয়নি।"
+            newItem={{ photoUrl: "" }}
+            renderItem={(i) => (
+              <ImageUploadField
+                name={`bannerImages.${i}.photoUrl`}
+                label={`Banner Slide #${i + 1}`}
+              />
+            )}
           />
         </CardContent>
       </Card>

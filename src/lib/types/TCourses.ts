@@ -7,6 +7,8 @@ export type TCourse = {
   duration: string;
   lessons: string;
   photoUrl: string;
+  courseBanner?: string;
+  bannerImages?: { photoUrl: string }[];
   projects: string;
   description: string;
   courseFee: string;

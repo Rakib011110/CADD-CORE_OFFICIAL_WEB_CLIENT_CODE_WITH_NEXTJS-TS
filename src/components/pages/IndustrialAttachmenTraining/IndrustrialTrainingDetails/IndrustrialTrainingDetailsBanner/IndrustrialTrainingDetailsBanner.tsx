@@ -1,5 +1,7 @@
 "use client";
-import { CheckCircle } from "lucide-react";
+import React, { useCallback, useEffect, useState } from "react";
+import { CheckCircle, ChevronLeft, ChevronRight } from "lucide-react";
+import useEmblaCarousel from "embla-carousel-react";
 
 import { TCourse } from "@/lib/courses";
 import Link from "next/link";
@@ -7,36 +9,128 @@ import DetailsHeadNav from "@/components/pages/CourseDetails/DetailsHeadNav/Deta
 import Image from "next/image";
 
 export default function IndrustrialTrainingDetailsBanner({ course }: { course: TCourse }) {
-   
-  
-  // const formattedFee = new Intl.NumberFormat("en-IN").format(course?.courseFee || 0); 
+  // Extract all available banner slide URLs
+  const slides: string[] = React.useMemo(() => {
+    if (course?.bannerImages && Array.isArray(course.bannerImages) && course.bannerImages.length > 0) {
+      const urls = course.bannerImages
+        .map((item: any) => (typeof item === "string" ? item : item?.photoUrl))
+        .filter((url): url is string => Boolean(url && url.trim().length > 0));
+      if (urls.length > 0) return urls;
+    }
+    return course?.courseBanner ? [course.courseBanner] : [];
+  }, [course]);
 
-  const formattedFee= new Intl.NumberFormat("en-IN").format(course?.courseFee || 0)
+  // Setup Embla Carousel
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
+  const scrollPrev = useCallback(() => emblaApi && emblaApi.scrollPrev(), [emblaApi]);
+  const scrollNext = useCallback(() => emblaApi && emblaApi.scrollNext(), [emblaApi]);
+  const scrollTo = useCallback((index: number) => emblaApi && emblaApi.scrollTo(index), [emblaApi]);
 
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setSelectedIndex(emblaApi.selectedScrollSnap());
+  }, [emblaApi]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    onSelect();
+    emblaApi.on("select", onSelect);
+    emblaApi.on("reInit", onSelect);
+  }, [emblaApi, onSelect]);
+
+  // Autoplay loop every 4 seconds
+  useEffect(() => {
+    if (!emblaApi || slides.length <= 1) return;
+    const interval = setInterval(() => {
+      emblaApi.scrollNext();
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [emblaApi, slides.length]);
 
   return (
-    <section className="max-w-7xl mx-auto px-">
-    {/* Use flex-col on mobile, row on md+ */}
-    <div className="flex flex-col md:flex-row gap-7">
-     
-      <div className="md:w-1/4 order-2 md:order-1">
-        <DetailsHeadNav />
-      </div>
+    <section className="max-w-7xl mx-auto px-2">
+      {/* Use flex-col on mobile, row on md+ */}
+      <div className="flex flex-col md:flex-row gap-7">
+        <div className="md:w-1/4 order-2 md:order-1">
+          <DetailsHeadNav />
+        </div>
 
-      <div className="md:w-3/4 order-1 md:order-2">
-     
+        <div className="md:w-3/4 order-1 md:order-2">
           <div
-            className="relative bg-cover  bg-center bg-no-repeat "
-            style={{ backgroundImage: `url(https://res.cloudinary.com/dbkwiwoll/image/upload/v1745483393/a1af9617-b96a-494d-870e-37c3c96e766b_jpbfzz.jpg` }}
+            className="relative bg-cover bg-center bg-no-repeat rounded-lg overflow-hidden"
+            style={{
+              backgroundImage: `url(https://res.cloudinary.com/dbkwiwoll/image/upload/v1745483393/a1af9617-b96a-494d-870e-37c3c96e766b_jpbfzz.jpg)`,
+            }}
           >
-       
             <div className="absolute inset-0 bg-black/40"></div>
 
-            {/* Banner Content */}
-            <div className="relative z-30 max-w-5xl mx-auto  border-4 border-t-0 border-b-0 border-red-500">
-              {/* White Card */}
-             <Image className=" h-auto " src={course.courseBanner} width={1000} height={900} alt=""/>
+            {/* Banner Slider Container */}
+            <div className="relative z-30 max-w-5xl mx-auto border-4 border-t-0 border-b-0 border-red-500 overflow-hidden group">
+              {slides.length > 1 ? (
+                <div className="relative">
+                  {/* Embla Viewport */}
+                  <div className="overflow-hidden" ref={emblaRef}>
+                    <div className="flex">
+                      {slides.map((slideUrl, idx) => (
+                        <div key={idx} className="flex-[0_0_100%] min-w-0 relative">
+                          <Image
+                            className="w-full h-auto object-cover max-h-[500px]"
+                            src={slideUrl}
+                            width={1000}
+                            height={600}
+                            alt={`${course.title} Banner Slide ${idx + 1}`}
+                            priority={idx === 0}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Slider Controls (Prev / Next Buttons) */}
+                  <button
+                    onClick={scrollPrev}
+                    type="button"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-red-600 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 z-40"
+                    aria-label="Previous Slide"
+                  >
+                    <ChevronLeft className="w-6 h-6" />
+                  </button>
+                  <button
+                    onClick={scrollNext}
+                    type="button"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-red-600 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 z-40"
+                    aria-label="Next Slide"
+                  >
+                    <ChevronRight className="w-6 h-6" />
+                  </button>
+
+                  {/* Slider Pagination Dots */}
+                  <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-2 z-40">
+                    {slides.map((_, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => scrollTo(idx)}
+                        type="button"
+                        className={`h-2.5 rounded-full transition-all duration-300 ${
+                          selectedIndex === idx ? "w-7 bg-red-600" : "w-2.5 bg-white/70 hover:bg-white"
+                        }`}
+                        aria-label={`Go to slide ${idx + 1}`}
+                      />
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                /* Single Image fallback */
+                <Image
+                  className="w-full h-auto object-cover max-h-[500px]"
+                  src={slides[0] || course.courseBanner || "https://www.freeiconspng.com/thumbs/no-image-icon/no-image-icon-6.png"}
+                  width={1000}
+                  height={600}
+                  alt={course.title || "Course Banner"}
+                />
+              )}
             </div>  
             <div className="backdrop-filter backdrop-blur-sm  rounded-md shadow-lg p-6 md:p-8">
                 {/* SubTitle */}

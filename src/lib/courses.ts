@@ -91,6 +91,7 @@ export type TCourse = {
   courseType?: "regular" | "one-to-one";
   categories: Category[];
   courseBanner: string;
+  bannerImages?: { photoUrl: string }[];
   batch: string;
 
   InternationaldemoCertificate: TInternationaldemoCertificate[];

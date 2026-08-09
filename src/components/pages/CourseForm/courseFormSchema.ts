@@ -31,6 +31,8 @@ export const courseFormSchema = z.object({
   lessons: z.string().min(1, "ক্লাসের সংখ্যা (Lessons) দেওয়া আবশ্যক"),
   projects: z.string().min(1, "প্রজেক্টের তথ্য (Projects) দেওয়া আবশ্যক"),
   photoUrl: z.string().min(1, "কোর্সের কভার ছবি (Course Image) আপলোড করা আবশ্যক"),
+  courseBanner: z.string().optional(),
+  bannerImages: z.array(z.object({ photoUrl: z.string() })).optional(),
   description: z.string().min(1, "কোর্সের বিবরণ (Description) দেওয়া আবশ্যক"),
 
   schedule: z.object({
@@ -108,6 +110,8 @@ export const courseFormDefaults: CourseFormValues = {
   lessons: "",
   projects: "",
   photoUrl: "",
+  courseBanner: "",
+  bannerImages: [],
   description: "",
   schedule: { startingDate: "", mode: "", days: "", time: "" },
   overview: { overviewDescription: "", videoUrl: "" },
@@ -142,6 +146,8 @@ export const TAB_FIELD_MAP: Record<string, string[]> = {
     "lessons",
     "projects",
     "photoUrl",
+    "courseBanner",
+    "bannerImages",
     "description",
     "schedule",
     "overview",
@@ -184,6 +190,10 @@ export function courseToFormValues(course: any): CourseFormValues {
     lessons: asString(course.lessons),
     projects: asString(course.projects),
     photoUrl: asString(course.photoUrl),
+    courseBanner: asString(course.courseBanner),
+    bannerImages: asArray<any>(course.bannerImages).map((b) => ({
+      photoUrl: typeof b === "string" ? b : asString(b?.photoUrl),
+    })),
     description: asString(course.description),
     schedule: {
       startingDate: asString(course.schedule?.startingDate).split("T")[0],
