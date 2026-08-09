@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import Swal from 'sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
 import { Button } from '@/components/UI/button';
@@ -13,53 +14,26 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/UI/table';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 import {
-  useGetAllCourseQuery,
-  useDeleteCourseMutation,
-  useUpdateCourseMutation,
-} from '@/redux/api/courseApi';
-import UpdateCourse from '@/components/pages/Courses/UpdateCourses';
-import { Pencil, Trash2 } from 'lucide-react';
-import { useDeleteIndrustrialCourseMutation, useGetAllIndrustrialCourseQuery, useUpdateIndrustrialCourseMutation } from '@/redux/api/indrustrialcourseApi';
-import UpdateIndustrialCourses from '../update-industrial-courses/UpdaeIndrustrialCourses';
+  useDeleteIndrustrialCourseMutation,
+  useGetAllIndrustrialCourseQuery,
+} from '@/redux/api/indrustrialcourseApi';
 
 export default function ManageIndustrialCourses() {
+  const router = useRouter();
   const { data: courses, isLoading } = useGetAllIndrustrialCourseQuery({});
-  const [updateCourse] = useUpdateIndrustrialCourseMutation();
   const [deleteCourse] = useDeleteIndrustrialCourseMutation();
 
-  const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
-  const [formData, setFormData] = useState<any>(null);
-  const [originalData, setOriginalData] = useState<any>(null);
-
   const handleEdit = (course: any) => {
-    setSelectedCourseId(course._id || null);
-    setFormData(course);
-    setOriginalData(course);
-  };
-
-  const handleUpdate = async (updatedFields: Partial<any>) => {
-    try {
-      if (selectedCourseId && formData) {
-        await updateCourse({ id: selectedCourseId, courseData: updatedFields }).unwrap();
-        await Swal.fire({
-          icon: 'success',
-          title: 'Course updated!',
-          text: 'Your changes have been saved.',
-          timer: 2000,
-          showConfirmButton: false,
-        });
-      }
-    } catch (error: any) {
-      await Swal.fire({
-        icon: 'error',
-        title: 'Update failed',
-        text: error?.data?.message || 'Could not update the course.',
-      });
-    } finally {
-      setSelectedCourseId(null);
-      setFormData(null);
-      setOriginalData(null);
+    if (course?.slug) {
+      router.push(
+        `/dashboard/industrial-training/edit-industrial-course/${course.slug}`
+      );
+    } else if (course?._id) {
+      router.push(
+        `/dashboard/industrial-training/edit-industrial-course/${course._id}`
+      );
     }
   };
 
@@ -95,14 +69,28 @@ export default function ManageIndustrialCourses() {
   };
 
   if (isLoading) {
-    return <div className="text-center py-10 text-lg font-semibold">Loading...</div>;
+    return (
+      <div className="text-center py-10 text-lg font-semibold">Loading...</div>
+    );
   }
 
   return (
-    <div className="p-6">
-   <div className=''>
-   <h1 className="text-2xl font-bold mb-4 border text-center p-2">Manage Courses</h1>
-   </div>
+    <div className="p-6 space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b pb-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">
+            Manage Industrial Courses
+          </h1>
+          <p className="text-sm text-gray-500">
+            View, edit, or delete existing industrial attachment courses.
+          </p>
+        </div>
+        <Link href="/dashboard/industrial-training/create-industrial-courses">
+          <Button className="bg-gray-900 hover:bg-red-600 flex items-center gap-2">
+            <Plus size={16} /> Add Industrial Course
+          </Button>
+        </Link>
+      </div>
 
       <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-md">
         <Table className="w-full">
@@ -125,7 +113,7 @@ export default function ManageIndustrialCourses() {
                       course.photoUrl ||
                       'https://www.freeiconspng.com/thumbs/no-image-icon/no-image-icon-6.png'
                     }
-                    alt={course.title}
+                    alt={course.title || 'Course'}
                     width={50}
                     height={50}
                     className="rounded-md object-cover"
@@ -133,10 +121,10 @@ export default function ManageIndustrialCourses() {
                 </TableCell>
 
                 {/* Title */}
-                <TableCell>{course.title}</TableCell>
+                <TableCell className="font-medium">{course.title}</TableCell>
 
                 {/* Fee */}
-                <TableCell>{course.courseFee}</TableCell>
+                <TableCell>{course.courseFee ? `${course.courseFee} ৳` : 'N/A'}</TableCell>
 
                 {/* Category */}
                 <TableCell>{course.categories}</TableCell>
@@ -147,6 +135,7 @@ export default function ManageIndustrialCourses() {
                     onClick={() => handleEdit(course)}
                     variant="ghost"
                     className="text-blue-500 hover:bg-blue-100"
+                    title="Edit course"
                   >
                     <Pencil size={18} />
                   </Button>
@@ -155,6 +144,7 @@ export default function ManageIndustrialCourses() {
                     onClick={() => handleDelete(course._id || course.slug)}
                     variant="ghost"
                     className="text-red-500 hover:bg-red-100"
+                    title="Delete course"
                   >
                     <Trash2 size={18} />
                   </Button>
@@ -164,16 +154,7 @@ export default function ManageIndustrialCourses() {
           </TableBody>
         </Table>
       </div>
-
-      {selectedCourseId && formData && originalData && (
-        <UpdateIndustrialCourses
-          formData={formData}
-          originalData={originalData}
-          setFormData={setFormData}
-          setSelectedCourse={setSelectedCourseId}
-          handleUpdate={handleUpdate}
-        />
-      )}
     </div>
   );
 }
+

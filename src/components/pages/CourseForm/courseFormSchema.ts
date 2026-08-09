@@ -16,19 +16,22 @@ const planSchema = z.object({
 
 export const courseFormSchema = z.object({
   // --- Basic info (required mirrors the Mongoose `required: true` fields) ---
-  title: z.string().min(1, "Title is required"),
+  title: z.string().min(1, "কোর্সের শিরোনাম (Title) দেওয়া আবশ্যক"),
   slug: z
     .string()
-    .min(1, "Slug is required")
-    .regex(/^[^\s]+$/, "No spaces — use hyphens (-) to separate words"),
+    .min(1, "কোর্সের স্ল্যাগ (Slug) দেওয়া আবশ্যক")
+    .regex(/^[a-z0-9-]+$/i, "স্পেস ছাড়া শুধু ইংরেজি অক্ষর, সংখ্যা এবং হাইফেন (-) ব্যবহার করুন"),
   courseType: z.enum(["regular", "one-to-one"]),
-  categories: z.string().min(1, "At least one category is required"),
-  courseFee: z.string().min(1, "Course fee is required"),
-  duration: z.string().min(1, "Duration is required"),
-  lessons: z.string().min(1, "Lessons is required"),
-  projects: z.string().min(1, "Projects is required"),
-  photoUrl: z.string().min(1, "Course image is required"),
-  description: z.string().min(1, "Description is required"),
+  categories: z.string().min(1, "কমপক্ষে একটি ক্যাটাগরি দেওয়া আবশ্যক (যেমন: Civil, Electrical)"),
+  courseFee: z
+    .string()
+    .min(1, "কোর্স ফি (Course Fee) দেওয়া আবশ্যক")
+    .regex(/^\d+$/, "কোর্স ফি অবশ্যই একটি বৈধ সংখ্যা হতে হবে (যেমন: ২০০০০)"),
+  duration: z.string().min(1, "কোর্সের সময়সীমা (Duration) দেওয়া আবশ্যক"),
+  lessons: z.string().min(1, "ক্লাসের সংখ্যা (Lessons) দেওয়া আবশ্যক"),
+  projects: z.string().min(1, "প্রজেক্টের তথ্য (Projects) দেওয়া আবশ্যক"),
+  photoUrl: z.string().min(1, "কোর্সের কভার ছবি (Course Image) আপলোড করা আবশ্যক"),
+  description: z.string().min(1, "কোর্সের বিবরণ (Description) দেওয়া আবশ্যক"),
 
   schedule: z.object({
     startingDate: z.string(),

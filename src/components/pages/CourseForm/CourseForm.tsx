@@ -23,6 +23,10 @@ import {
   useCreateCourseMutation,
   useUpdateCourseMutation,
 } from "@/redux/api/courseApi";
+import {
+  useCreateIndrustrialCourseMutation,
+  useUpdateIndrustrialCourseMutation,
+} from "@/redux/api/indrustrialcourseApi";
 
 import { TabNav, type TabItem } from "./TabNav";
 import { BasicsTab } from "./tabs/BasicsTab";
@@ -50,9 +54,14 @@ const TABS: TabItem[] = [
 type CourseFormProps = {
   mode: "create" | "edit";
   initialData?: any;
+  isIndustrial?: boolean;
 };
 
-export default function CourseForm({ mode, initialData }: CourseFormProps) {
+export default function CourseForm({
+  mode,
+  initialData,
+  isIndustrial = false,
+}: CourseFormProps) {
   const router = useRouter();
   const [active, setActive] = useState("basics");
 
@@ -66,9 +75,15 @@ export default function CourseForm({ mode, initialData }: CourseFormProps) {
     formState: { errors },
   } = methods;
 
-  const [createCourse, { isLoading: creating }] = useCreateCourseMutation();
-  const [updateCourse, { isLoading: updating }] = useUpdateCourseMutation();
-  const isSaving = creating || updating;
+  const [createCourse, { isLoading: creatingRegular }] = useCreateCourseMutation();
+  const [updateCourse, { isLoading: updatingRegular }] = useUpdateCourseMutation();
+  const [createIndustrialCourse, { isLoading: creatingIndustrial }] =
+    useCreateIndrustrialCourseMutation();
+  const [updateIndustrialCourse, { isLoading: updatingIndustrial }] =
+    useUpdateIndrustrialCourseMutation();
+
+  const isSaving =
+    creatingRegular || updatingRegular || creatingIndustrial || updatingIndustrial;
 
   // Once a course is created via "Save & Next", remember its id so subsequent
   // saves update the same course instead of creating duplicates.
@@ -105,18 +120,45 @@ export default function CourseForm({ mode, initialData }: CourseFormProps) {
     const payload = formValuesToPayload(values);
     const editingId = mode === "edit" ? initialData?._id : savedCourseId;
     try {
-      if (editingId) {
-        await updateCourse({ id: editingId, courseData: payload }).unwrap();
-        toast.success("Saved successfully!");
+      if (isIndustrial) {
+        if (editingId) {
+          await updateIndustrialCourse({
+            id: editingId,
+            courseData: payload,
+          }).unwrap();
+          toast.success("Saved industrial course successfully!");
+        } else {
+          const res: any = await createIndustrialCourse(payload).unwrap();
+          const newId = res?.data?._id;
+          if (newId) setSavedCourseId(newId);
+          toast.success("Industrial course created successfully!");
+        }
       } else {
-        const res: any = await createCourse(payload).unwrap();
-        const newId = res?.data?._id;
-        if (newId) setSavedCourseId(newId);
-        toast.success("Course created successfully!");
+        if (editingId) {
+          await updateCourse({ id: editingId, courseData: payload }).unwrap();
+          toast.success("Saved course successfully!");
+        } else {
+          const res: any = await createCourse(payload).unwrap();
+          const newId = res?.data?._id;
+          if (newId) setSavedCourseId(newId);
+          toast.success("Course created successfully!");
+        }
       }
       return true;
     } catch (err: any) {
-      toast.error(err?.data?.message || "Save failed. Please try again.");
+      console.error("Course save error:", err);
+      const serverMsg = err?.data?.message;
+      const errorSources = err?.data?.errorSources;
+      if (Array.isArray(errorSources) && errorSources.length > 0) {
+        const details = errorSources
+          .map((e: any) => `${e.path ? e.path + ': ' : ''}${e.message}`)
+          .join(" | ");
+        toast.error(`সেভ ব্যর্থ হয়েছে: ${details}`);
+      } else if (serverMsg) {
+        toast.error(`সেভ ব্যর্থ হয়েছে: ${serverMsg}`);
+      } else {
+        toast.error("সেভ করতে সমস্যা হয়েছে। ফিল্ডসমূহ আবার পরীক্ষা করে চেষ্টা করুন।");
+      }
       return false;
     }
   };
@@ -127,7 +169,8 @@ export default function CourseForm({ mode, initialData }: CourseFormProps) {
       TAB_FIELD_MAP[t.id].some((k) => errorKeys.includes(k))
     );
     if (firstTab) setActive(firstTab.id);
-    toast.error("কিছু ফিল্ড সঠিকভাবে পূরণ করুন।");
+    const count = errorKeys.length;
+    toast.error(`${count}টি ফিল্ডে অসম্পূর্ণ বা ভুল তথ্য রয়েছে। লাল চিহ্নিত ট্যাবে গিয়ে ফিল্ডগুলো সঠিক করুন।`);
   };
 
   // Save and stay on the current tab (header button).
@@ -144,7 +187,13 @@ export default function CourseForm({ mode, initialData }: CourseFormProps) {
   // Save and leave to the courses list (final tab).
   const saveAndFinish = methods.handleSubmit(async (v) => {
     const ok = await persist(v);
-    if (ok) router.push("/dashboard/manage-courses");
+    if (ok) {
+      router.push(
+        isIndustrial
+          ? "/dashboard/industrial-training/manage-industrial-courses"
+          : "/dashboard/manage-courses"
+      );
+    }
   }, onInvalid);
 
   return (
@@ -157,7 +206,13 @@ export default function CourseForm({ mode, initialData }: CourseFormProps) {
               <div className="mb-4 flex items-center justify-between gap-4">
                 <div>
                   <h1 className="text-xl font-bold text-gray-900">
-                    {mode === "edit" ? "Update Course" : "Create a New Course"}
+                    {mode === "edit"
+                      ? isIndustrial
+                        ? "Update Industrial Course"
+                        : "Update Course"
+                      : isIndustrial
+                        ? "Create a New Industrial Course"
+                        : "Create a New Course"}
                   </h1>
                   <p className="text-xs text-gray-500">
                     যেকোনো ট্যাবে গিয়ে এডিট করুন, যেকোনো সময় সেভ করুন।
@@ -253,3 +308,4 @@ export default function CourseForm({ mode, initialData }: CourseFormProps) {
     </div>
   );
 }
+
