@@ -25,15 +25,15 @@ const IndustrialCourseCard: React.FC<TCourse & { variant: number }> = ({
   const currentVariant = variants[variant % variants.length];
 
   return (
-    <div className="h-full">
-      <div className="h-full bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-shadow duration-300 flex flex-col">
+    <Link href={`/industrial-attachment-training/${slug}`} className="block h-full group">
+      <div className="h-full bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-all duration-300 flex flex-col cursor-pointer">
         {/* Image with gradient overlay */}
         <div className="relative h-48 overflow-hidden">
           <Image
             src={photoUrl}
             alt={title}
             fill
-            className="object-cover"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
             quality={100}
           />
           <div className={`absolute inset-0 ${currentVariant.bg} opacity-20 mix-blend-multiply`} />
@@ -47,7 +47,7 @@ const IndustrialCourseCard: React.FC<TCourse & { variant: number }> = ({
 
         {/* Content */}
         <div className="p-6 flex-1 flex flex-col">
-          <h3 className="text-xl font-bold text-gray-900 mb-3">{title}</h3>
+          <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-red-600 transition-colors">{title}</h3>
           
           {/* Stats */}
           <div className="flex flex-wrap gap-4 mb-5 text-sm">
@@ -82,16 +82,13 @@ const IndustrialCourseCard: React.FC<TCourse & { variant: number }> = ({
           )}
 
           {/* Animated CTA */}
-          <Link 
-            href={`/industrial-attachment-training/${slug}`}
-            className={`mt-auto group flex items-center justify-between ${currentVariant.text} font-medium hover:${currentVariant.text}/80 transition-colors`}
-          >
+          <div className={`mt-auto flex items-center justify-between ${currentVariant.text} font-medium transition-colors`}>
             <span>বিস্তারিত দেখুন</span>
-            <ChevronRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-          </Link>
+            <ChevronRight className="w-5 h-5 transition-transform group-hover:translate-x-1.5" />
+          </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 };
 

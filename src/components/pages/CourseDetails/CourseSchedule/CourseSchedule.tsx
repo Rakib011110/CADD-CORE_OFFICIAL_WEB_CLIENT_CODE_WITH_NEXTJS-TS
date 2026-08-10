@@ -6,10 +6,17 @@ import { motion } from "framer-motion";
 
 // Utility function to format dates in both English and Bangla
 const formatDualDate = (dateString: string) => {
+  if (!dateString) return { english: "TBD", bangla: "TBD", monthDayEng: "TBD", monthDayBn: "TBD" };
   const date = new Date(dateString);
+  if (isNaN(date.getTime())) return { english: "TBD", bangla: "TBD", monthDayEng: "TBD", monthDayBn: "TBD" };
+  
+  const formattedEng = format(date, "MMMM d, yyyy");
+  const formattedBn = format(date, "MMMM d, yyyy", { locale: bn });
   return {
     english: format(date, "EEEE, MMMM d, yyyy"),
     bangla: format(date, "EEEE, MMMM d, yyyy", { locale: bn }),
+    monthDayEng: formattedEng,
+    monthDayBn: formattedBn,
   };
 };
 
@@ -70,14 +77,18 @@ export default function CourseSchedule({ course }: { course: any }) {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="mb-8 space-y-1">
-        <h3 className="text-sm font-semibold text-gray-500">Current Batch</h3>
-        <h2 className="text-2xl font-bold text-gray-900">
-          {course.title}
-          {/* <span className="text-blue-600">
-            
-            #{schedule.batchNo}</span> */}
-        </h2>
+        className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-gray-100 pb-4">
+        <div>
+          <h3 className="text-xs font-bold uppercase tracking-wider text-red-500">Current Batch Schedule</h3>
+          <h2 className="text-2xl font-bold text-gray-900 mt-0.5">
+            {course.title}
+          </h2>
+        </div>
+        {schedule.batchNo && (
+          <div className="bg-red-50 text-red-700 px-3.5 py-1.5 rounded-full text-xs font-bold border border-red-200 w-fit">
+            Batch #{schedule.batchNo}
+          </div>
+        )}
       </motion.div>
 
       {/* Responsive Timeline */}
@@ -93,35 +104,35 @@ export default function CourseSchedule({ course }: { course: any }) {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.15, duration: 0.4 }}
-                className="relative border flex flex-col items-center text-center w-[130px] md:min-w-[130px] mx-auto p-3 rounded-xl bg-red-50">
+                className="relative border flex flex-col items-center text-center w-[135px] md:min-w-[135px] mx-auto p-3.5 rounded-xl bg-gradient-to-b from-red-50/80 to-white shadow-xs">
                 {/* Connecting Line */}
                 {!isLast && (
-                  <div className="hidden md:block absolute top-5 left-20 w-[calc(100%+1.5rem)] h-1 bg-red-500 z-10" />
+                  <div className="hidden md:block absolute top-5 left-20 w-[calc(100%+1.5rem)] h-1 bg-red-400 z-10" />
                 )}
 
                 {/* Icon */}
-                <div className="relative z-30 w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-2xl text-blue-700 border border-red-500 shadow-md">
+                <div className="relative z-30 w-12 h-12 rounded-full bg-white flex items-center justify-center text-2xl text-blue-700 border-2 border-red-500 shadow-md">
                   {milestone.icon}
                 </div>
 
                 {/* Date */}
-                <div className="mt-3">
-                  <p className="text-xs font-medium text-gray-900">
-                    {date.english.split(",")[1].trim()}
+                <div className="mt-3 bg-white px-2 py-1 rounded-md border border-gray-200/80 w-full shadow-2xs">
+                  <p className="text-xs font-bold text-gray-900">
+                    {date.monthDayEng}
                   </p>
-                  <p className="text-[0.7rem] text-gray-400">
-                    {date.bangla.split(",")[1].trim()}
+                  <p className="text-[0.68rem] text-gray-500 font-medium">
+                    {date.monthDayBn}
                   </p>
                 </div>
 
                 {/* Title */}
-                <h3 className="mt-1 text-sm font-semibold text-gray-700">
+                <h3 className="mt-2 text-xs font-bold text-gray-800">
                   {milestone.title}
                 </h3>
 
                 {/* Optional Duration */}
                 {milestone.duration && (
-                  <p className="text-[0.65rem] text-gray-500 mt-1 italic">
+                  <p className="text-[0.65rem] text-blue-600 font-medium mt-1">
                     {milestone.duration}
                   </p>
                 )}
