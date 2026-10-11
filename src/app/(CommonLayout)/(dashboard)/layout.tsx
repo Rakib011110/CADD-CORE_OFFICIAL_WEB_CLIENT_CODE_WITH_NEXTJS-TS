@@ -102,8 +102,18 @@ const navigationSections = [
         icon: "🎯",
         color: "",
       },
-     
-     
+    ],
+  },
+  {
+    title: "🖼️ Home Banner",
+    icon: "🖼️",
+    links: [
+      {
+        label: "Manage Home Banner",
+        href: "/dashboard/manage-home-banner",
+        icon: "🏠",
+        color: "",
+      },
     ],
   },
   {
