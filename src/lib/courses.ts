@@ -84,6 +84,42 @@ export type TIdemoCertificate = {
   photoUrl: string;
 };
 
+export type TDeliveryMode = "online" | "offline" | "weekend" | "corporate" | "one-to-one";
+export type TBatchStatus = "upcoming" | "running" | "full" | "closed";
+
+export type TCourseBatch = {
+  _id: string;
+  course: string | { _id: string; title: string; slug: string; courseType?: string; courseFee?: number };
+  mode: TDeliveryMode;
+  batchNo: string;
+  startDate?: string | null;
+  endDate?: string | null;
+  registrationDeadline?: string | null;
+  classDays?: string;
+  classTime?: string;
+  location?: string;
+  platform?: string;
+  fee: number;
+  seatsTotal?: number;
+  seatsBooked?: number;
+  minParticipants?: number;
+  note?: string;
+  status: TBatchStatus;
+  isPublished: boolean;
+  onJobTrainingStart?: string | null;
+  onJobTrainingEnd?: string | null;
+  certificationDate?: string | null;
+  internshipStartDate?: string | null;
+};
+
+export type TPaymentPlan = {
+  _id?: string;
+  name: string;
+  installments: number;
+  discountPercent: number;
+  isActive: boolean;
+};
+
 export type TCourse = {
   title: string;
   _id: string;
@@ -111,4 +147,15 @@ export type TCourse = {
   freeTrainingSessions: TFreeTrainingSession[];
   courseFee: number;
   faqs: TFAQ[];
+  paymentPlans?: TPaymentPlan[];
+  // Upcoming batches for every delivery mode, soonest first (from the API)
+  batches?: TCourseBatch[];
+  courseSchedules?: {
+    batchNo?: string;
+    onlineStartDate?: string;
+    onlineFinishDate?: string;
+    onJobTrainingStart?: string;
+    certificationDate?: string;
+    internshipStartDate?: string;
+  }[];
 };

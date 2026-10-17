@@ -1,14 +1,21 @@
 
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-// aaa
+import Cookies from "js-cookie";
+import { API_BASE_URL } from "@/lib/apiBase";
+
 const baseApi = createApi({
   reducerPath: "baseApi",
   baseQuery: fetchBaseQuery({
-    // baseUrl: "https://caddcoreapi-ten.vercel.app/api",
-
-
-    baseUrl: "https://caddcoreapi-ten.vercel.app/api",
-  }),     
+    baseUrl: API_BASE_URL,
+    // Send the logged-in user's token so the API can check admin/staff access
+    prepareHeaders: (headers) => {
+      const token = Cookies.get("accessToken");
+      if (token && !headers.has("Authorization")) {
+        headers.set("Authorization", token);
+      }
+      return headers;
+    },
+  }),
   tagTypes: [
     "User",
     "Event",
@@ -25,7 +32,8 @@ const baseApi = createApi({
     "Coupon","InstallmentPlans",
     "CourseSchedule",
     "Payment",
-    "Banner"
+    "Banner",
+    "CourseBatch"
   ],
   endpoints: () => ({})
 });

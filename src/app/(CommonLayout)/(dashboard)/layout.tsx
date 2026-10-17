@@ -53,7 +53,13 @@ const navigationSections = [
         color: "",
       },
       {
-        label: "Manage Schedule",
+        label: "Course Batches & Fees",
+        href: "/dashboard/course-batches",
+        icon: "🗓️",
+        color: "",
+      },
+      {
+        label: "Manage Schedule (old timeline)",
         href: "/dashboard/course-schedule-mange",
         icon: "📅",
         color: "",

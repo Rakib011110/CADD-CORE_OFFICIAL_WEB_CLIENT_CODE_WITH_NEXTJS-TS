@@ -1,4 +1,5 @@
 import Marquee from "react-fast-marquee";
+import HomeSection, { Highlight } from "@/components/Home/HomeSection";
 
 const ClientsandPartners = () => {
   const data = [
@@ -133,51 +134,45 @@ const ClientsandPartners = () => {
     },
   ];
 
-  const chunked = (arr: typeof data, size: number) =>
-    Array.from({ length: Math.ceil(arr.length / size) }, (_, i) =>
-      arr.slice(i * size, i * size + size)
-    );
-
-  const groups = chunked(data, Math.ceil(data.length / 3));
+  // Two rows moving in opposite directions
+  const half = Math.ceil(data.length / 2);
+  const rows = [data.slice(0, half), data.slice(half)];
+  const nameOf = (title: string) => title.replace(/[_-]+/g, " ");
 
   return (
-    <div className="max-w-6xl mx-auto py-10 space-y-6">
-      <div className="text-center space-y-2 mb-6">
-        <h1 className="text-3xl font-bold">আমাদের জার্নি
-
-</h1>
-        <div className="flex justify-center ">
-        <span className="inline-block w-24 h-1 bg-red-500 rounded"></span>
-      </div>
-      
-        <h2 className="text-xl text-gray-600">আমাদের ক্লায়েন্ট ও পার্টনার</h2>
-      </div>
-
-      {groups.map((group, index) => (
-        <Marquee
-          key={index}
-          pauseOnHover
-          gradient={false}
-          direction={index % 2 === 1 ? "right" : "left"}
-          speed={40 + index * 10}
-        >
-          <div className="flex gap-6 border-4  border-l-0 border-r-0 py-4">
-            {group.map((item) => (
-              <div key={item.id} className="w-44  text-center flex-shrink-0">
+    <HomeSection
+      id="partners"
+      eyebrow="আমাদের জার্নি"
+      title={
+        <>
+          আমাদের <Highlight>ক্লায়েন্ট ও পার্টনার</Highlight>
+        </>
+      }
+      subtitle={`সরকারি প্রতিষ্ঠান, সফটওয়্যার প্রতিষ্ঠান এবং ইন্ডাস্ট্রির ${data.length.toLocaleString("bn-BD")}টিরও বেশি প্রতিষ্ঠানের সাথে আমাদের পথচলা।`}>
+      <div className="space-y-4 [-webkit-mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)] [mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)]">
+        {rows.map((row, index) => (
+          <Marquee key={index} pauseOnHover gradient={false} direction={index === 1 ? "right" : "left"} speed={32}>
+            {row.map((item) => (
+              <div
+                key={item.id}
+                title={nameOf(item.title)}
+                className="group mx-2 my-2 flex h-32 w-52 flex-col items-center justify-center gap-2 rounded-2xl border border-zinc-200 bg-white px-4 transition duration-300 hover:-translate-y-1 hover:border-red-200 hover:shadow-[0_16px_36px_-20px_rgba(220,38,38,0.4)]">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={item.photoUrl}
-                  alt={item.title}
-                  className="h-20 object-contain mx-auto mb-2"
+                  alt={nameOf(item.title)}
+                  loading="lazy"
+                  className="h-[4.5rem] w-auto max-w-full object-contain opacity-75 grayscale transition duration-300 group-hover:scale-105 group-hover:opacity-100 group-hover:grayscale-0"
                 />
-                <p className="text-xs font-medium text-gray-700 line-clamp-2">
-                  {item.title}
-                </p>
+                <span className="w-full truncate text-center text-[11px] font-medium text-zinc-500 transition-colors group-hover:text-zinc-700">
+                  {nameOf(item.title)}
+                </span>
               </div>
             ))}
-          </div>
-        </Marquee>
-      ))}
-    </div>
+          </Marquee>
+        ))}
+      </div>
+    </HomeSection>
   );
 };
 

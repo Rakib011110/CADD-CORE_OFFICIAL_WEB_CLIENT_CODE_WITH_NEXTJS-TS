@@ -8,6 +8,7 @@ import { Textarea } from "@/components/UI/textarea";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/UI/form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/UI/card";
 import Image from 'next/image';
+import { Highlight, SectionHeader } from '@/components/Home/HomeSection';
 import { InstructorformSchema } from '@/lib/validation/validation';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -152,14 +153,19 @@ const [submissionData, { isLoading }]= useCreateInstructorHireMutation()
       initial="hidden"
       animate="visible"
       variants={containerVariants}
-      className="max-w-6xl mx-auto px-4 py-12"
+      className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-14"
     >
-      <motion.div variants={itemVariants} className="text-center mb-12">
-        <h1 className="text-3xl font-bold ">শিক্ষাদানে আপনার পথ শুরু হোক <span className='text-[#F01A24]'>CADD CORE-এ</span></h1> 
-        <span className="inline-block w-28 h-1 mb-4 bg-red-500 rounded"></span>
-        <p className="text-lg text-muted-foreground">
-          আপনার জ্ঞান শেয়ার করুন, ভবিষ্যতের ইঞ্জিনিয়ার তৈরিতে অংশ নিন
-        </p>
+      <motion.div variants={itemVariants}>
+        <SectionHeader
+          eyebrow="ক্যারিয়ার"
+          title={
+            <>
+              শিক্ষাদানে আপনার পথ শুরু হোক <Highlight>CADD CORE-এ</Highlight>
+            </>
+          }
+          subtitle="আপনার জ্ঞান শেয়ার করুন, ভবিষ্যতের ইঞ্জিনিয়ার তৈরিতে অংশ নিন"
+          action={{ label: "সব চাকরি দেখুন", href: "/job" }}
+        />
       </motion.div>
     
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

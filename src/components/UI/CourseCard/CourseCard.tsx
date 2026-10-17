@@ -1,109 +1,112 @@
-import React from 'react';
-import { Card } from '../card'; // Your custom Card component
-import { Book, Clock, ArrowRight, Settings } from 'lucide-react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { motion } from 'framer-motion';
-import { TCourse } from '@/lib/courses';
+import React from "react";
+import { Book, Clock, Plus, Settings } from "lucide-react";
+import Link from "next/link";
+import Image from "next/image";
+import { motion } from "framer-motion";
+import { TCourse } from "@/lib/courses";
 
-const CourseCard: React.FC<TCourse> = ({
-  title,
-  duration,
-  lessons,
-  projects,
-  photoUrl,
-  slug,
-  softwaresTaught,
-}) => 
-{ 
+// One row of logos, the rest as "+N"
+const MAX_SOFTWARE = 4;
+
+// Compact card: image, two-line title, one meta line, one row of software
+// and a details button. Every card lines up.
+const CourseCard: React.FC<TCourse> = ({ title, duration, lessons, projects, photoUrl, slug, softwaresTaught }) => {
   const isRecorded = slug === "professional-electrical-design-mastercourse";
+  const software = softwaresTaught || [];
+  const extraSoftware = software.length - MAX_SOFTWARE;
+  const stats = [
+    { icon: Clock, value: duration },
+    { icon: Book, value: lessons },
+    { icon: Settings, value: projects },
+  ].filter((s) => s.value);
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
-      className="group h-full"
-    >
-      <Link href={`/courses/${slug}`} className="block h-full">
-        {/* --- FIX IS HERE --- */}
-        {/* We've added "p-0" to remove any default padding from the Card component itself. */}
-        <Card className="p-0 flex flex-col h-full rounded-lg overflow-hidden bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-gray-950 dark:hover:border-red-500 transition-colors duration-300 shadow-sm hover:shadow-lg">
-          
-          {/* 1. Image Section - This will now sit flush against the top of the card. */}
-          <div className="relative h-48 w-full overflow-hidden">
-            <Image
-              src={photoUrl}
-              alt={title}
-              fill
-              className="object-cover transition-transform duration-500 ease-in-out group-hover:scale-105"
-            />
-            {/* Live Badge */}
-            <div className={`absolute top-3 right-3 ${isRecorded ? 'bg-blue-600' : 'bg-red-600'} text-white px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1 ${isRecorded ? '' : 'animate-pulse'}`}>
-              {!isRecorded && <div className="w-2 h-2 bg-white rounded-full animate-ping"></div>}
-              {isRecorded ? 'RECORDED' : 'LIVE'}
+      transition={{ duration: 0.45, ease: "easeOut" }}
+      className="group h-full">
+      <Link
+        href={`/courses/${slug}`}
+        className="flex h-full flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition duration-300 hover:-translate-y-1.5 hover:border-red-200 hover:shadow-[0_24px_48px_-24px_rgba(220,38,38,0.35)]">
+        {/* Image with live badge */}
+        <div className="relative aspect-[16/9] w-full overflow-hidden bg-zinc-100">
+          <Image
+            src={photoUrl}
+            alt={title}
+            fill
+            sizes="(min-width: 1024px) 400px, (min-width: 640px) 50vw, 100vw"
+            className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
+          />
+          <span
+            className={`absolute right-3 top-3 flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold tracking-wide text-white shadow-md ${
+              isRecorded ? "bg-blue-600" : "bg-red-600"
+            }`}>
+            {!isRecorded ? (
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white opacity-75" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-white" />
+              </span>
+            ) : null}
+            {isRecorded ? "RECORDED" : "LIVE"}
+          </span>
+        </div>
+
+        {/* Soft warm tint that fades in from white */}
+        <div className="flex flex-1 flex-col bg-gradient-to-b from-white via-white to-rose-50/70 p-4 transition-colors duration-300 group-hover:to-rose-50 sm:p-5">
+          <h3
+            title={title}
+            className="line-clamp-2 min-h-[2.75rem] text-[1.05rem] font-bold leading-snug text-zinc-900 transition-colors group-hover:text-red-600">
+            {title}
+          </h3>
+
+          {/* Duration, classes and projects on one line */}
+          {stats.length ? (
+            <p className="mt-2.5 flex flex-wrap items-center gap-x-3.5 gap-y-1 text-sm text-zinc-600">
+              {stats.map(({ icon: Icon, value }, i) => (
+                <span key={i} className="flex items-center gap-1.5 whitespace-nowrap">
+                  <Icon className="h-4 w-4 shrink-0 text-red-500" />
+                  {value}
+                </span>
+              ))}
+            </p>
+          ) : null}
+
+          {/* Software, always one row */}
+          {software.length ? (
+            <div className="mt-4 mb-4 flex items-center gap-1.5" aria-label="যে সফটওয়্যার শিখবেন">
+              {software.slice(0, MAX_SOFTWARE).map((s, idx) => (
+                <span
+                  key={idx}
+                  title={s.softwareTitle}
+                  className="flex h-9 w-14 shrink-0 items-center justify-center rounded-lg bg-white p-1 ring-1 ring-zinc-200">
+                  <Image src={s.photoUrl} alt={s.softwareTitle || ""} width={56} height={36} className="max-h-full w-auto object-contain" />
+                </span>
+              ))}
+              {extraSoftware > 0 ? (
+                <span
+                  title={software
+                    .slice(MAX_SOFTWARE)
+                    .map((s) => s.softwareTitle)
+                    .join(", ")}
+                  className="flex h-9 shrink-0 items-center rounded-lg bg-zinc-100 px-2.5 text-xs font-semibold text-zinc-600">
+                  +{extraSoftware.toLocaleString("bn-BD")}
+                </span>
+              ) : null}
             </div>
+          ) : null}
+
+          {/* Footer: details button */}
+          <div className="mt-auto border-t border-rose-100/80 pt-4">
+            <span className="flex items-center justify-between rounded-xl border border-red-200 bg-white py-1.5 pl-4 pr-1.5 text-sm font-semibold text-red-600 transition duration-300 group-hover:border-red-600 group-hover:bg-red-600 group-hover:text-white">
+              বিস্তারিত দেখুন
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-50 transition duration-300 group-hover:rotate-90 group-hover:bg-white/20">
+                <Plus className="h-4 w-4" />
+              </span>
+            </span>
           </div>
-
-          {/* 2. Content Section - We keep the padding here, where it's needed. */}
-          <div className="p-4 flex flex-col flex-grow">
-            {/* Course Title */}
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2 min-h-[56px]">
-              {title}
-            </h3>
-
-            {/* Course Stats */}
-            <div className="flex  gap-2 text-sm text-gray-600 dark:text-gray-400 mb-4">
-              <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-red-500" />
-                <span>{duration}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Book className="w-4 h-4 text-red-500" />
-                <span>{lessons} </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Settings className="w-4 h-4 text-red-500" />
-                <span>{projects} </span>
-              </div>
-            </div>
-            
-            <div className="flex-grow" />
-
-            {/* 3. Footer Section with Software and CTA */}
-            <div>
-              {softwaresTaught && softwaresTaught.length > 0 && (
-                <div className="mb-4">
-                  <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Tools You'll Learn</p>
-                  <div className="flex flex-wrap items-center gap-2 transition-transform duration-500 ease-in-out group-hover:scale-110">
-                    {softwaresTaught.slice(0, 5).map((software, idx) => (
-                      <Image
-                        key={idx}
-                        src={software.photoUrl}
-                        alt={software.softwareTitle || ''}
-                        width={600}
-                        height={600}
-                        className="rounded-full w-14 h-8 bg-gray-100 p-1 object-contain"
-                        title={software.softwareTitle}
-                      /> 
-
-
-                      
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <div
-                className="font-semibold text-red-500 flex items-center gap-1.5 transition-all duration-300 group-hover:gap-2.5"
-              >
-                বিস্তারিত দেখুন
-                <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
-              </div>
-            </div>
-          </div>
-        </Card>
+        </div>
       </Link>
     </motion.div>
   );

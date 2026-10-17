@@ -1,78 +1,61 @@
-// app/success-stories/SuccessVideoCard.tsx
-import { motion } from 'framer-motion';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/UI/card';
-import { Play, Eye, CalendarDays, Tag } from 'lucide-react'; // Added Tag icon for category
+import { CalendarDays, Eye, Play } from "lucide-react";
+import type { Video } from "./SuccessStoryVideo";
 
-export const VideoCard = ({ video }: { video: any }) => {
-  const handlePlayClick = () => {
-    if (video.videoUrl) {
-      window.open(video.videoUrl, '_blank', 'noopener,noreferrer');
-    }
-  };
+const FALLBACK_THUMBNAIL = "https://res.cloudinary.com/dalpf8iip/image/upload/v1748758084/sddefault_qicg3z.jpg";
 
-  return (
-    <Card className="h-full flex flex-col rounded-lg overflow-hidden border border-gray-200/70 shadow-md hover:shadow-lg transition-all duration-300 group bg-white">
-      <div className="relative overflow-hidden cursor-pointer" onClick={handlePlayClick}>
-        <img 
-          src={video.thumbnail} 
-          alt={`Thumbnail for ${video.title}`}
-          className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105" 
-          // Basic error handling for image loading
-          onError={(e) => (e.currentTarget.src = 'https://res.cloudinary.com/dalpf8iip/image/upload/v1748758084/sddefault_qicg3z.jpg')} // Add a placeholder image
-        />
-        
-        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <div className="bg-red-600/90 hover:bg-red-700 w-14 h-14 rounded-full flex items-center justify-center transition-all shadow-lg transform scale-90 group-hover:scale-100">
-            <Play className="text-white ml-1" size={26} />
-          </div>
-        </div>
+// Opens the video on YouTube in a new tab
+export const VideoCard = ({ video }: { video: Video }) => (
+  <a
+    href={video.videoUrl}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="group flex h-full flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition duration-300 hover:-translate-y-1 hover:border-red-200 hover:shadow-[0_20px_44px_-24px_rgba(220,38,38,0.35)]">
+    {/* Thumbnail */}
+    <span className="relative block aspect-video overflow-hidden bg-zinc-900">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={video.thumbnail}
+        alt=""
+        loading="lazy"
+        onError={(e) => (e.currentTarget.src = FALLBACK_THUMBNAIL)}
+        className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+      />
+      <span className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent transition group-hover:from-black/60" />
+      <span className="absolute inset-0 flex items-center justify-center">
+        <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white/90 text-red-600 shadow-lg backdrop-blur transition duration-300 group-hover:scale-110 group-hover:bg-red-600 group-hover:text-white">
+          <Play className="ml-0.5 h-6 w-6 fill-current" />
+        </span>
+      </span>
+      <span className="absolute left-3 top-3 rounded-full bg-white/95 px-2.5 py-0.5 text-xs font-semibold text-zinc-800 shadow-sm">
+        {video.category}
+      </span>
+      <span className="absolute bottom-3 right-3 rounded-md bg-black/75 px-2 py-0.5 text-xs font-medium tabular-nums text-white">
+        {video.duration}
+      </span>
+    </span>
 
-        <div className="absolute bottom-2 right-2 bg-black/75 text-white px-2.5 py-1 rounded text-xs font-medium shadow-md">
-          {video.duration}
-        </div>
-        
-        <div className="absolute top-2 left-2 bg-red-600 text-white px-2.5 py-1 rounded-full text-xs font-semibold shadow-md flex items-center">
-          <Tag size={12} className="mr-1" />
-          {video.category}
-        </div>
-      </div>
-
-      <CardHeader className="pb-2 pt-4 px-4">
-        <CardTitle 
-          className="text-md font-semibold text-gray-800 line-clamp-2 group-hover:text-red-600 transition-colors h-[2.8em]" // Adjusted height for 2 lines of text-md
-          title={video.title} // Show full title on hover
-        >
-          {video.title}
-        </CardTitle>
-      </CardHeader>
-
-      <CardContent className="pt-1 px-4 pb-4 flex-grow flex flex-col justify-between">
-        <div>
-          <div className="flex items-center mb-3">
-            <img 
-              src={video.avatar} 
-              alt={`Avatar of ${video.engineer}`}
-              className="w-9 h-9 rounded-full object-cover border-2 border-gray-100" 
-            //   onError={(e) => (e.currentTarget.src = '/images/placeholder-avatar.jpg')} // Add a placeholder avatar
-            />
-            <div className="ml-2.5">
-              <p className="font-medium text-gray-900 text-sm leading-tight">{video.engineer}</p>
-              <p className="text-xs text-gray-500 leading-tight">{video.company}</p>
-            </div>
-          </div>
-
-          <div className="flex items-center text-xs text-gray-500 space-x-3 mt-2">
-            <div className="flex items-center" title="Views">
-              <Eye size={13} className="mr-1 text-gray-400" />
-              <span>{video.views}</span>
-            </div>
-            <div className="flex items-center" title="Date">
-              <CalendarDays size={13} className="mr-1 text-gray-400" />
-              <span>{video.date}</span>
-            </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-};
+    {/* Details */}
+    <span className="flex flex-1 flex-col p-4">
+      <span title={video.title} className="mb-4 line-clamp-2 min-h-[2.75rem] font-semibold leading-snug text-zinc-900 transition-colors group-hover:text-red-600">
+        {video.title}
+      </span>
+      <span className="mt-auto flex items-center gap-2.5 border-t border-zinc-100 pt-3">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-red-50 text-sm font-bold text-red-600">
+          {video.engineer.charAt(0)}
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block truncate text-sm font-semibold text-zinc-900">{video.engineer}</span>
+          <span className="block truncate text-xs text-zinc-500">{video.company}</span>
+        </span>
+        <span className="flex shrink-0 flex-col items-end gap-0.5 text-[11px] text-zinc-500">
+          <span className="flex items-center gap-1">
+            <Eye className="h-3 w-3" /> {video.views}
+          </span>
+          <span className="flex items-center gap-1">
+            <CalendarDays className="h-3 w-3" /> {video.date}
+          </span>
+        </span>
+      </span>
+    </span>
+  </a>
+);

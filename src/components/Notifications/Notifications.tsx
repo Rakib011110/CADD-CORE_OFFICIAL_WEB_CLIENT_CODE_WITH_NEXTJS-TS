@@ -11,12 +11,9 @@ import {
 } from "@/components/UI/tooltip";
 import { useUser } from "@/context/user.provider";
 
-export default function Notifications() {
+export default function Notifications({ iconClassName }: { iconClassName?: string }) {
   const { data: response } = useGetAllApplicationsQuery();
   const applications = response?.data || [];
-const user= useUser() 
-console.log(user)
-
 
   // Filter only applications with 'applied' status
   const appliedApplications = applications.filter(
@@ -31,8 +28,8 @@ console.log(user)
         <TooltipTrigger asChild>
           <Link href="/dashboard/certificate-stutus">
             <div className="relative inline-block cursor-pointer">
-              <Bell className="w-6 h-6 text-blue-600" />
-              <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+              <Bell className={iconClassName || "w-5 h-5 text-white"} />
+              <span className="absolute -top-1.5 -right-1.5 bg-amber-400 text-zinc-950 text-[10px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center shadow">
                 {appliedApplications.length}
               </span>
             </div>

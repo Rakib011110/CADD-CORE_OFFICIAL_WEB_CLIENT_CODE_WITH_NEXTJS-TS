@@ -16,9 +16,12 @@ interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   defaultTab?: "login" | "register";
+  // Called after a successful login/register instead of reloading the page,
+  // so the caller can continue where the visitor left off (e.g. checkout).
+  onAuthenticated?: () => void;
 }
 
-export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: AuthModalProps) {
+export default function AuthModal({ isOpen, onClose, defaultTab = "login", onAuthenticated }: AuthModalProps) {
   const [activeTab, setActiveTab] = useState(defaultTab);
 
   // Reset to default tab when modal opens
@@ -29,6 +32,10 @@ export default function AuthModal({ isOpen, onClose, defaultTab = "login" }: Aut
   }, [isOpen, defaultTab]);
 
   const handleSuccess = () => {
+    if (onAuthenticated) {
+      onAuthenticated();
+      return;
+    }
     // Don't redirect - just close modal and refresh the page to update user state
     onClose();
     // Small delay to allow the modal to close before reloading

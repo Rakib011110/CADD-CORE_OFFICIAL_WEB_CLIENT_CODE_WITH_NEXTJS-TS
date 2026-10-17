@@ -1,177 +1,141 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Countdown from "@/components/UI/Countdown/Countdown";
-import LoadingSpinner from "@/components/UI/LoadingSpinner/LoadingSpinner";
+import HomeSection, { Highlight } from "@/components/Home/HomeSection";
+import { DEFAULT_SEMINAR_URL, seminarTimeBn, visibleSeminars } from "@/lib/seminarSchedule";
 import { TSeminar } from "@/lib/types/TSeminars";
 import { useGetAllSeminarQuery } from "@/redux/api/seminarApi";
-import { motion } from "framer-motion";
-import { ArrowRightIcon, CalendarDaysIcon, CalendarIcon, ClockIcon, MapPinIcon } from "lucide-react";
-import Link from "next/link";
-import React from "react";
+import { ArrowRight, CalendarDays, Clock, MapPin, Repeat } from "lucide-react";
 
-// Format ISO date (YYYY-MM-DD) to DD-MM-YYYY
-const formatDate = (isoDate: string) => {
-  if (!isoDate) return "";
-  const [year, month, day] = isoDate.split("-");
-  return `${day}-${month}-${year}`;
+const TZ = "Asia/Dhaka";
+const placeText = (place: string) => (/online|অনলাইন|zoom|meet/i.test(place) ? "অনলাইন" : place);
+const repeatText = (s: TSeminar) => {
+  if (s.repeat !== "weekly") return null;
+  const every = s.repeatEveryWeeks || 1;
+  return every === 1 ? "প্রতি সপ্তাহে" : `প্রতি ${every.toLocaleString("bn-BD")} সপ্তাহে`;
 };
 
+// Columns that fit the number of cards, so a row is never half empty
+const gridCols = (n: number) =>
+  n === 1 ? "mx-auto max-w-sm" : n === 2 ? "mx-auto max-w-3xl sm:grid-cols-2" : n === 3 ? "sm:grid-cols-2 lg:grid-cols-3" : "sm:grid-cols-2 xl:grid-cols-4";
 
-const formatTime = (timeStr: string) => {
-  if (!timeStr) return "";
-  const timeParts = timeStr.split(":");
-  // Get the hour and minute safely (handle missing values)
-  const hour = parseInt(timeParts[0] || "0", 10);
-  const minute = timeParts[1] ? parseInt(timeParts[1], 10) : 0;
-  const ampm = hour >= 12 ? "PM" : "AM";
-  const hour12 = hour % 12 || 12; // Convert 0 to 12 in 12-hour format
-  return `${hour12}:${minute.toString().padStart(2, "0")} ${ampm}`;
-};
+function SeminarCard({ seminar, onEnd }: { seminar: TSeminar; onEnd: () => void }) {
+  const start = new Date(seminar.nextStartsAt!);
+  const repeat = repeatText(seminar);
+  const date = (opts: Intl.DateTimeFormatOptions) => start.toLocaleDateString("bn-BD", { ...opts, timeZone: TZ });
+  const chip = "inline-flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1 ring-1 ring-white/15";
 
-// Calculate the number of days remaining from today's date to the seminar date
-const getRemainingTime = (isoDate: string) => {
-  if (!isoDate) return "";
+  return (
+    <article className="group relative flex h-full flex-col overflow-hidden rounded-3xl bg-white shadow-[0_1px_3px_rgba(0,0,0,0.06),0_16px_40px_-24px_rgba(0,0,0,0.35)] transition duration-300 hover:-translate-y-1.5 hover:shadow-[0_1px_3px_rgba(0,0,0,0.06),0_28px_50px_-24px_rgba(0,0,0,0.45)]">
+      {/* Ticket top: what and when */}
+      <div className="relative isolate flex flex-1 flex-col overflow-hidden bg-zinc-950 p-5 pb-7 text-white">
+        <span aria-hidden="true" className="absolute -right-14 -top-16 -z-10 h-48 w-48 rounded-full bg-red-600/40 blur-3xl transition duration-500 group-hover:bg-red-600/60" />
+        <span
+          aria-hidden="true"
+          className="absolute inset-0 -z-10 opacity-[0.06] [background-image:linear-gradient(white_1px,transparent_1px),linear-gradient(90deg,white_1px,transparent_1px)] [background-size:22px_22px]"
+        />
 
-  const seminarDate = new Date(isoDate);
-  const now = new Date();
+        <div className="flex items-center justify-between gap-2 text-[11px] font-semibold text-zinc-100">
+          {repeat ? (
+            <span className={chip}>
+              <Repeat className="h-3 w-3" /> {repeat}
+            </span>
+          ) : (
+            <span />
+          )}
+          <span className={chip}>
+            <MapPin className="h-3 w-3" /> {placeText(seminar.place)}
+          </span>
+        </div>
 
-  const diffMs = seminarDate.getTime() - now.getTime();
+        <h3 title={seminar.topic} className="mt-4 line-clamp-2 text-lg font-bold leading-[1.4] sm:h-[2.8em]">{seminar.topic}</h3>
 
-  if (diffMs <= 0) return "0"; // Seminar started or passed
+        <div className="mt-auto flex items-end gap-3 pt-5">
+          <span className="text-5xl font-bold leading-[0.85]">{date({ day: "numeric" })}</span>
+          <span className="text-sm leading-snug">
+            <span className="block font-semibold text-red-400">
+              {date({ month: "long" })} · {date({ weekday: "long" })}
+            </span>
+            <span className="flex items-center gap-1.5 text-zinc-300">
+              <Clock className="h-3.5 w-3.5" /> {seminarTimeBn(seminar.nextTime || seminar.time)}
+            </span>
+          </span>
+        </div>
+      </div>
 
-  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-  const diffHours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-
-  if (diffDays > 1) {
-    return `${diffDays} days`;
-  } else if (diffHours > 0) {
-    return `${diffHours} hours`;
-  } else if (diffMinutes > 0) {
-    return `${diffMinutes} minutes`;
-  } else {
-    return "0";
-  }
-};
+      {/* Ticket bottom: countdown and action. The notches use the section's background colour. */}
+      <div className="relative space-y-4 p-5">
+        <span aria-hidden="true" className="absolute -left-3 -top-3 h-6 w-6 rounded-full bg-zinc-50" />
+        <span aria-hidden="true" className="absolute -right-3 -top-3 h-6 w-6 rounded-full bg-zinc-50" />
+        <span aria-hidden="true" className="absolute inset-x-6 top-0 border-t-2 border-dashed border-zinc-200" />
+        <div className="pt-2">
+          <Countdown startsAt={seminar.nextStartsAt!} endsAt={seminar.nextEndsAt} onEnd={onEnd} />
+        </div>
+        <a
+          href={seminar.registrationUrl || DEFAULT_SEMINAR_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-600 py-3 font-semibold text-white transition hover:bg-red-700">
+          যোগ দিন <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
+        </a>
+      </div>
+    </article>
+  );
+}
 
 export default function SeminarSchedule() {
-  const { data: seminars, isLoading } = useGetAllSeminarQuery({});
-// Date formatting helpers
-const formatDay = (dateString: string) => {
-  return new Date(dateString).toLocaleDateString('bn-BD', { day: 'numeric' });
-};
+  // The API returns each seminar's next session; weekly seminars move to the
+  // following week automatically once a session is over.
+  const { data, isLoading, refetch } = useGetAllSeminarQuery({ upcoming: true });
 
-const formatMonthYear = (dateString: string) => {
-  return new Date(dateString).toLocaleDateString('bn-BD', { 
-    month: 'long', 
-    year: 'numeric' 
-  });
-};
+  // Re-check every 15s so the order stays current
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 15000);
+    return () => clearInterval(id);
+  }, []);
+
+  const seminars = visibleSeminars(data?.data || [], new Date(now));
+
   return (
- <motion.section 
-  id="seminar-time"
-  initial={{ opacity: 0 }}
-  animate={{ opacity: 1 }}
-  transition={{ duration: 0.6 }}
-  className="py-16 bg-gradient-to-b from-white to-red-50"
->
-  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div className="text-center mb-14">
-      <motion.h2 
-        initial={{ y: -20 }}
-        animate={{ y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="text-3xl md:text-4xl font-bold text-gray-900 mb-4"
-      >
-        ফ্রি/পেইড সেমিনারের <span className="text-red-600">সময়সূচী</span>
-      </motion.h2>
-      <div className="w-24 h-1 bg-gradient-to-r from-red-400 to-red-600 mx-auto rounded-full"></div>
-    </div>
-
-    {isLoading ? (
-      <div className="flex justify-center items-center h-64">
-        <LoadingSpinner  />
-      </div>
-    ) : (
-      <div className="grid gap-6">
-        {seminars?.data?.map((seminar: TSeminar, index: number) => (
-          <motion.div
-            key={index}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 + 0.3 }}
-            className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100 overflow-hidden"
-          >
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 p-6 items-center">
-              {/* Date Badge */}
-              <div className="md:col-span-2">
-                <div className="bg-gray-50 p-3 rounded-lg text-center border border-red-100">
-                  <div className="text-red-600 font-bold text-lg">
-                    {formatDay(seminar.date)}   {formatMonthYear(seminar.date)}
-                  </div>
-                  <div className="text-gray-700 text-sm">
-                    {/* {formatMonthYear(seminar.date)} */}
-                  </div>
-                  <div className="flex items-center justify-center mt-1 text-red-500">
-                    <ClockIcon className="w-4 h-4 mr-1" />
-                    <span className="text-sm">{formatTime(seminar.time)}</span>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Seminar Details */}
-              <div className="md:col-span-5">
-                <div className="flex items-start space-x-3">
-                  <div className="bg-red-100 p-2 rounded-lg mt-1">
-                    <CalendarIcon className="w-5 h-5 text-red-600" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-gray-900 mb-1">{seminar.topic}</h3>
-                    <div className="flex items-center text-gray-600">
-                      <MapPinIcon className="w-4 h-4 mr-1.5 text-red-400" />
-                      <span>{seminar.place}</span>
-                    </div>
-                    {seminar.type && (
-                      <span className={`inline-block mt-2 px-2 py-1 text-xs rounded-full 
-                        ${seminar.type === 'ফ্রি' ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'}`}>
-                        {seminar.type}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-              
-              {/* Countdown */}
-              <div className="md:col-span-3">
-                <div className="bg-gray-50 p-3 rounded-lg border  border-gray-200">
-                  <div className="text-xs font-medium text-gray-500 mb-1">শুরু হতে বাকি</div>
-                  <Countdown 
-                    date={seminar.date} 
-                    time={seminar.time}
-                  />
-                </div>
-              </div>
-              
-              {/* Join Button */}
-              <div className="md:col-span-2 flex justify-center">
-                <motion.button
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                  className="bg-[#F01A24] hover:bg-gray-900 text-white py-2.5 px-5 rounded-lg font-medium 
-                    flex items-center space-x-2 transition-colors duration-200 shadow-sm"
-                >
-                  <Link href="https://docs.google.com/forms/d/e/1FAIpQLScZysZu-d44Md-KbsIPXOX-wuoobxWbcBaXN04ITkgWYNR6Fw/viewform">যোগ দিন</Link>
-                  <ArrowRightIcon className="w-4 h-4" />
-                </motion.button>
-              </div>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-    )}
-  </div>
-</motion.section>
-
-
+    <HomeSection
+      id="seminar-time"
+      tone="muted"
+      eyebrow="আপকামিং সেমিনার"
+      title={
+        <>
+          ফ্রি/পেইড সেমিনারের <Highlight>সময়সূচী</Highlight>
+        </>
+      }
+      action={{ label: "রেজিস্ট্রেশন ফর্ম", href: DEFAULT_SEMINAR_URL, external: true }}
+      subtitle="">
+        {isLoading ? (
+          <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4" aria-busy="true">
+            {[0, 1, 2, 3].map((i) => (
+              <div key={i} className="h-[22rem] animate-pulse rounded-2xl bg-zinc-100" />
+            ))}
+          </div>
+        ) : seminars.length ? (
+          <div className={`grid gap-5 ${gridCols(seminars.length)}`}>
+            {seminars.map((s) => (
+              <SeminarCard key={`${s._id}-${s.nextStartsAt}`} seminar={s} onEnd={refetch} />
+            ))}
+          </div>
+        ) : (
+          <div className="mx-auto flex max-w-xl flex-col items-center rounded-2xl border border-dashed border-zinc-300 bg-white px-6 py-10 text-center">
+            <CalendarDays className="h-8 w-8 text-red-500" />
+            <p className="mt-3 font-semibold text-zinc-900">পরবর্তী সেমিনারের তারিখ শীঘ্রই ঘোষণা করা হবে</p>
+            <p className="mt-1 text-sm text-zinc-600">ফর্মটি পূরণ করে রাখুন, তারিখ ঠিক হলে আমরা আপনাকে জানিয়ে দেব।</p>
+            <a
+              href={DEFAULT_SEMINAR_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-5 inline-flex items-center gap-2 rounded-xl bg-red-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-red-700">
+              রেজিস্ট্রেশন করুন <ArrowRight className="h-4 w-4" />
+            </a>
+          </div>
+        )}
+    </HomeSection>
   );
 }

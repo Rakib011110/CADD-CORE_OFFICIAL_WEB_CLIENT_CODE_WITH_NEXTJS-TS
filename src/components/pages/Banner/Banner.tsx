@@ -143,7 +143,7 @@ export default function Banner() {
                   aria-label={`Go to slide ${dotIdx + 1}`}
                   className={`transition-all duration-300 rounded-full ${
                     dotIdx === currentIndex
-                      ? "w-8 h-2 bg-sky-500 shadow-md"
+                      ? "w-8 h-2 bg-red-600 shadow-md"
                       : "w-2 h-2 bg-white/60 hover:bg-white/90"
                   }`}
                 />

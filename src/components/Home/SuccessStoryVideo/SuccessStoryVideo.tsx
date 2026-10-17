@@ -1,16 +1,10 @@
-// app/success-stories/page.tsx
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import { Button } from '@/components/UI/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/UI/card'; // Removed CardDescription as it's not used directly here
-import { Play, Star, Eye, CalendarDays, ArrowRight, ArrowLeft, ChevronRight, Award, Lightbulb, Rocket, BarChart2 } from 'lucide-react';
-import { useRef, useEffect, useState } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { VideoCard } from './SuccessVideoCard';
-
-gsap.registerPlugin(ScrollTrigger);
+import { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
+import { ArrowLeft, ArrowRight, Quote, Rocket, Star } from "lucide-react";
+import { Highlight, SectionHeader } from "@/components/Home/HomeSection";
+import { VideoCard } from "./SuccessVideoCard";
 
 export interface Video {
   id: string;
@@ -110,389 +104,178 @@ const allVideosData: Video[] = [
 const filters = ["সব", "সিভিল", "আর্কিটেকচারাল", "মেকানিক্যাল", "ইলেকট্রিক্যাল", "বিম"];
 const VIDEOS_PER_PAGE = 3;
 
+const WHATSAPP_URL = "https://wa.me/8801611223631";
+
 export default function SuccessStoriesPageVideo() {
   const [activeFilter, setActiveFilter] = useState(filters[0]);
   const [currentPage, setCurrentPage] = useState(1);
-  
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const cardsWrapperRef = useRef<HTMLDivElement>(null); // Ref for the grid container of cards
-  const floatingRef = useRef<HTMLDivElement>(null);
-  
-  // This ref will store an array of individual card elements for GSAP
-  const cardElementsRef = useRef<(HTMLDivElement | null)[]>([]);
+  const gridRef = useRef<HTMLDivElement>(null);
 
-  // Filter videos based on selected category
-  const filteredVideos = activeFilter === "সব"
-    ? allVideosData
-    : allVideosData.filter(video => video.category === activeFilter);
-
-  // Pagination logic
-  const indexOfLastVideo = currentPage * VIDEOS_PER_PAGE;
-  const indexOfFirstVideo = indexOfLastVideo - VIDEOS_PER_PAGE;
-  const currentVideos = filteredVideos.slice(indexOfFirstVideo, indexOfLastVideo);
+  const filteredVideos =
+    activeFilter === "সব" ? allVideosData : allVideosData.filter((video) => video.category === activeFilter);
   const totalPages = Math.ceil(filteredVideos.length / VIDEOS_PER_PAGE);
+  const currentVideos = filteredVideos.slice((currentPage - 1) * VIDEOS_PER_PAGE, currentPage * VIDEOS_PER_PAGE);
 
-  // Reset to page 1 when filter changes
+  // Back to the first page when the filter changes
   useEffect(() => {
     setCurrentPage(1);
   }, [activeFilter]);
 
-  // GSAP Animations for static elements (run once on mount)
-  useEffect(() => {
-    gsap.fromTo(sectionRef.current,
-      { opacity: 0 },
-      { opacity: 1, duration: 0.8, scrollTrigger: { trigger: sectionRef.current, start: "top 85%" } }
-    );
-
-    if (floatingRef.current) {
-      const floatingElements = floatingRef.current.children;
-      gsap.to(floatingElements, {
-        y: 20, duration: 3, yoyo: true, repeat: -1, ease: "sine.inOut", stagger: { each: 0.2, from: "random" }
-      });
-    }
-    // Cleanup for these specific ScrollTriggers if sectionRef could be unmounted/remounted independently
-    // For a page component, the main unmount cleanup is usually sufficient.
-    return () => {
-        if(ScrollTrigger.getById("sectionIntro")) ScrollTrigger.getById("sectionIntro")?.kill();
-        // Add similar logic for floating elements if they have specific IDs
-    }
-  }, []);
-
-
-  // GSAP Animations for video cards (run when currentVideos changes)
-  useEffect(() => {
-    cardElementsRef.current = cardElementsRef.current.slice(0, currentVideos.length); // Keep refs only for current videos
-
-    const cards = cardElementsRef.current.filter(card => card !== null) as HTMLDivElement[];
-
-    cards.forEach((card, index) => {
-      gsap.set(card, { opacity: 0, y: 50 }); // Reset before animating
-      gsap.to(card, {
-        opacity: 1,
-        y: 0,
-        duration: 0.5,
-        delay: index * 0.1,
-        scrollTrigger: {
-          trigger: card,
-          start: "top 90%",
-          toggleActions: "play none none none",
-          // once: true // Optional: if animation should only play once
-        }
-      });
-    });
-
-    // Cleanup function for this effect
-    return () => {
-      cards.forEach(card => {
-        const triggers = ScrollTrigger.getAll().filter(st => st.trigger === card);
-        triggers.forEach(trigger => {
-          trigger.kill();
-        });
-      });
-    };
-  }, [currentVideos, currentPage]); // Depend on currentVideos and currentPage
-
-  const handlePageChange = (pageNumber: number) => {
-    setCurrentPage(pageNumber);
-    // Scroll to top of video section smoothly (optional)
-    cardsWrapperRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const goToPage = (page: number) => {
+    if (page < 1 || page > totalPages) return;
+    setCurrentPage(page);
+    gridRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   };
 
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      handlePageChange(currentPage + 1);
-    }
-  };
-
-  const handlePrevPage = () => {
-    if (currentPage > 1) {
-      handlePageChange(currentPage - 1);
-    }
-  };
-
-  // Generate page numbers for pagination controls
-  const pageNumbers = [];
-  for (let i = 1; i <= totalPages; i++) {
-    pageNumbers.push(i);
-  }
+  const pageButton = "flex h-10 w-10 items-center justify-center rounded-full text-sm font-semibold transition";
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-12 px-4 sm:px-6 relative overflow-hidden">
-     
-      <div className="absolute inset-0 bg-[url('https://static.vecteezy.com/system/resources/thumbnails/036/492/752/original/animated-grid-lines-red-background-for-your-designs-grid-background-4k-free-video.jpg')] bg-repeat opacity-[0.03] pointer-events-none"></div>
-      
-      <div className="max-w-6xl mx-auto relative z-10 mt-10" ref={sectionRef}>
-        {/* Animated Header */}
-        <motion.div 
-          className="text-center mb-16 relative" 
-          initial={{ opacity: 0, y: -20 }} 
-          animate={{ opacity: 1, y: 0 }} 
-          transition={{ duration: 0.5 }}
-        >
-          <motion.h1 
-            className="text-3xl md:text-4xl font-bold text-gray-900 mb-4" 
-            initial={{ opacity: 0 }} 
-            animate={{ opacity: 1 }} 
-            transition={{ delay: 0.2 }}
-          >
-            ক্যাড কোর <span className="text-[#F01A24]">সাফল্যের গল্প</span>
-          </motion.h1>
-          <motion.div 
-            className="h-1 w-24 bg-gradient-to-r from-[#F01A24] to-[#D4141E] mx-auto rounded-full mb-6" 
-            initial={{ width: 0 }} 
-            animate={{ width: 96 }} 
-            transition={{ delay: 0.4, duration: 0.8 }} 
-          />
-          <motion.p 
-            className="text-xl text-gray-600 max-w-3xl mx-auto" 
-            initial={{ opacity: 0 }} 
-            animate={{ opacity: 1 }} 
-            transition={{ delay: 0.6 }}
-          >
-            আমাদের ক্যাড কোর প্রশিক্ষণ কমিউনিটির যুগান্তকারী প্রকল্প এবং উদ্ভাবন আবিষ্কার করুন
-          </motion.p>
-          <motion.div 
-            className="mt-8 flex justify-center gap-4" 
-            initial={{ opacity: 0 }} 
-            animate={{ opacity: 1 }} 
-            transition={{ delay: 0.8 }}
-          >
-            <Button variant="outline" className="rounded-full border-[#F01A24] text-[#F01A24] hover:bg-[#F01A24]/10">
-              আলোচিত প্রকল্প
-            </Button>
-            <Button className="bg-[#F01A24] hover:bg-[#D4141E] rounded-full">
-              পুরস্কার বিজয়ী <Award className="ml-2 h-4 w-4" />
-            </Button>
-          </motion.div>
-        </motion.div>
+    <section id="success-stories" className="bg-zinc-50 py-12 sm:py-14">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <SectionHeader
+          eyebrow="শিক্ষার্থীদের কথা"
+          title={
+            <>
+              ক্যাড কোর <Highlight>সাফল্যের গল্প</Highlight>
+            </>
+          }
+          subtitle="আমাদের ক্যাড কোর প্রশিক্ষণ কমিউনিটির যুগান্তকারী প্রকল্প এবং উদ্ভাবন আবিষ্কার করুন"
+        />
 
-        {/* Video Section */}
-        <Card className="rounded-xl shadow-sm overflow-hidden border-0 bg-white relative z-10">
-          {/* Card Header with Filters */}
-          <div className="bg-gradient-to-r from-[#F01A24] to-[#D4141E] p-6 md:p-8 relative overflow-hidden">
-            <div className="absolute -top-20 -right-20 w-40 h-40 rounded-full bg-[#F01A24] opacity-20"></div>
-            <div className="absolute -bottom-20 -left-20 w-40 h-40 rounded-full bg-[#D4141E] opacity-20"></div>
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4 relative z-10">
-              <div>
-                <motion.h2 
-                  className="text-2xl md:text-3xl font-bold text-white" 
-                  initial={{ x: -20 }} 
-                  animate={{ x: 0 }} 
-                  transition={{ type: "spring", stiffness: 100 }}
-                >
-                  ক্যাড কোর প্রশিক্ষণার্থীদের সাফল্য
-                </motion.h2>
-                <motion.p 
-                  className="text-white mt-2" 
-                  initial={{ opacity: 0 }} 
-                  animate={{ opacity: 1 }} 
-                  transition={{ delay: 0.3 }}
-                >
-                  বাস্তব প্রকল্প, অসাধারণ অর্জন
-                </motion.p>
-              </div>
-              <div className="flex flex-wrap justify-center gap-2">
-                {filters.map((filter) => (
-                  <motion.div 
-                    key={filter} 
-                    initial={{ opacity: 0, y: 10 }} 
-                    animate={{ opacity: 1, y: 0 }} 
-                    transition={{ duration: 0.3 }} 
-                    whileHover={{ scale: 1.05 }}
-                  >
-                    <Button 
-                      onClick={() => setActiveFilter(filter)} 
-                      variant={filter === activeFilter ? "default" : "outline"} 
-                      className={`rounded-full font-medium px-4 py-2 text-sm md:text-base ${
-                        filter === activeFilter 
-                          ? "bg-white text-[#F01A24] hover:bg-[#F01A24]/10 shadow-md" 
-                          : "bg-transparent text-white hover:bg-white/20 border-white/50 hover:border-white"
-                      }`}
-                    >
-                      {filter}
-                    </Button>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
+        {/* Category filter */}
+        <div className="-mx-4 mb-6 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+          <div role="tablist" aria-label="বিভাগ" className="inline-flex gap-1 rounded-full bg-white p-1 ring-1 ring-zinc-200">
+            {filters.map((filter) => {
+              const active = filter === activeFilter;
+              return (
+                <button
+                  key={filter}
+                  type="button"
+                  role="tab"
+                  aria-selected={active}
+                  onClick={() => setActiveFilter(filter)}
+                  className={`whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition ${
+                    active ? "bg-zinc-900 text-white shadow-sm" : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
+                  }`}>
+                  {filter}
+                </button>
+              );
+            })}
           </div>
-          
-          <CardContent className="p-6 md:p-8">
-            {/* Video Grid */}
-            <div ref={cardsWrapperRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 min-h-[400px]">
+        </div>
+
+        {/* Videos */}
+        <div ref={gridRef} className="scroll-mt-24">
+          {currentVideos.length ? (
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {currentVideos.map((video, index) => (
                 <motion.div
                   key={video.id}
-                  ref={el => { cardElementsRef.current[index] = el; }}
-                  whileHover={{ y: -5 }}
-                  className="rounded-lg overflow-hidden"
-                >
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: index * 0.08 }}>
                   <VideoCard video={video} />
                 </motion.div>
               ))}
             </div>
-            
-            {filteredVideos.length === 0 && (
-              <div className="text-center py-12">
-                <div className="bg-gray-100 border-2 border-dashed border-gray-300 rounded-xl w-20 h-20 mx-auto mb-4 flex items-center justify-center">
-                  <Rocket size={32} className="text-gray-400" />
-                </div>
-                <h3 className="text-xl font-medium text-gray-700">কোনো প্রকল্প খুঁজে পাওয়া যায়নি</h3>
-                <p className="text-gray-500 mt-2">অনুগ্রহ করে অন্য একটি বিভাগ নির্বাচন করুন</p>
-              </div>
-            )}
-            
-            {currentVideos.length === 0 && filteredVideos.length > 0 && (
-              <div className="text-center py-12">
-                <div className="bg-gray-100 border-2 border-dashed border-gray-300 rounded-xl w-20 h-20 mx-auto mb-4 flex items-center justify-center">
-                  <Rocket size={32} className="text-gray-400" />
-                </div>
-                <h3 className="text-xl font-medium text-gray-700">এই পৃষ্ঠায় কোনো প্রকল্প নেই</h3>
-                <p className="text-gray-500 mt-2">অনুগ্রহ করে আগের পৃষ্ঠায় যান অথবা ফিল্টার পরিবর্তন করুন</p>
-              </div>
-            )}
-          </CardContent>
-          
-          {/* Pagination Controls */}
-          {totalPages > 1 && (
-            <div className="flex justify-center items-center gap-2 sm:gap-4 p-6 border-t border-gray-100">
-              <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-                <Button 
-                  variant="outline" 
-                  className="rounded-full w-10 h-10 sm:w-12 sm:h-12 border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                  onClick={handlePrevPage}
-                  disabled={currentPage === 1}
-                  aria-label="Previous Page"
-                >
-                  <ArrowLeft size={18} />
-                </Button>
-              </motion.div>
-              
-              {pageNumbers.map((number) => (
-                <motion.div key={number} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-                  <Button 
-                    variant={number === currentPage ? "default" : "outline"} 
-                    className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full font-medium ${
-                      number === currentPage 
-                        ? "bg-[#F01A24] hover:bg-[#D4141E] text-white" 
-                        : "hover:bg-[#F01A24]/10 border-gray-300"
-                    }`}
-                    onClick={() => handlePageChange(number)}
-                  >
-                    {number}
-                  </Button>
-                </motion.div>
-              ))}
-              
-              <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
-                <Button 
-                  variant="outline" 
-                  className="rounded-full w-10 h-10 sm:w-12 sm:h-12 border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                  onClick={handleNextPage}
-                  disabled={currentPage === totalPages}
-                  aria-label="Next Page"
-                >
-                  <ArrowRight size={18} />
-                </Button>
-              </motion.div>
+          ) : (
+            <div className="flex flex-col items-center rounded-2xl border border-dashed border-zinc-300 bg-white px-6 py-12 text-center">
+              <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-zinc-100 text-zinc-400">
+                <Rocket className="h-7 w-7" />
+              </span>
+              <p className="mt-4 font-semibold text-zinc-800">এই বিভাগে এখনো কোনো ভিডিও নেই</p>
+              <p className="mt-1 text-sm text-zinc-500">অনুগ্রহ করে অন্য একটি বিভাগ নির্বাচন করুন</p>
             </div>
           )}
-        </Card>
-        
-        {/* Testimonial Section */}
-        <motion.div 
-          className="bg-gradient-to-r from-[#F01A24] to-[#D4141E] rounded-2xl p-8 md:p-12 my-16 text-white shadow-xl overflow-hidden" 
-          initial={{ opacity: 0, y: 30 }} 
-          animate={{ opacity: 1, y: 0 }} 
-          transition={{ delay: 0.5, duration: 0.5 }}
-        >
-          <div className="max-w-4xl mx-auto">
-            <div className="flex flex-col md:flex-row items-center gap-8">
-              <div className="relative">
-                <img 
-                  src="https://res.cloudinary.com/dalpf8iip/image/upload/v1752395972/caddcoreuser_irg7qa.jpg" 
-                  alt="" 
-                  className="bg-gray-200 border-4  border-[#F01A24]/50 rounded-full    object-cover"
-                />
-                <div className="absolute -top-2 -right-2 bg-[#F01A24] text-white rounded-full p-2 shadow-lg">
-                  <Award className="h-6 w-6" />
-                </div>
-              </div>
+        </div>
+
+        {/* Pagination */}
+        {totalPages > 1 ? (
+          <nav aria-label="পৃষ্ঠা" className="mt-8 flex items-center justify-center gap-2">
+            <button
+              type="button"
+              onClick={() => goToPage(currentPage - 1)}
+              disabled={currentPage === 1}
+              aria-label="আগের পৃষ্ঠা"
+              className={`${pageButton} bg-white text-zinc-700 ring-1 ring-zinc-200 hover:ring-zinc-400 disabled:opacity-40`}>
+              <ArrowLeft className="h-4 w-4" />
+            </button>
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                type="button"
+                onClick={() => goToPage(page)}
+                aria-current={page === currentPage ? "page" : undefined}
+                className={`${pageButton} ${
+                  page === currentPage ? "bg-red-600 text-white shadow-sm" : "bg-white text-zinc-700 ring-1 ring-zinc-200 hover:ring-zinc-400"
+                }`}>
+                {page.toLocaleString("bn-BD")}
+              </button>
+            ))}
+            <button
+              type="button"
+              onClick={() => goToPage(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              aria-label="পরের পৃষ্ঠা"
+              className={`${pageButton} bg-white text-zinc-700 ring-1 ring-zinc-200 hover:ring-zinc-400 disabled:opacity-40`}>
+              <ArrowRight className="h-4 w-4" />
+            </button>
+          </nav>
+        ) : null}
+
+        {/* Testimonial and share your story */}
+        <div className="mt-10 grid gap-5 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
+          <figure className="relative isolate overflow-hidden rounded-3xl bg-zinc-950 p-6 text-white sm:p-8">
+            <span aria-hidden="true" className="absolute -right-20 -top-24 -z-10 h-72 w-72 rounded-full bg-red-600/30 blur-3xl" />
+            <Quote aria-hidden="true" className="absolute right-6 top-6 h-12 w-12 text-white/10" />
+            <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="https://res.cloudinary.com/dalpf8iip/image/upload/v1752395972/caddcoreuser_irg7qa.jpg"
+                alt=""
+                className="h-16 w-16 shrink-0 rounded-full object-cover ring-4 ring-white/10"
+              />
               <div>
-                <div className="flex mb-4">
-                  {[...Array(5)].map((_, i) => (
-                    <motion.div 
-                      key={i} 
-                      initial={{ scale: 0 }} 
-                      animate={{ scale: 1 }} 
-                      transition={{ delay: 0.6 + i * 0.1 }}
-                    >
-                      <Star className="fill-yellow-400 text-yellow-400 w-6 h-6 mx-0.5" />
-                    </motion.div>
+                <div className="mb-3 flex gap-0.5" aria-label="৫ এর মধ্যে ৫ রেটিং">
+                  {[0, 1, 2, 3, 4].map((i) => (
+                    <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />
                   ))}
                 </div>
-                
-                <motion.p 
-                  className="text-xl md:text-2xl italic mb-6" 
-                  initial={{ opacity: 0 }} 
-                  animate={{ opacity: 1 }} 
-                  transition={{ delay: 1 }}
-                >
-                  "CAD কোর্সটি করার পর আমি AutoCAD-এ confident হয়ে উঠি এবং নিজের একটি portfolio তৈরি করি। কোর্সের practical assignment আর real-life project guideline গুলো আমাকে industry-ready করে তোলে। এখন আমি একটি leading architectural firm-এ কাজ করছি — এ কোর্সটা আমার career-এর turning point ছিল!"
-                </motion.p>
-                
-                <motion.div 
-                  className="space-y-1" 
-                  initial={{ opacity: 0 }} 
-                  animate={{ opacity: 1 }} 
-                  transition={{ delay: 1.2 }}
-                >
-                  <p className="text-lg font-semibold">- সাবরিন হোসেন, Junior CAD Designer</p>
-                  <p className="text-gray-200">ArchiZone Ltd. | ২০২৩ Best Newcomer Award</p>
-                </motion.div>
+                <blockquote className="leading-relaxed text-zinc-100 sm:text-lg">
+                  &ldquo;CAD কোর্সটি করার পর আমি AutoCAD-এ confident হয়ে উঠি এবং নিজের একটি portfolio তৈরি করি। কোর্সের practical
+                  assignment আর real-life project guideline গুলো আমাকে industry-ready করে তোলে। এখন আমি একটি leading architectural
+                  firm-এ কাজ করছি — এ কোর্সটা আমার career-এর turning point ছিল!&rdquo;
+                </blockquote>
+                <figcaption className="mt-4 text-sm">
+                  <span className="font-semibold text-white">সাবরিন হোসেন, Junior CAD Designer</span>
+                  <span className="block text-zinc-400">ArchiZone Ltd. | ২০২৩ Best Newcomer Award</span>
+                </figcaption>
               </div>
             </div>
+          </figure>
+
+          <div className="flex flex-col justify-between gap-6 rounded-3xl border border-zinc-200 bg-white p-6 sm:p-8">
+            <div>
+              <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-red-50 text-red-600">
+                <Rocket className="h-6 w-6" />
+              </span>
+              <h3 className="mt-4 text-xl font-bold leading-snug text-zinc-900">আপনার ইঞ্জিনিয়ারিং সাফল্য শেয়ার করুন</h3>
+              <p className="mt-2 text-sm leading-relaxed text-zinc-600">
+                আপনার উদ্ভাবনী প্রকল্প এবং সমাধান প্রদর্শন করে পরবর্তী প্রজন্মের প্রকৌশলীদের অনুপ্রাণিত করুন
+              </p>
+            </div>
+            <a
+              href={WHATSAPP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-flex items-center justify-center gap-2 rounded-xl bg-zinc-900 px-5 py-3 font-semibold text-white transition hover:bg-red-600">
+              আপনার সাফল্য জমা দিন
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            </a>
           </div>
-        </motion.div>
-        
-        {/* CTA Section */}
-        <motion.div 
-          className="text-center my-16 relative" 
-          initial={{ opacity: 0 }} 
-          animate={{ opacity: 1 }} 
-          transition={{ delay: 0.7, duration: 0.5 }}
-        >
-          <div className="absolute -z-10 -inset-4">
-            <div className="absolute top-0 left-1/4 w-32 h-32 bg-[#F01A24] rounded-full filter blur-3xl opacity-20 animate-blob"></div>
-            <div className="absolute top-0 right-1/4 w-48 h-48 bg-[#D4141E] rounded-full filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
-            <div className="absolute bottom-0 left-1/3 w-40 h-40 bg-[#B8121B] rounded-full filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
-          </div>
-          <h3 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">আপনার ইঞ্জিনিয়ারিং সাফল্য শেয়ার করুন</h3>
-          <p className="text-gray-600 max-w-2xl mx-auto mb-8 text-lg">
-            আপনার উদ্ভাবনী প্রকল্প এবং সমাধান প্রদর্শন করে পরবর্তী প্রজন্মের প্রকৌশলীদের অনুপ্রাণিত করুন
-          </p>
-          <motion.div 
-            whileHover={{ scale: 1.05 }} 
-            whileTap={{ scale: 0.95 }} 
-            className="inline-block"
-          >
-            <Button 
-              className="bg-gradient-to-r from-[#F01A24] to-[#D4141E] hover:from-[#D4141E] hover:to-[#B8121B] text-white px-8 py-4 text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transition-all" 
-              size="lg"
-            >
-              আপনার সাফল্য জমা দিন <Rocket className="ml-3 h-5 w-5" />
-            </Button>
-          </motion.div>
-          <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4">
-            <Button variant="outline" className="border-[#F01A24] text-[#F01A24] hover:bg-[#F01A24]/10 rounded-full px-6 py-3">
-              একটি প্রকল্প মনোনয়ন করুন
-            </Button>
-            <Button variant="outline" className="border-[#F01A24] text-[#F01A24] hover:bg-[#F01A24]/10 rounded-full px-6 py-3">
-              জমা দেওয়ার নির্দেশিকা দেখুন
-            </Button>
-          </div>
-        </motion.div>
+        </div>
       </div>
-    </div>
+    </section>
   );
-}  
+}

@@ -158,7 +158,7 @@ export default function Footer() {
         </div>
       </div>
     </div>
-<div className=" mx-auto max-w-6xl ">
+<div className=" mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <Image 
             className="w-full mx-auto h-auto bg-black rounded-md"
               src="https://res.cloudinary.com/dalpf8iip/image/upload/v1753097013/0_c8xd5e.png"
@@ -167,7 +167,7 @@ export default function Footer() {
               alt="payment method"
             />
           </div>
-  <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center mt-8 text-gray-300 text-sm gap-2">
+  <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center mt-8 text-gray-300 text-sm gap-2">
         <p>© 2026 Caddcore. All rights reserved.</p>
         <p>Trade License:  000257</p>
         <p>V: 1.0.0</p>

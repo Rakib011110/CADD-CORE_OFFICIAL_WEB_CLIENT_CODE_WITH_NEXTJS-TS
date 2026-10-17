@@ -401,3 +401,61 @@
 
 
       
+/* Course page: grid that never leaves empty cells.
+   --c-xs / --c-sm / --c-xl are balanced column counts (set by <AutoGrid>); items in a
+   short last row grow to fill the width. */
+.auto-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ag-gap, 1rem);
+}
+.auto-grid > * {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 calc((100% - (var(--c-xs, 1) - 1) * var(--ag-gap, 1rem)) / var(--c-xs, 1));
+}
+.auto-grid > * > * {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+@media (min-width: 640px) {
+  .auto-grid > * {
+    flex-basis: calc((100% - (var(--c-sm, 2) - 1) * var(--ag-gap, 1rem)) / var(--c-sm, 2));
+  }
+}
+@media (min-width: 1280px) {
+  .auto-grid > * {
+    flex-basis: calc((100% - (var(--c-xl, 3) - 1) * var(--ag-gap, 1rem)) / var(--c-xl, 3));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-float,
+  .animate-float-delay,
+  .animate-float-delay-2 {
+    animation: none;
+  }
+}
+
+/* Course page: soft alternating background bands that run full width behind
+   each section (white → cool grey → white → warm rose). */
+.course-sections > section {
+  position: relative;
+  isolation: isolate;
+}
+.course-sections > section::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  left: -100vw;
+  right: -100vw;
+  z-index: -1;
+}
+.course-sections > section:nth-of-type(4n + 2)::before {
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+  border-block: 1px solid rgba(15, 23, 42, 0.05);
+}
+.course-sections > section:nth-of-type(4n)::before {
+  background: linear-gradient(180deg, #fff8f8 0%, #fff1f2 100%);
+  border-block: 1px solid rgba(225, 29, 72, 0.06);
+}

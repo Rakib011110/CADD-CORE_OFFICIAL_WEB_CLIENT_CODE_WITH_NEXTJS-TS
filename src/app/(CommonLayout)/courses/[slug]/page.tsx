@@ -1,180 +1,95 @@
-"use client";
-import BatchSchedule from "@/components/pages/CourseDetails/BatchSchedule/BatchSchedule";
-import CourseContentList from "@/components/pages/CourseDetails/CourseContent/CourseContent";
-import { CourseForWhom } from "@/components/pages/CourseDetails/CourseForWhom/CourseForWhom";
-import DetailsBannar from "@/components/pages/CourseDetails/DetailsBannar/DetailsBannar";
-import SoftwareTaught from "@/components/pages/CourseDetails/DetailsHeadNav/SoftwareTaught";
-import { FreelancingGuide } from "@/components/pages/CourseDetails/FreelancingGuide/FreelancingGuide";
-import MastercourseOverview from "@/components/pages/CourseDetails/MastercourseOverview/MastercourseOverview";
-import SupportAndTraining from "@/components/pages/CourseDetails/SupportAndTraining/SupportAndTraining";
-import LoadingSpinner from "@/components/UI/LoadingSpinner/LoadingSpinner";
-import { useGetCourseBySlugQuery } from "@/redux/api/courseApi";
-import { useParams } from "next/navigation";
-import ExpertPanel from "@/components/pages/CourseDetails/ExpertPanel/ExpartPanel";
-import FreeTrainingSessions from "@/components/pages/CourseDetails/FreeTrainingSessions/FreeTrainingSessions";
-import Certificate from "@/components/pages/CourseDetails/Certificate/Certificate";
-import WorkingProjects from "@/components/pages/CourseDetails/WorkingProject/WorkingProject";
-import OurCertificate from "@/components/pages/CourseDetails/Certificate/Ourcerticates";
-import CertificateVerification from "@/components/pages/StudentCornar/CertificateVerification/CertificateVerification";
-import useSmoothScroll from "@/hooks/useSmoothScroll";
+import type { Metadata } from "next";
+import CoursePageView from "@/components/pages/CourseDetails/CoursePage/CoursePageView";
+import { API_BASE_URL } from "@/lib/apiBase";
+import { TCourse } from "@/lib/courses";
 
-import CourseSchedule from "@/components/pages/CourseDetails/CourseSchedule/CourseSchedule";
-import RevitSection from "@/components/pages/CourseDetails/RevitSectionProps/RevitSectionProps"; // Corrected import path based on your snippet
-import CourseFees from "@/components/pages/CourseDetails/CourseFees/CourseFees";
-import OfflineBatchSchedule from "@/components/pages/CourseDetails/OflineBatchSchedule/OflineBatchSchedule";
-import OfflineBatchBIM from "@/components/pages/CourseDetails/OflineBatchSchedule/offlineBatchBIM";
-import OfflineBatchStructural from "@/components/pages/CourseDetails/OflineBatchSchedule/offlineBatchStructural ";
+const SITE_URL = "https://www.caddcore.net";
 
-export default function CourseDetails() {
-  useSmoothScroll();
+type PageProps = { params: Promise<{ slug: string }> };
 
-  const params = useParams();
-  const slug = params?.slug; // The slug from the URL
+// Fetched on the server so search engines and link previews get the course
+// name, description, price and batch dates. Refreshed every 5 minutes.
+async function getCourse(slug: string): Promise<TCourse | null> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/courses/${encodeURIComponent(slug)}`, {
+      next: { revalidate: 300 },
+    });
+    if (!res.ok) return null;
+    const json = await res.json();
+    return json?.data ?? null;
+  } catch {
+    return null;
+  }
+}
 
-  const {
-    data: course,
-    isError,
-    isLoading,
-  } = useGetCourseBySlugQuery(slug, {
-    skip: !slug,
-  });
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const course = await getCourse(slug);
+  if (!course) return { title: "Course | CADD CORE" };
 
-  if (isLoading)
-    return (
-      <div>
-        <LoadingSpinner />
-      </div>
-    );
+  const description = (course.overview?.overviewDescription || course.description || "").slice(0, 160);
+  const image = course.courseBanner || course.photoUrl;
+  return {
+    title: `${course.title} | CADD CORE`,
+    description,
+    alternates: { canonical: `${SITE_URL}/courses/${slug}` },
+    openGraph: {
+      title: course.title,
+      description,
+      url: `${SITE_URL}/courses/${slug}`,
+      type: "website",
+      images: image ? [{ url: image }] : undefined,
+    },
+  };
+}
 
-  if (isError) return <p>Error fetching course details.</p>;
+const COURSE_MODE: Record<string, string> = {
+  online: "online",
+  offline: "onsite",
+  weekend: "onsite",
+  corporate: "onsite",
+  "one-to-one": "onsite",
+};
 
-  // Define the specific slug for conditional rendering
-  const requiredSlug = "professional-architectural-bim-modeling-mastercourse";
-  const showRevitSection = slug === requiredSlug;
+export default async function CourseDetailsPage({ params }: PageProps) {
+  const { slug } = await params;
+  const course = await getCourse(slug);
 
-
-  // Define the specific slug for conditional rendering
-  const RCCrequiredSlug = "professional-autocad-mastercourse";
-  const RccshowRevitSection = slug === RCCrequiredSlug;
-
-
-  const AutocadRequiredSlug = "professional-autocad-mastercourse";
-  const showAutocadSection = slug === AutocadRequiredSlug;
-
-  const BimRequiredSlug = "professional-architectural-bim-modeling-mastercourse";
-  const showBimSection = slug === BimRequiredSlug;
-
-  const StructuralRequiredSlug = "rcc-building-structural-analysis-design-mastercourse";
-  const showStructuralSection = slug === StructuralRequiredSlug;
-
-  // Hide support section for Primavera P6 course
-  const hideSupportForPrimavera = slug === "project-management-primavera-p6";
-
-
-
-
+  // schema.org Course with one CourseInstance per upcoming batch
+  const jsonLd = course
+    ? {
+        "@context": "https://schema.org",
+        "@type": "Course",
+        name: course.title,
+        description: course.description,
+        url: `${SITE_URL}/courses/${slug}`,
+        provider: { "@type": "Organization", name: "CADD CORE Training Institute", url: SITE_URL },
+        ...(course.courseFee
+          ? { offers: { "@type": "Offer", price: course.courseFee, priceCurrency: "BDT", category: "Paid" } }
+          : {}),
+        ...(course.batches?.length
+          ? {
+              hasCourseInstance: course.batches.map((b) => ({
+                "@type": "CourseInstance",
+                courseMode: COURSE_MODE[b.mode] || "onsite",
+                ...(b.startDate ? { startDate: b.startDate.slice(0, 10) } : {}),
+                ...(b.location ? { location: b.location } : {}),
+                offers: { "@type": "Offer", price: b.fee, priceCurrency: "BDT" },
+              })),
+            }
+          : {}),
+      }
+    : null;
 
   return (
-    <div style={{ fontFamily: "banglaFont" }} className="font-serif bg-gradient-to-b from-[#fff7f8] to-white ">
-      {course?.data && (
+    <>
+      {jsonLd ? (
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Course",
-              "name": course.data.title,
-              "description": course.data.description,
-              "provider": {
-                "@type": "Organization",
-                "name": "CADD CORE Training Institute",
-                "url": "https://www.caddcore.net"
-              },
-              "offers": course.data.courseFee ? {
-                "@type": "Offer",
-                "price": course.data.courseFee,
-                "priceCurrency": "BDT",
-                "category": "Paid"
-              } : undefined
-            })
-          }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
         />
-      )}
-      
-      <DetailsBannar course={course?.data} />
-      <CourseFees course={course.data} />
-      <div
-        style={{ fontFamily: "banglaFont" }}
-        className="text-justify font-sans">
-        <BatchSchedule course={course?.data} />
-
-
-        <div>
-          <CourseSchedule course={course?.data} />
-        </div>
-
-  {showAutocadSection && <OfflineBatchSchedule />}
-  {showBimSection && <OfflineBatchBIM />}
-  {/* {showStructuralSection && <OfflineBatchStructural />} */}
-
-        <div className="" id="mastercourse-overview">
-          <MastercourseOverview course={course?.data} />
-        </div>
-
-        {/* <div className="">{RccshowRevitSection && <Roadmap />}</div> */}
-      </div>
-      <div id="course-content">
-        <CourseContentList course={course?.data} />
-      </div>
-      <div>
-        <div>
-          <WorkingProjects course={course?.data} />
-        </div>
-
-        {/* <div className="">{RccshowRevitSection && <ProjectShowcase />}</div> */}
-
-        {/* Conditional rendering for RevitSection */}
-        {showRevitSection && <RevitSection />}
-      </div>
-      <SoftwareTaught course={course?.data} />
-      <div>
-        <div id="freelancing-guide">
-          <FreelancingGuide />
-        </div>
-
-        <div id="target-audience">
-          <CourseForWhom />
-        </div>
-
-        
-        
-        {!hideSupportForPrimavera && (
-          <div id="student-support">
-            <SupportAndTraining />
-          </div>
-        )}
-
-
-
-
-        <div id="experienced-advisors">
-          <ExpertPanel course={course?.data} />
-        </div>
-        <div id="certificate-verification">
-          <OurCertificate course={course?.data} />
-        </div>
-        {/* <div className="mt-10">
-          <CertificateVerification />
-        </div> */}
-
-        <div id="certificate-verification">
-          <Certificate course={course?.data} />
-        </div>
-
-        <div id="free-resources">
-          <FreeTrainingSessions course={course?.data} />
-        </div>
-      </div>
-    </div>
+      ) : null}
+      <CoursePageView slug={slug} />
+    </>
   );
 }

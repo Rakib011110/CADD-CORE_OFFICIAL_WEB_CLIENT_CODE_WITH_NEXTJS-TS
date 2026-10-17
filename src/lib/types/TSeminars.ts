@@ -1,22 +1,24 @@
-export type  TSeminar ={
-    type: any;
-    topic: "",
-    place: "",
-    date: "",
-    time: "",
-    remainingDays: 0,
-  }
-  
-  interface FormData {
-    topic: string;
-    place: string;
-    date: string;
-    time: string;
-  }
-  
-  export interface UpdateSeminarsProps {
-    formData: FormData;
-    setFormData: React.Dispatch<React.SetStateAction<FormData>>;
-    setSelectedSeminar: React.Dispatch<React.SetStateAction<string | any>>;
-    handleUpdate: () => Promise<void>;
-  }
+export type TSeminarRepeat = "none" | "weekly";
+export type TSeminarStatus = "upcoming" | "live" | "ended";
+
+export type TSeminar = {
+  _id: string;
+  topic: string;
+  place: string;
+  // First session, Bangladesh time: "2026-10-10" and "21:00"
+  date: string;
+  time: string;
+  durationMinutes?: number;
+  repeat?: TSeminarRepeat;
+  repeatEveryWeeks?: number;
+  repeatUntil?: string | null;
+  skipDates?: string[];
+  registrationUrl?: string;
+  isActive?: boolean;
+  // Calculated by the API: the running session, or the next one
+  nextDate?: string;
+  nextTime?: string;
+  nextStartsAt?: string;
+  nextEndsAt?: string;
+  status?: TSeminarStatus;
+};
