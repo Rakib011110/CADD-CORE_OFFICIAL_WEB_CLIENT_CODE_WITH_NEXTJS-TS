@@ -6,6 +6,7 @@ import {
   batchDateText,
   batchStatusText,
   formatShortDateBn,
+  plansForBatch,
   priceSummary,
   taka,
 } from "../courseUtils";
@@ -54,7 +55,7 @@ export default function BatchesSection({ course, batches, plans, selectedBatch, 
       {batches.length ? (
         <div className="divide-y divide-zinc-200 overflow-hidden rounded-2xl border border-zinc-200 bg-white">
           {batches.map((b) => {
-            const { best } = priceSummary(b.fee, plans);
+            const { best } = priceSummary(b.fee, plansForBatch(b, plans));
             const active = b._id === selectedBatch?._id;
             const full = b.status === "full";
             return (

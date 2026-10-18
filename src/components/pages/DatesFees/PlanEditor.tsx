@@ -53,6 +53,10 @@ export const fromRow = (r: PlanRow): TPaymentPlan => {
   };
 };
 
+// Short label for lists, e.g. "Full −20%" or "2 installments"
+export const planLabel = (p: Pick<TPaymentPlan, "installments" | "discountPercent">) =>
+  `${p.installments > 1 ? `${p.installments} installments` : "Full"}${p.discountPercent ? ` −${p.discountPercent}%` : ""}`;
+
 /** Returns an error message, or null when the plans can be saved. */
 export const validatePlans = (rows: PlanRow[]) => {
   const names = rows.map((r) => r.name.trim().toLowerCase());

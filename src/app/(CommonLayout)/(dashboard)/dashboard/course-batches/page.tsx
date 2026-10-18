@@ -13,8 +13,10 @@ import {
 } from "@/redux/api/courseBatchApi";
 import { TBatchStatus, TCourseBatch, TDeliveryMode, TPaymentPlan } from "@/lib/courses";
 import { useGetInstallmentPlansQuery } from "@/redux/api/payment/useInstallmentPlansApi";
+import { priceForPlan, resolvePlans } from "@/components/pages/CourseDetails/CoursePage/courseUtils";
 import DefaultPlansPanel from "@/components/pages/DatesFees/DefaultPlansPanel";
 import CoursePricingDialog, { PricedCourse } from "@/components/pages/DatesFees/CoursePricingDialog";
+import PlanEditor, { PlanRow, fromRow, planLabel, toRow, validatePlans } from "@/components/pages/DatesFees/PlanEditor";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/UI/dialog";
 import { API_BASE_URL } from "@/lib/apiBase";
 
@@ -49,6 +51,9 @@ const emptyForm = {
   location: "",
   platform: "",
   fee: "",
+  // false = the course's plans apply; true = planRows are this batch's own plans
+  customPlans: false,
+  planRows: [] as PlanRow[],
   seatsTotal: "",
   seatsBooked: "",
   minParticipants: "",
@@ -66,6 +71,9 @@ const toInputDate = (v?: string | null) => (v ? new Date(v).toISOString().slice(
 const prettyDate = (v?: string | null) =>
   v ? new Date(v).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "—";
 const courseOf = (b: TCourseBatch) => (typeof b.course === "object" ? b.course : null);
+const taka = (n: number) => `৳${Math.round(n).toLocaleString("en-IN")}`;
+// Numbers the server creates by itself; only numbers typed by an admin are worth showing
+const AUTO_BATCH_NO = /^(ONLINE|OFFLINE|WEEKEND|CORPORATE|ONE-TO-ONE)-(\d{4}-\d{2}-\d{2}|ANYTIME|TBA)(-\d+)?$/;
 
 // Same visibility rule as the API: an upcoming batch stays on the website for
 // 14 days after it starts (admission open), unless it is set to running/full.
@@ -88,8 +96,65 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
   );
 }
 
+// One titled block of the batch form
+function FormSection({ step, title, children }: { step: number; title: string; children: React.ReactNode }) {
+  return (
+    <section className="space-y-3 py-5 first:pt-0">
+      <h3 className="flex items-center gap-2 text-sm font-semibold text-zinc-900">
+        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-zinc-900 text-[11px] font-bold text-white">{step}</span>
+        {title}
+      </h3>
+      {children}
+    </section>
+  );
+}
+
+const Pills = <T extends string | boolean>({
+  value,
+  options,
+  onChange,
+}: {
+  value: T;
+  options: readonly { value: T; label: string }[];
+  onChange: (v: T) => void;
+}) => (
+  <div className="inline-flex flex-wrap gap-1 rounded-lg bg-zinc-100 p-1">
+    {options.map((o) => (
+      <button
+        key={String(o.value)}
+        type="button"
+        onClick={() => onChange(o.value)}
+        className={`rounded-md px-3 py-1.5 text-sm font-medium transition ${
+          value === o.value ? "bg-white text-red-700 shadow-sm" : "text-zinc-600 hover:text-zinc-900"
+        }`}>
+        {o.label}
+      </button>
+    ))}
+  </div>
+);
+
+// Small chips with the plans a batch offers
+function PlanChips({ plans, own }: { plans: TPaymentPlan[]; own?: boolean }) {
+  if (!plans.length) return <span className="text-xs text-zinc-400">No plans</span>;
+  return (
+    <span className="flex flex-wrap gap-1">
+      {plans.map((p) => (
+        <span
+          key={p.name}
+          className={`rounded px-1.5 py-0.5 text-[11px] font-medium ${
+            p.discountPercent ? "bg-emerald-50 text-emerald-700" : "bg-zinc-100 text-zinc-600"
+          }`}>
+          {planLabel(p)}
+        </span>
+      ))}
+      {own ? <span className="rounded bg-sky-50 px-1.5 py-0.5 text-[11px] font-medium text-sky-700">Batch only</span> : null}
+    </span>
+  );
+}
+
 const inputCls =
   "w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/20";
+const iconBtn = "rounded-md p-1.5 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900";
 
 export default function CourseBatchesPage() {
   const { data: coursesRes } = useGetAllCourseQuery({});
@@ -113,6 +178,9 @@ export default function CourseBatchesPage() {
   const [pricingCourse, setPricingCourse] = useState<CourseOption | null>(null);
   const { data: plansRes } = useGetInstallmentPlansQuery({});
   const defaultPlans: TPaymentPlan[] = plansRes?.data || [];
+
+  // Plans a course gives its batches: its own plans, or the default plans
+  const coursePlans = (c?: CourseOption) => (c ? resolvePlans(c, defaultPlans) : []);
 
   // Links like ?course=<id> (from the course editor) open on that course
   useEffect(() => {
@@ -150,6 +218,8 @@ export default function CourseBatchesPage() {
   const coursesWithoutBatch = courses.filter((c) => !batches.some((b) => courseOf(b)?._id === c._id && isLive(b)));
 
   const set = <K extends keyof FormState>(key: K, value: FormState[K]) => setForm((f) => ({ ...f, [key]: value }));
+  const formCourse = courses.find((c) => c._id === form.course);
+  const formFee = Number(form.fee) || 0;
 
   const openCreate = (preset?: Partial<FormState>) => {
     setEditing(null);
@@ -168,7 +238,7 @@ export default function CourseBatchesPage() {
   const fromBatch = (b: TCourseBatch): FormState => ({
     course: courseOf(b)?._id || String(b.course),
     mode: b.mode,
-    batchNo: b.batchNo,
+    batchNo: AUTO_BATCH_NO.test(b.batchNo) ? "" : b.batchNo,
     startType: b.startAnytime ? "anytime" : b.startDate ? "date" : "tba",
     startDate: toInputDate(b.startDate),
     endDate: toInputDate(b.endDate),
@@ -178,6 +248,8 @@ export default function CourseBatchesPage() {
     location: b.location || "",
     platform: b.platform || "",
     fee: String(b.fee ?? ""),
+    customPlans: Boolean(b.paymentPlans?.length),
+    planRows: (b.paymentPlans || []).map((p) => toRow(p)),
     seatsTotal: b.seatsTotal != null ? String(b.seatsTotal) : "",
     seatsBooked: b.seatsBooked != null ? String(b.seatsBooked) : "",
     minParticipants: b.minParticipants != null ? String(b.minParticipants) : "",
@@ -196,7 +268,7 @@ export default function CourseBatchesPage() {
     setFormOpen(true);
   };
 
-  // Copy days, time, fee etc. into a new batch; dates and batch number are left for the admin
+  // Copy days, time, fee, plans etc. into a new batch; dates and batch number are left for the admin
   const duplicate = (b: TCourseBatch) => {
     openCreate({
       ...fromBatch(b),
@@ -213,18 +285,32 @@ export default function CourseBatchesPage() {
     });
   };
 
+  const setCustomPlans = (custom: boolean) =>
+    setForm((f) => ({
+      ...f,
+      customPlans: custom,
+      // Start from the course's plans so only the difference has to be typed
+      planRows: custom && !f.planRows.length ? coursePlans(formCourse).map((p) => toRow(p)) : f.planRows,
+    }));
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.course) return toast.error("Choose a course");
     if (form.startType === "date" && !form.startDate) return toast.error("Choose the start date, or pick Start anytime / Date to be announced");
     if (form.fee === "" || Number(form.fee) < 0) return toast.error("Enter the fee for this batch");
-    const { course, startType, ...rest } = form;
+    if (form.customPlans) {
+      if (!form.planRows.length) return toast.error("Add at least one plan, or choose Same as course");
+      const problem = validatePlans(form.planRows);
+      if (problem) return toast.error(problem);
+    }
+    const { course, startType, customPlans, planRows, ...rest } = form;
     const payload = {
       ...rest,
       batchNo: rest.batchNo.trim(),
       startAnytime: startType === "anytime",
       startDate: startType === "date" ? rest.startDate : "",
       fee: Number(form.fee),
+      paymentPlans: customPlans ? planRows.map(fromRow) : [],
     };
     try {
       if (editing) {
@@ -236,12 +322,14 @@ export default function CourseBatchesPage() {
       }
       setFormOpen(false);
     } catch (err) {
-      const e = err as { data?: { message?: string; errorSources?: { message: string }[] } };
+      const e = err as { status?: number; data?: { message?: string; errorSources?: { message: string }[] } };
       const duplicateKey = e.data?.message?.toLowerCase().includes("duplicate");
       toast.error(
-        duplicateKey
-          ? "This course already has a batch with this number and mode"
-          : e.data?.errorSources?.[0]?.message || e.data?.message || "Could not save the batch"
+        e.status === 401 || e.status === 403
+          ? "Your login has expired. Log in again and retry."
+          : duplicateKey
+            ? "This course already has a batch with this number and mode"
+            : e.data?.errorSources?.[0]?.message || e.data?.message || "Could not save the batch"
       );
     }
   };
@@ -257,6 +345,8 @@ export default function CourseBatchesPage() {
     }
   };
 
+  const inheritedPlans = coursePlans(formCourse);
+
   return (
     <div className="mx-auto max-w-7xl space-y-5 p-4 sm:p-6">
       <Toaster richColors position="top-center" />
@@ -264,11 +354,7 @@ export default function CourseBatchesPage() {
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-zinc-900">Dates, Fees &amp; Plans</h1>
-          <p className="mt-1 max-w-3xl text-sm text-zinc-500">
-            One place for everything students see about when a course starts and what it costs: the regular fee, payment
-            plans with discounts, and batches (online, offline, weekend, corporate, one to one). Changes show on the website
-            right away.
-          </p>
+          <p className="mt-1 text-sm text-zinc-500">Batches, fees and discounts for every course. Changes show on the website right away.</p>
         </div>
         <button
           type="button"
@@ -281,12 +367,11 @@ export default function CourseBatchesPage() {
       <DefaultPlansPanel exampleFee={10000} />
 
       {coursesWithoutBatch.length ? (
-        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-          <p className="font-semibold">
-            {coursesWithoutBatch.length} course{coursesWithoutBatch.length > 1 ? "s have" : " has"} no open batch on the
-            website
-          </p>
-          <p className="mt-0.5 text-amber-800">Visitors see &quot;date to be announced&quot; and the regular fee. Add a batch:</p>
+        <details className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-2.5 text-sm text-amber-900">
+          <summary className="cursor-pointer font-semibold">
+            {coursesWithoutBatch.length} course{coursesWithoutBatch.length > 1 ? "s have" : " has"} no open batch on the website
+          </summary>
+          <p className="mt-1 text-amber-800">Visitors see &quot;date to be announced&quot; and the regular fee. Add a batch:</p>
           <div className="mt-2 flex flex-wrap gap-1.5">
             {coursesWithoutBatch.map((c) => (
               <button
@@ -298,7 +383,7 @@ export default function CourseBatchesPage() {
               </button>
             ))}
           </div>
-        </div>
+        </details>
       ) : null}
 
       {/* Filters */}
@@ -309,7 +394,7 @@ export default function CourseBatchesPage() {
             id="batch-search"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search course, batch number, days, location"
+            placeholder="Search course, days, location"
             className={`${inputCls} pl-9`}
           />
         </div>
@@ -357,45 +442,41 @@ export default function CourseBatchesPage() {
       ) : (
         <div className="space-y-4">
           {courseGroups.map(({ course: c, rows }) => {
-            const ownPlans = (c.paymentPlans || []).filter((p) => p.isActive !== false);
-            const planText = ownPlans.length
-              ? `Custom plans: ${ownPlans.map((p) => `${p.name}${p.discountPercent ? ` −${p.discountPercent}%` : ""}`).join(", ")}`
-              : "Default plans";
+            const cPlans = coursePlans(c);
+            const ownCoursePlans = Boolean(c.paymentPlans?.length);
             return (
               <section key={c._id} className="overflow-hidden rounded-xl border border-zinc-200 bg-white">
                 <header className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-zinc-100 bg-zinc-50/70 px-4 py-3">
                   <div className="min-w-0 flex-1">
-                    <p className="truncate font-semibold text-zinc-900">{c.title}</p>
-                    <p className="mt-0.5 flex flex-wrap gap-x-3 text-xs text-zinc-500">
-                      <span>{c.courseType === "one-to-one" ? "One to one" : "Regular course"}</span>
-                      <span className="font-medium text-zinc-700">
-                        Fee {c.courseFee ? `৳${c.courseFee.toLocaleString("en-IN")}` : "not set"}
-                      </span>
-                      <span className={ownPlans.length ? "text-sky-700" : ""}>{planText}</span>
+                    <p className="flex items-center gap-2 font-semibold text-zinc-900">
+                      <span className="truncate">{c.title}</span>
+                      {c.slug ? (
+                        <Link href={`/courses/${c.slug}`} target="_blank" title="View course page" className="shrink-0 text-zinc-400 hover:text-zinc-900">
+                          <ExternalLink className="h-3.5 w-3.5" />
+                        </Link>
+                      ) : null}
                     </p>
+                    <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-zinc-500">
+                      <span>{c.courseType === "one-to-one" ? "One to one" : "Regular course"}</span>
+                      <span className="font-medium text-zinc-700">Fee {c.courseFee ? taka(c.courseFee) : "not set"}</span>
+                      <span className="flex items-center gap-1.5">
+                        {ownCoursePlans ? "Course plans:" : "Default plans:"} <PlanChips plans={cPlans} />
+                      </span>
+                    </div>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <button
                       type="button"
                       onClick={() => setPricingCourse(c)}
                       className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium text-zinc-800 hover:border-zinc-400">
-                      <Wallet className="h-4 w-4" /> Fee &amp; plans
+                      <Wallet className="h-4 w-4" /> Course fee &amp; plans
                     </button>
                     <button
                       type="button"
                       onClick={() => openCreate({ course: c._id })}
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium text-zinc-800 hover:border-zinc-400">
-                      <CalendarPlus className="h-4 w-4" /> Batch
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-700">
+                      <CalendarPlus className="h-4 w-4" /> Add batch
                     </button>
-                    {c.slug ? (
-                      <Link
-                        href={`/courses/${c.slug}`}
-                        target="_blank"
-                        title="View course page"
-                        className="rounded-md p-1.5 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900">
-                        <ExternalLink className="h-4 w-4" />
-                      </Link>
-                    ) : null}
                   </div>
                 </header>
 
@@ -404,11 +485,9 @@ export default function CourseBatchesPage() {
                     <table className="w-full min-w-[820px] text-sm">
                       <thead className="text-left text-[11px] uppercase tracking-wide text-zinc-500">
                         <tr>
-                          <th className="px-4 py-2 font-medium">Mode</th>
-                          <th className="px-4 py-2 font-medium">Start</th>
+                          <th className="px-4 py-2 font-medium">Batch</th>
                           <th className="px-4 py-2 font-medium">Days &amp; time</th>
-                          <th className="px-4 py-2 text-right font-medium">Fee</th>
-                          <th className="px-4 py-2 font-medium">Seats</th>
+                          <th className="px-4 py-2 font-medium">Fee &amp; plans</th>
                           <th className="px-4 py-2 font-medium">Status</th>
                           <th className="px-4 py-2 text-right font-medium">Actions</th>
                         </tr>
@@ -417,35 +496,46 @@ export default function CourseBatchesPage() {
                         {rows.map((b) => {
                           const status = STATUSES.find((s) => s.value === b.status);
                           const live = isLive(b);
+                          const own = Boolean(b.paymentPlans?.length);
+                          const plans = own ? (b.paymentPlans || []).filter((p) => p.isActive !== false) : cPlans;
                           return (
-                            <tr key={b._id} className={live ? "" : "bg-zinc-50/60 text-zinc-500"}>
-                              <td className="px-4 py-2.5">
-                                <span className="block font-medium text-zinc-900">{MODES.find((m) => m.value === b.mode)?.label}</span>
-                                <span className="text-xs text-zinc-500">#{b.batchNo}</span>
+                            <tr key={b._id} className={live ? "align-top" : "bg-zinc-50/60 align-top text-zinc-500"}>
+                              <td className="px-4 py-3">
+                                <span className="block font-medium text-zinc-900">
+                                  {MODES.find((m) => m.value === b.mode)?.label}
+                                  {!AUTO_BATCH_NO.test(b.batchNo) ? <span className="ml-1.5 text-xs font-normal text-zinc-400">#{b.batchNo}</span> : null}
+                                </span>
+                                <span className="text-xs text-zinc-500">
+                                  {b.startAnytime ? (
+                                    <span className="font-medium text-sky-700">Start anytime</span>
+                                  ) : b.startDate ? (
+                                    `Starts ${prettyDate(b.startDate)}`
+                                  ) : (
+                                    "Date to be announced"
+                                  )}
+                                </span>
                               </td>
-                              <td className="whitespace-nowrap px-4 py-2.5">
-                                {b.startAnytime ? (
-                                  <span className="font-medium text-sky-700">Start anytime</span>
-                                ) : b.startDate ? (
-                                  prettyDate(b.startDate)
-                                ) : (
-                                  <span className="text-zinc-500">To be announced</span>
-                                )}
-                              </td>
-                              <td className="max-w-[220px] px-4 py-2.5">
+                              <td className="max-w-[220px] px-4 py-3">
                                 <span className="block truncate">{b.classDays || "—"}</span>
                                 <span className="block truncate text-xs text-zinc-500">{b.classTime}</span>
                               </td>
-                              <td className="whitespace-nowrap px-4 py-2.5 text-right font-medium tabular-nums">৳{b.fee?.toLocaleString("en-IN")}</td>
-                              <td className="whitespace-nowrap px-4 py-2.5 tabular-nums">{b.seatsTotal ? `${b.seatsBooked || 0} / ${b.seatsTotal}` : "—"}</td>
-                              <td className="px-4 py-2.5">
+                              <td className="px-4 py-3">
+                                <span className="block font-semibold tabular-nums text-zinc-900">{taka(b.fee || 0)}</span>
+                                <span className="mt-1 block">
+                                  <PlanChips plans={plans} own={own} />
+                                </span>
+                              </td>
+                              <td className="px-4 py-3">
                                 <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${status?.className}`}>
                                   {status?.label.split(" (")[0]}
                                 </span>
                                 {!b.isPublished ? <span className="ml-1.5 text-xs text-zinc-500">Draft</span> : null}
-                                {live ? <span className="mt-0.5 block text-[11px] text-emerald-700">On website</span> : null}
+                                <span className="mt-0.5 block text-[11px] text-zinc-500">
+                                  {live ? <span className="text-emerald-700">On website</span> : "Hidden"}
+                                  {b.seatsTotal ? ` · ${b.seatsBooked || 0}/${b.seatsTotal} seats` : ""}
+                                </span>
                               </td>
-                              <td className="whitespace-nowrap px-4 py-2.5 text-right">
+                              <td className="whitespace-nowrap px-4 py-3 text-right">
                                 {confirmDelete === b._id ? (
                                   <span className="inline-flex items-center gap-2">
                                     <span className="text-xs text-zinc-600">Delete?</span>
@@ -458,11 +548,11 @@ export default function CourseBatchesPage() {
                                   </span>
                                 ) : (
                                   <span className="inline-flex items-center gap-1">
-                                    <button type="button" onClick={() => duplicate(b)} title="Duplicate as new batch" className="rounded-md p-1.5 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900">
-                                      <Copy className="h-4 w-4" />
-                                    </button>
-                                    <button type="button" onClick={() => openEdit(b)} title="Edit" className="rounded-md p-1.5 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900">
+                                    <button type="button" onClick={() => openEdit(b)} title="Edit" className={iconBtn}>
                                       <Pencil className="h-4 w-4" />
+                                    </button>
+                                    <button type="button" onClick={() => duplicate(b)} title="Duplicate as new batch" className={iconBtn}>
+                                      <Copy className="h-4 w-4" />
                                     </button>
                                     <button type="button" onClick={() => setConfirmDelete(b._id)} title="Delete" className="rounded-md p-1.5 text-zinc-500 hover:bg-red-50 hover:text-red-600">
                                       <Trash2 className="h-4 w-4" />
@@ -494,154 +584,216 @@ export default function CourseBatchesPage() {
 
       {/* Create / edit form */}
       <Dialog open={formOpen} onOpenChange={setFormOpen}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto bg-white sm:max-w-2xl">
+        <DialogContent className="max-h-[90vh] overflow-y-auto bg-white sm:max-w-3xl">
           <DialogHeader>
             <DialogTitle>{editing ? "Edit batch" : "Add batch"}</DialogTitle>
-            <DialogDescription>
-              The fee is the regular fee. Payment-plan discounts (e.g. full payment) are applied on top automatically.
-            </DialogDescription>
+            <DialogDescription>{formCourse?.title || "Choose the course, when it starts, and what it costs."}</DialogDescription>
           </DialogHeader>
-          <form onSubmit={submit} className="space-y-5">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="sm:col-span-2">
-                <Field label="Course">
-                  <select
-                    id="batch-form-course"
-                    value={form.course}
-                    disabled={!!editing}
-                    onChange={(e) => {
-                      const c = courses.find((x) => x._id === e.target.value);
-                      setForm((f) => ({ ...f, course: e.target.value, fee: f.fee || (c?.courseFee ? String(c.courseFee) : "") }));
-                    }}
-                    className={inputCls}
-                    required>
-                    <option value="">Choose a course</option>
-                    {courses.map((c) => (
-                      <option key={c._id} value={c._id}>
-                        {c.title}
-                      </option>
-                    ))}
-                  </select>
-                </Field>
-              </div>
-              <Field label="Mode">
-                <select id="batch-form-mode" value={form.mode} onChange={(e) => set("mode", e.target.value as TDeliveryMode)} className={inputCls}>
-                  {MODES.map((m) => (
-                    <option key={m.value} value={m.value}>
-                      {m.label}
-                    </option>
-                  ))}
-                </select>
-              </Field>
-              <Field label="Batch number (optional)" hint="Leave empty and it is created automatically">
-                <input id="batch-form-no" value={form.batchNo} onChange={(e) => set("batchNo", e.target.value)} placeholder="e.g. OFFLINE-2026-11" className={inputCls} />
-              </Field>
-              <div className="sm:col-span-2">
-                <span className="mb-1 block text-sm font-medium text-zinc-700">When does it start?</span>
-                <div className="flex flex-wrap items-center gap-2">
-                  {(
-                    [
-                      { value: "date", label: "Fixed date" },
-                      { value: "anytime", label: "Start anytime" },
-                      { value: "tba", label: "Date to be announced" },
-                    ] as const
-                  ).map((o) => (
-                    <button
-                      key={o.value}
-                      type="button"
-                      onClick={() => set("startType", o.value)}
-                      className={`rounded-full border px-3 py-1.5 text-sm font-medium ${
-                        form.startType === o.value ? "border-red-600 bg-red-50 text-red-700" : "border-zinc-300 text-zinc-600 hover:bg-zinc-50"
-                      }`}>
-                      {o.label}
-                    </button>
-                  ))}
-                  {form.startType === "date" ? (
-                    <input id="batch-form-start" type="date" aria-label="Start date" value={form.startDate} onChange={(e) => set("startDate", e.target.value)} className={`${inputCls} w-auto`} />
+          <form onSubmit={submit}>
+            <div className="divide-y divide-zinc-100">
+              <FormSection step={1} title="Batch">
+                <div className="grid gap-4 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+                  <Field label="Course">
+                    <select
+                      id="batch-form-course"
+                      value={form.course}
+                      disabled={!!editing}
+                      onChange={(e) => {
+                        const c = courses.find((x) => x._id === e.target.value);
+                        setForm((f) => ({ ...f, course: e.target.value, fee: f.fee || (c?.courseFee ? String(c.courseFee) : "") }));
+                      }}
+                      className={`${inputCls} disabled:bg-zinc-50 disabled:text-zinc-600`}
+                      required>
+                      <option value="">Choose a course</option>
+                      {courses.map((c) => (
+                        <option key={c._id} value={c._id}>
+                          {c.title}
+                        </option>
+                      ))}
+                    </select>
+                  </Field>
+                  <Field label="Mode">
+                    <select id="batch-form-mode" value={form.mode} onChange={(e) => set("mode", e.target.value as TDeliveryMode)} className={inputCls}>
+                      {MODES.map((m) => (
+                        <option key={m.value} value={m.value}>
+                          {m.label}
+                        </option>
+                      ))}
+                    </select>
+                  </Field>
+                </div>
+                <div>
+                  <span className="mb-1 block text-sm font-medium text-zinc-700">Start</span>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Pills
+                      value={form.startType}
+                      onChange={(v) => set("startType", v)}
+                      options={[
+                        { value: "date", label: "Fixed date" },
+                        { value: "anytime", label: "Start anytime" },
+                        { value: "tba", label: "To be announced" },
+                      ]}
+                    />
+                    {form.startType === "date" ? (
+                      <input id="batch-form-start" type="date" aria-label="Start date" value={form.startDate} onChange={(e) => set("startDate", e.target.value)} className={`${inputCls} w-auto`} />
+                    ) : null}
+                  </div>
+                  <span className="mt-1 block text-xs text-zinc-500">
+                    {form.startType === "anytime"
+                      ? "Students see “যেকোনো সময় শুরু করা যাবে” and can enrol any day. The batch stays open until you close it."
+                      : form.startType === "tba"
+                        ? form.mode === "corporate"
+                          ? "Students see “আপনার সুবিধামতো সময়ে”."
+                          : "Students see “তারিখ শীঘ্রই ঘোষণা করা হবে” and can still enrol."
+                        : "Admission stays open for 14 days after the start date."}
+                  </span>
+                </div>
+              </FormSection>
+
+              <FormSection step={2} title="Class schedule">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Field label="Class days" hint="As students see it, e.g. শনিবার ও মঙ্গলবার">
+                    <input id="batch-form-days" value={form.classDays} onChange={(e) => set("classDays", e.target.value)} className={inputCls} />
+                  </Field>
+                  <Field label="Class time" hint="e.g. সন্ধ্যা ৬টা - রাত ৮টা">
+                    <input id="batch-form-time" value={form.classTime} onChange={(e) => set("classTime", e.target.value)} className={inputCls} />
+                  </Field>
+                  {form.mode === "online" ? (
+                    <Field label="Platform" hint="e.g. Zoom, Google Meet">
+                      <input id="batch-form-platform" value={form.platform} onChange={(e) => set("platform", e.target.value)} className={inputCls} />
+                    </Field>
+                  ) : (
+                    <Field label="Location" hint="Campus or branch address">
+                      <input id="batch-form-location" value={form.location} onChange={(e) => set("location", e.target.value)} className={inputCls} />
+                    </Field>
+                  )}
+                  <Field label="Registration deadline" hint="Optional">
+                    <input id="batch-form-deadline" type="date" value={form.registrationDeadline} onChange={(e) => set("registrationDeadline", e.target.value)} className={inputCls} />
+                  </Field>
+                </div>
+              </FormSection>
+
+              <FormSection step={3} title="Fee & payment plans">
+                <div className="flex flex-wrap items-end gap-4">
+                  <div className="w-40">
+                    <Field label="Fee (৳)">
+                      <input id="batch-form-fee" type="number" min={0} value={form.fee} onChange={(e) => set("fee", e.target.value)} className={inputCls} required />
+                    </Field>
+                  </div>
+                  <div>
+                    <span className="mb-1 block text-sm font-medium text-zinc-700">Plans &amp; discount</span>
+                    <Pills
+                      value={form.customPlans}
+                      onChange={setCustomPlans}
+                      options={[
+                        { value: false, label: "Same as course" },
+                        { value: true, label: "Own plans for this batch" },
+                      ]}
+                    />
+                  </div>
+                </div>
+
+                {form.customPlans ? (
+                  <>
+                    <p className="text-xs text-zinc-500">
+                      Only this batch uses these plans. Set discount 0 for no discount, or remove a plan to hide it.
+                    </p>
+                    <PlanEditor rows={form.planRows} onChange={(rows) => set("planRows", rows)} previewFee={formFee || undefined} />
+                  </>
+                ) : (
+                  <div className="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2.5 text-sm">
+                    {inheritedPlans.length ? (
+                      <ul className="space-y-1">
+                        {inheritedPlans.map((p) => {
+                          const price = formFee ? priceForPlan(formFee, p) : null;
+                          return (
+                            <li key={p.name} className="flex flex-wrap justify-between gap-x-3">
+                              <span className="font-medium text-zinc-800">
+                                {p.name}
+                                {p.discountPercent ? <span className="text-emerald-700"> −{p.discountPercent}%</span> : null}
+                              </span>
+                              {price ? (
+                                <span className="text-zinc-500">
+                                  {taka(price.payNow)} now
+                                  {price.laterInstallments ? ` + ${price.laterInstallments} × ${taka(price.perLaterInstallment)}` : ""}
+                                  {" · "}total {taka(price.total)}
+                                </span>
+                              ) : null}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    ) : (
+                      <p className="text-zinc-500">{form.course ? "This course has no plans yet." : "Choose a course to see its plans."}</p>
+                    )}
+                    <p className="mt-2 text-xs text-zinc-500">
+                      From {formCourse?.paymentPlans?.length ? "the course's own plans" : "the default plans"}. Choose “Own plans for this batch” to give
+                      this batch a different discount.
+                    </p>
+                  </div>
+                )}
+              </FormSection>
+
+              <FormSection step={4} title="Seats & status">
+                <div className="grid gap-4 sm:grid-cols-3">
+                  <Field label="Status">
+                    <select id="batch-form-status" value={form.status} onChange={(e) => set("status", e.target.value as TBatchStatus)} className={inputCls}>
+                      {STATUSES.map((s) => (
+                        <option key={s.value} value={s.value}>
+                          {s.label}
+                        </option>
+                      ))}
+                    </select>
+                  </Field>
+                  <Field label="Total seats" hint="Empty = no limit">
+                    <input id="batch-form-seats" type="number" min={0} value={form.seatsTotal} onChange={(e) => set("seatsTotal", e.target.value)} className={inputCls} />
+                  </Field>
+                  {editing ? (
+                    <Field label="Seats booked" hint="Goes up after each online payment">
+                      <input id="batch-form-booked" type="number" min={0} value={form.seatsBooked} onChange={(e) => set("seatsBooked", e.target.value)} className={inputCls} />
+                    </Field>
+                  ) : null}
+                  {form.mode === "corporate" ? (
+                    <Field label="Minimum participants">
+                      <input id="batch-form-min" type="number" min={0} value={form.minParticipants} onChange={(e) => set("minParticipants", e.target.value)} className={inputCls} />
+                    </Field>
                   ) : null}
                 </div>
-                <span className="mt-1 block text-xs text-zinc-500">
-                  {form.startType === "anytime"
-                    ? "Students see “যেকোনো সময় শুরু করা যাবে” and can enrol any day. The batch stays open until you close it."
-                    : form.startType === "tba"
-                      ? form.mode === "corporate"
-                        ? "Students see “আপনার সুবিধামতো সময়ে”."
-                        : "Students see “তারিখ শীঘ্রই ঘোষণা করা হবে” and can still enrol."
-                      : "Upcoming batches stay open for 14 days after the start date."}
-                </span>
-              </div>
-              <Field label="Registration deadline">
-                <input id="batch-form-deadline" type="date" value={form.registrationDeadline} onChange={(e) => set("registrationDeadline", e.target.value)} className={inputCls} />
-              </Field>
-              <Field label="Class days" hint="As shown to students, e.g. শনিবার ও মঙ্গলবার">
-                <input id="batch-form-days" value={form.classDays} onChange={(e) => set("classDays", e.target.value)} className={inputCls} />
-              </Field>
-              <Field label="Class time" hint="e.g. সন্ধ্যা ৬টা - রাত ৮টা">
-                <input id="batch-form-time" value={form.classTime} onChange={(e) => set("classTime", e.target.value)} className={inputCls} />
-              </Field>
-              {form.mode === "online" ? (
-                <Field label="Platform" hint="e.g. Zoom, Google Meet">
-                  <input id="batch-form-platform" value={form.platform} onChange={(e) => set("platform", e.target.value)} className={inputCls} />
-                </Field>
-              ) : (
-                <Field label="Location" hint="Campus or branch address">
-                  <input id="batch-form-location" value={form.location} onChange={(e) => set("location", e.target.value)} className={inputCls} />
-                </Field>
-              )}
-              <Field label="Fee (৳)">
-                <input id="batch-form-fee" type="number" min={0} value={form.fee} onChange={(e) => set("fee", e.target.value)} className={inputCls} required />
-              </Field>
-              <Field label="Total seats" hint="Leave empty for no limit">
-                <input id="batch-form-seats" type="number" min={0} value={form.seatsTotal} onChange={(e) => set("seatsTotal", e.target.value)} className={inputCls} />
-              </Field>
-              {editing ? (
-                <Field label="Seats booked" hint="Increases automatically after each online payment">
-                  <input id="batch-form-booked" type="number" min={0} value={form.seatsBooked} onChange={(e) => set("seatsBooked", e.target.value)} className={inputCls} />
-                </Field>
-              ) : null}
-              {form.mode === "corporate" ? (
-                <Field label="Minimum participants">
-                  <input id="batch-form-min" type="number" min={0} value={form.minParticipants} onChange={(e) => set("minParticipants", e.target.value)} className={inputCls} />
-                </Field>
-              ) : null}
-              <Field label="Status" hint="Upcoming batches stay open for 14 days after the start date. Set Running to keep admission open longer.">
-                <select id="batch-form-status" value={form.status} onChange={(e) => set("status", e.target.value as TBatchStatus)} className={inputCls}>
-                  {STATUSES.map((s) => (
-                    <option key={s.value} value={s.value}>
-                      {s.label}
-                    </option>
-                  ))}
-                </select>
-              </Field>
-              <div className="sm:col-span-2">
-                <Field label="Note for students" hint="One short line, e.g. নিজস্ব ল্যাপটপ আবশ্যক">
-                  <input id="batch-form-note" value={form.note} onChange={(e) => set("note", e.target.value)} className={inputCls} maxLength={200} />
-                </Field>
+              </FormSection>
+
+              <div className="py-4">
+                <details className="rounded-lg border border-zinc-200 px-4 py-3 text-sm">
+                  <summary className="cursor-pointer font-medium text-zinc-700">More options: note, batch number, learning journey dates</summary>
+                  <div className="mt-3 grid gap-4 sm:grid-cols-2">
+                    <div className="sm:col-span-2">
+                      <Field label="Note for students" hint="One short line, e.g. নিজস্ব ল্যাপটপ আবশ্যক">
+                        <input id="batch-form-note" value={form.note} onChange={(e) => set("note", e.target.value)} className={inputCls} maxLength={200} />
+                      </Field>
+                    </div>
+                    <Field label="Batch number" hint="Empty = created automatically">
+                      <input id="batch-form-no" value={form.batchNo} onChange={(e) => set("batchNo", e.target.value)} placeholder="e.g. 12" className={inputCls} />
+                    </Field>
+                    <Field label="Classes end">
+                      <input id="batch-form-end" type="date" value={form.endDate} onChange={(e) => set("endDate", e.target.value)} className={inputCls} />
+                    </Field>
+                    <Field label="On-job training starts">
+                      <input id="batch-form-ojt" type="date" value={form.onJobTrainingStart} onChange={(e) => set("onJobTrainingStart", e.target.value)} className={inputCls} />
+                    </Field>
+                    <Field label="On-job training ends">
+                      <input id="batch-form-ojt-end" type="date" value={form.onJobTrainingEnd} onChange={(e) => set("onJobTrainingEnd", e.target.value)} className={inputCls} />
+                    </Field>
+                    <Field label="Certification">
+                      <input id="batch-form-cert" type="date" value={form.certificationDate} onChange={(e) => set("certificationDate", e.target.value)} className={inputCls} />
+                    </Field>
+                    <Field label="Internship starts">
+                      <input id="batch-form-intern" type="date" value={form.internshipStartDate} onChange={(e) => set("internshipStartDate", e.target.value)} className={inputCls} />
+                    </Field>
+                  </div>
+                </details>
               </div>
             </div>
 
-            <details className="rounded-lg border border-zinc-200 px-4 py-3 text-sm">
-              <summary className="cursor-pointer font-medium text-zinc-700">Learning journey dates (optional)</summary>
-              <div className="mt-3 grid gap-4 sm:grid-cols-2">
-                <Field label="Classes end">
-                  <input id="batch-form-end" type="date" value={form.endDate} onChange={(e) => set("endDate", e.target.value)} className={inputCls} />
-                </Field>
-                <Field label="On-job training starts">
-                  <input id="batch-form-ojt" type="date" value={form.onJobTrainingStart} onChange={(e) => set("onJobTrainingStart", e.target.value)} className={inputCls} />
-                </Field>
-                <Field label="On-job training ends">
-                  <input id="batch-form-ojt-end" type="date" value={form.onJobTrainingEnd} onChange={(e) => set("onJobTrainingEnd", e.target.value)} className={inputCls} />
-                </Field>
-                <Field label="Certification">
-                  <input id="batch-form-cert" type="date" value={form.certificationDate} onChange={(e) => set("certificationDate", e.target.value)} className={inputCls} />
-                </Field>
-                <Field label="Internship starts">
-                  <input id="batch-form-intern" type="date" value={form.internshipStartDate} onChange={(e) => set("internshipStartDate", e.target.value)} className={inputCls} />
-                </Field>
-              </div>
-            </details>
-
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-100 pt-4">
+            <div className="sticky bottom-0 -mx-6 -mb-6 flex flex-wrap items-center justify-between gap-3 border-t border-zinc-200 bg-white px-6 py-3">
               <label className="flex items-center gap-2 text-sm text-zinc-700">
                 <input
                   id="batch-form-published"

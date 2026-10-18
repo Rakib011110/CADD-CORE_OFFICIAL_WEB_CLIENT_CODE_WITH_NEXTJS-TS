@@ -19,7 +19,7 @@ import { CertificatesSection, InstructorsSection } from "./sections/PeopleCertif
 import { AudienceSection, CareerSupportSection } from "./sections/CareerSections";
 import { FaqSection, FreeSessionsSection } from "./sections/ResourcesFaqSections";
 import WhyRevitSection from "./sections/WhyRevitSection";
-import { MODE_ORDER, batchDateText, resolvePlans } from "./courseUtils";
+import { MODE_ORDER, batchDateText, plansForBatch, resolvePlans } from "./courseUtils";
 
 // Course-specific extras that are not stored in the database yet
 const REVIT_SECTION_SLUGS = ["professional-architectural-bim-modeling-mastercourse"];
@@ -98,6 +98,8 @@ export default function CoursePageView({ slug }: { slug: string }) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const selectedBatch =
     batches.find((b) => b._id === selectedId) || batches.find((b) => b.status !== "full") || batches[0] || null;
+  // Plans of the chosen batch (a batch can have its own discount)
+  const selectedPlans = useMemo(() => plansForBatch(selectedBatch, plans), [selectedBatch, plans]);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const openCheckout = useCallback(() => setCheckoutOpen(true), []);
   const closeCheckout = useCallback(() => setCheckoutOpen(false), []);
@@ -119,7 +121,7 @@ export default function CoursePageView({ slug }: { slug: string }) {
   const cardProps = {
     course,
     batches,
-    plans,
+    plans: selectedPlans,
     selectedBatch,
     onSelectBatch: selectBatch,
     onEnroll: openCheckout,
@@ -187,7 +189,7 @@ export default function CoursePageView({ slug }: { slug: string }) {
       </div>
 
       <Toaster richColors position="top-center" />
-      <MobileEnrollBar course={course} batch={selectedBatch} plans={plans} onEnroll={openCheckout} />
+      <MobileEnrollBar course={course} batch={selectedBatch} plans={selectedPlans} onEnroll={openCheckout} />
       <CheckoutPanel
         open={checkoutOpen}
         onClose={closeCheckout}
@@ -195,7 +197,7 @@ export default function CoursePageView({ slug }: { slug: string }) {
         batch={selectedBatch}
         batches={batches}
         onSelectBatch={selectBatch}
-        plans={plans}
+        plans={selectedPlans}
         plansLoading={plansLoading}
       />
     </div>

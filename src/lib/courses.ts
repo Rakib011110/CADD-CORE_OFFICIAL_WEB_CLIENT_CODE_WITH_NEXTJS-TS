@@ -101,6 +101,7 @@ export type TCourseBatch = {
   location?: string;
   platform?: string;
   fee: number;
+  paymentPlans?: TPaymentPlan[]; // empty = the course's plans
   seatsTotal?: number;
   seatsBooked?: number;
   minParticipants?: number;

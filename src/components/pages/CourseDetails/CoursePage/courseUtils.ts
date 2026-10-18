@@ -98,6 +98,12 @@ export const resolvePlans = (
     .filter((p) => !fullOnly || p.installments === 1);
 };
 
+/** A batch's own active plans, or the course's plans when it has none. Same order as the server. */
+export const plansForBatch = (batch: Pick<TCourseBatch, "paymentPlans"> | null | undefined, coursePlans: TPaymentPlan[]) => {
+  const own = (batch?.paymentPlans || []).filter((p) => p.isActive !== false);
+  return batch?.paymentPlans?.length ? own : coursePlans;
+};
+
 /** Same calculation as the server. The server's amount is the one that is charged. */
 export const priceForPlan = (fee: number, plan?: TPaymentPlan) => {
   const installments = plan?.installments || 1;
