@@ -107,18 +107,32 @@ export default function CourseForm({
     return set;
   }, [errors]);
 
-  const activeIndex = TABS.findIndex((t) => t.id === active);
+  // Regular courses: fee, dates and plans are managed on Dates, Fees & Plans
+  const pricingElsewhere = !isIndustrial;
+  const tabs = pricingElsewhere ? TABS.filter((t) => t.id !== "pricing") : TABS;
+  const activeIndex = tabs.findIndex((t) => t.id === active);
   const isFirst = activeIndex === 0;
-  const isLast = activeIndex === TABS.length - 1;
+  const isLast = activeIndex === tabs.length - 1;
 
   const goNext = () => {
-    if (activeIndex < TABS.length - 1) setActive(TABS[activeIndex + 1].id);
+    if (activeIndex < tabs.length - 1) setActive(tabs[activeIndex + 1].id);
   };
 
   /** Create (first time) or update the course. Returns true on success. */
   const persist = async (values: CourseFormValues): Promise<boolean> => {
-    const payload = formValuesToPayload(values);
     const editingId = mode === "edit" ? initialData?._id : savedCourseId;
+    if (isIndustrial && !values.courseFee) {
+      toast.error("কোর্স ফি (Course Fee) দেওয়া আবশ্যক");
+      setActive("basics");
+      return false;
+    }
+    const payload: Record<string, unknown> = formValuesToPayload(values);
+    if (pricingElsewhere) {
+      // Never overwrite what was set on Dates, Fees & Plans
+      delete payload.courseFee;
+      delete payload.schedule;
+      delete payload.paymentPlans;
+    }
     try {
       if (isIndustrial) {
         if (editingId) {
@@ -165,7 +179,7 @@ export default function CourseForm({
 
   const onInvalid = (formErrors: typeof errors) => {
     const errorKeys = Object.keys(formErrors);
-    const firstTab = TABS.find((t) =>
+    const firstTab = tabs.find((t) =>
       TAB_FIELD_MAP[t.id].some((k) => errorKeys.includes(k))
     );
     if (firstTab) setActive(firstTab.id);
@@ -233,7 +247,7 @@ export default function CourseForm({
                 </Button>
               </div>
               <TabNav
-                tabs={TABS}
+                tabs={tabs}
                 active={active}
                 onChange={setActive}
                 errorTabs={errorTabs}
@@ -244,7 +258,7 @@ export default function CourseForm({
           {/* Tab content */}
           <div className="mx-auto max-w-5xl px-4 py-6">
             <div className={active === "basics" ? "block" : "hidden"}>
-              <BasicsTab />
+              <BasicsTab pricingElsewhere={pricingElsewhere} courseId={mode === "edit" ? initialData?._id : savedCourseId} />
             </div>
             <div className={active === "content" ? "block" : "hidden"}>
               <ContentTab />
@@ -267,7 +281,7 @@ export default function CourseForm({
                 type="button"
                 variant="outline"
                 disabled={isFirst}
-                onClick={() => setActive(TABS[activeIndex - 1].id)}
+                onClick={() => setActive(tabs[activeIndex - 1].id)}
               >
                 <ArrowLeft className="h-4 w-4" /> Previous
               </Button>

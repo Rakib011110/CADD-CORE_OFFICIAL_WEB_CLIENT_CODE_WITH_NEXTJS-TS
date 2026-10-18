@@ -27,12 +27,6 @@ const navigationSections = [
         icon: "💰",
         color: "",
       },
-       {
-        label: "Installment Plan",
-        href: "/dashboard/payments/installment-plan",
-        icon: "💰",
-        color: "",
-      },
       {
         label: "Manage Coupon",
         href: "/dashboard/payments/manage-coupon",
@@ -53,15 +47,9 @@ const navigationSections = [
         color: "",
       },
       {
-        label: "Course Batches & Fees",
+        label: "Dates, Fees & Plans",
         href: "/dashboard/course-batches",
         icon: "🗓️",
-        color: "",
-      },
-      {
-        label: "Manage Schedule (old timeline)",
-        href: "/dashboard/course-schedule-mange",
-        icon: "📅",
         color: "",
       },
       {

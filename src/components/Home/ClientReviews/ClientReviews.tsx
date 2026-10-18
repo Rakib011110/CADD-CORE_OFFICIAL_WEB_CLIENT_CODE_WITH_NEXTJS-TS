@@ -61,8 +61,6 @@ export default function ClientReviews() {
       <h2 className="text-center text-2xl md:text-3xl font-bold text-gray-800 mb-4">
         কেন আমরা শিক্ষার্থীদের কাছে সেরা
       </h2>
-
-
       <div className="flex justify-center mb-6">
         <span className="inline-block w-24 h-1 bg-red-500 rounded"></span>
       </div>

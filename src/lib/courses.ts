@@ -92,6 +92,7 @@ export type TCourseBatch = {
   course: string | { _id: string; title: string; slug: string; courseType?: string; courseFee?: number };
   mode: TDeliveryMode;
   batchNo: string;
+  startAnytime?: boolean; // no fixed date, students start when they enrol
   startDate?: string | null;
   endDate?: string | null;
   registrationDeadline?: string | null;
@@ -117,6 +118,8 @@ export type TPaymentPlan = {
   name: string;
   installments: number;
   discountPercent: number;
+  // Share of the total paid at enrollment; empty = 2 → 50%, 3 → 30%
+  payNowPercent?: number;
   isActive: boolean;
 };
 

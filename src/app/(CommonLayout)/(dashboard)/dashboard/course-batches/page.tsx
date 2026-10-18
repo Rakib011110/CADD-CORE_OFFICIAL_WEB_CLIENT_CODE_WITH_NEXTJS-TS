@@ -1,9 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { toast, Toaster } from "sonner";
-import { CalendarPlus, Copy, ExternalLink, Pencil, Search, Trash2 } from "lucide-react";
+import { CalendarPlus, Copy, ExternalLink, Pencil, Search, Trash2, Wallet } from "lucide-react";
 import { useGetAllCourseQuery } from "@/redux/api/courseApi";
 import {
   useCreateCourseBatchMutation,
@@ -11,11 +11,14 @@ import {
   useGetAllCourseBatchesQuery,
   useUpdateCourseBatchMutation,
 } from "@/redux/api/courseBatchApi";
-import { TBatchStatus, TCourseBatch, TDeliveryMode } from "@/lib/courses";
+import { TBatchStatus, TCourseBatch, TDeliveryMode, TPaymentPlan } from "@/lib/courses";
+import { useGetInstallmentPlansQuery } from "@/redux/api/payment/useInstallmentPlansApi";
+import DefaultPlansPanel from "@/components/pages/DatesFees/DefaultPlansPanel";
+import CoursePricingDialog, { PricedCourse } from "@/components/pages/DatesFees/CoursePricingDialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/UI/dialog";
 import { API_BASE_URL } from "@/lib/apiBase";
 
-type CourseOption = { _id: string; title: string; slug: string; courseFee?: number; courseType?: string };
+type CourseOption = PricedCourse & { courseType?: string };
 
 const MODES: { value: TDeliveryMode; label: string }[] = [
   { value: "online", label: "Online" },
@@ -36,6 +39,8 @@ const emptyForm = {
   course: "",
   mode: "online" as TDeliveryMode,
   batchNo: "",
+  // "date" = fixed start date, "anytime" = start when enrolling, "tba" = date to be announced
+  startType: "date" as "date" | "anytime" | "tba",
   startDate: "",
   endDate: "",
   registrationDeadline: "",
@@ -105,6 +110,15 @@ export default function CourseBatchesPage() {
   const [formOpen, setFormOpen] = useState(false);
   const [form, setForm] = useState<FormState>(emptyForm);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [pricingCourse, setPricingCourse] = useState<CourseOption | null>(null);
+  const { data: plansRes } = useGetInstallmentPlansQuery({});
+  const defaultPlans: TPaymentPlan[] = plansRes?.data || [];
+
+  // Links like ?course=<id> (from the course editor) open on that course
+  useEffect(() => {
+    const id = new URLSearchParams(window.location.search).get("course");
+    if (id) setCourseFilter(id);
+  }, []);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -119,6 +133,20 @@ export default function CourseBatchesPage() {
   }, [batches, courseFilter, modeFilter, showHidden, search]);
 
   const hiddenCount = batches.filter((b) => !isLive(b)).length;
+
+  // Courses with their matching batches. A course search or a mode filter hides courses with no match.
+  const courseGroups = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return courses
+      .filter((c) => !courseFilter || c._id === courseFilter)
+      .map((c) => ({
+        course: c,
+        titleMatch: !q || c.title.toLowerCase().includes(q),
+        rows: filtered.filter((b) => courseOf(b)?._id === c._id),
+      }))
+      .filter((g) => (q || modeFilter ? g.rows.length > 0 || (g.titleMatch && !modeFilter) : true))
+      .map((g) => ({ course: g.course, rows: g.titleMatch && q ? filtered.filter((b) => courseOf(b)?._id === g.course._id) : g.rows }));
+  }, [courses, filtered, courseFilter, modeFilter, search]);
   const coursesWithoutBatch = courses.filter((c) => !batches.some((b) => courseOf(b)?._id === c._id && isLive(b)));
 
   const set = <K extends keyof FormState>(key: K, value: FormState[K]) => setForm((f) => ({ ...f, [key]: value }));
@@ -131,6 +159,7 @@ export default function CourseBatchesPage() {
       course: course?._id || "",
       fee: course?.courseFee ? String(course.courseFee) : "",
       mode: course?.courseType === "one-to-one" ? "one-to-one" : "online",
+      startType: course?.courseType === "one-to-one" ? "anytime" : "date",
       ...preset,
     });
     setFormOpen(true);
@@ -140,6 +169,7 @@ export default function CourseBatchesPage() {
     course: courseOf(b)?._id || String(b.course),
     mode: b.mode,
     batchNo: b.batchNo,
+    startType: b.startAnytime ? "anytime" : b.startDate ? "date" : "tba",
     startDate: toInputDate(b.startDate),
     endDate: toInputDate(b.endDate),
     registrationDeadline: toInputDate(b.registrationDeadline),
@@ -186,10 +216,16 @@ export default function CourseBatchesPage() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.course) return toast.error("Choose a course");
-    if (!form.batchNo.trim()) return toast.error("Batch number is required");
+    if (form.startType === "date" && !form.startDate) return toast.error("Choose the start date, or pick Start anytime / Date to be announced");
     if (form.fee === "" || Number(form.fee) < 0) return toast.error("Enter the fee for this batch");
-    const { course, ...rest } = form;
-    const payload = { ...rest, fee: Number(form.fee) };
+    const { course, startType, ...rest } = form;
+    const payload = {
+      ...rest,
+      batchNo: rest.batchNo.trim(),
+      startAnytime: startType === "anytime",
+      startDate: startType === "date" ? rest.startDate : "",
+      fee: Number(form.fee),
+    };
     try {
       if (editing) {
         await updateBatch({ id: editing._id, ...payload }).unwrap();
@@ -222,15 +258,16 @@ export default function CourseBatchesPage() {
   };
 
   return (
-    <div className="mx-auto max-w-7xl space-y-6 p-4 sm:p-6">
+    <div className="mx-auto max-w-7xl space-y-5 p-4 sm:p-6">
       <Toaster richColors position="top-center" />
 
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-zinc-900">Course Batches</h1>
-          <p className="mt-1 text-sm text-zinc-500">
-            Dates, schedule and fees for online, offline, weekend, corporate and one-to-one batches. Published batches
-            appear on the course page right away.
+          <h1 className="text-2xl font-bold text-zinc-900">Dates, Fees &amp; Plans</h1>
+          <p className="mt-1 max-w-3xl text-sm text-zinc-500">
+            One place for everything students see about when a course starts and what it costs: the regular fee, payment
+            plans with discounts, and batches (online, offline, weekend, corporate, one to one). Changes show on the website
+            right away.
           </p>
         </div>
         <button
@@ -241,13 +278,15 @@ export default function CourseBatchesPage() {
         </button>
       </div>
 
+      <DefaultPlansPanel exampleFee={10000} />
+
       {coursesWithoutBatch.length ? (
         <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
           <p className="font-semibold">
             {coursesWithoutBatch.length} course{coursesWithoutBatch.length > 1 ? "s have" : " has"} no open batch on the
             website
           </p>
-          <p className="mt-0.5 text-amber-800">Visitors see &quot;date to be announced&quot; and the course fee. Add a batch:</p>
+          <p className="mt-0.5 text-amber-800">Visitors see &quot;date to be announced&quot; and the regular fee. Add a batch:</p>
           <div className="mt-2 flex flex-wrap gap-1.5">
             {coursesWithoutBatch.map((c) => (
               <button
@@ -296,113 +335,162 @@ export default function CourseBatchesPage() {
         </label>
       </div>
 
-      {/* Table */}
-      <div className="overflow-x-auto rounded-xl border border-zinc-200 bg-white">
-        <table className="w-full min-w-[960px] text-sm">
-          <thead className="bg-zinc-50 text-left text-xs uppercase tracking-wide text-zinc-500">
-            <tr>
-              <th className="px-4 py-3 font-medium">Course</th>
-              <th className="px-4 py-3 font-medium">Mode</th>
-              <th className="px-4 py-3 font-medium">Start</th>
-              <th className="px-4 py-3 font-medium">Days &amp; time</th>
-              <th className="px-4 py-3 text-right font-medium">Fee</th>
-              <th className="px-4 py-3 font-medium">Seats</th>
-              <th className="px-4 py-3 font-medium">Status</th>
-              <th className="px-4 py-3 text-right font-medium">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-zinc-100">
-            {isLoading ? (
-              <tr>
-                <td colSpan={8} className="px-4 py-10 text-center text-zinc-500">Loading batches…</td>
-              </tr>
-            ) : isError ? (
-              <tr>
-                <td colSpan={8} className="px-4 py-10 text-center text-red-600">
-                  {loadErrorStatus === 404 ? (
-                    <>
-                      This API server doesn&apos;t have Course Batches yet. The website is connected to{" "}
-                      <code className="rounded bg-red-50 px-1">{API_BASE_URL}</code>. Deploy the updated server, or point{" "}
-                      <code className="rounded bg-red-50 px-1">NEXT_PUBLIC_API_BASE_URL</code> to a server that has it.
-                    </>
-                  ) : loadErrorStatus === 401 || loadErrorStatus === 403 ? (
-                    "Your login has expired or this account is not an admin. Log in again as an admin and reload the page."
-                  ) : (
-                    "Could not reach the API server. Check that it is running and reload the page."
-                  )}
-                </td>
-              </tr>
-            ) : filtered.length === 0 ? (
-              <tr>
-                <td colSpan={8} className="px-4 py-10 text-center text-zinc-500">
-                  No batches match these filters.
-                </td>
-              </tr>
-            ) : (
-              filtered.map((b) => {
-                const c = courseOf(b);
-                const status = STATUSES.find((s) => s.value === b.status);
-                const live = isLive(b);
-                return (
-                  <tr key={b._id} className={live ? "" : "bg-zinc-50/60 text-zinc-500"}>
-                    <td className="max-w-[260px] px-4 py-3">
-                      <span className="block truncate font-medium text-zinc-900">{c?.title || "Deleted course"}</span>
-                      <span className="text-xs text-zinc-500">#{b.batchNo}</span>
-                    </td>
-                    <td className="px-4 py-3">{MODES.find((m) => m.value === b.mode)?.label}</td>
-                    <td className="whitespace-nowrap px-4 py-3">{prettyDate(b.startDate)}</td>
-                    <td className="max-w-[220px] px-4 py-3">
-                      <span className="block truncate">{b.classDays || "—"}</span>
-                      <span className="block truncate text-xs text-zinc-500">{b.classTime}</span>
-                    </td>
-                    <td className="whitespace-nowrap px-4 py-3 text-right font-medium tabular-nums">৳{b.fee?.toLocaleString("en-IN")}</td>
-                    <td className="whitespace-nowrap px-4 py-3 tabular-nums">
-                      {b.seatsTotal ? `${b.seatsBooked || 0} / ${b.seatsTotal}` : "—"}
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${status?.className}`}>
-                        {status?.label.split(" (")[0]}
+      {/* Courses with their fee, plans and batches */}
+      {isLoading ? (
+        <p className="rounded-xl border border-zinc-200 bg-white px-4 py-10 text-center text-sm text-zinc-500">Loading…</p>
+      ) : isError ? (
+        <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-6 text-center text-sm text-red-700">
+          {loadErrorStatus === 404 ? (
+            <>
+              This API server doesn&apos;t have Course Batches yet. The website is connected to{" "}
+              <code className="rounded bg-white px-1">{API_BASE_URL}</code>. Deploy the updated server, or point{" "}
+              <code className="rounded bg-white px-1">NEXT_PUBLIC_API_BASE_URL</code> to a server that has it.
+            </>
+          ) : loadErrorStatus === 401 || loadErrorStatus === 403 ? (
+            "Your login has expired or this account is not an admin. Log in again as an admin and reload the page."
+          ) : (
+            "Could not reach the API server. Check that it is running and reload the page."
+          )}
+        </p>
+      ) : courseGroups.length === 0 ? (
+        <p className="rounded-xl border border-zinc-200 bg-white px-4 py-10 text-center text-sm text-zinc-500">No courses match these filters.</p>
+      ) : (
+        <div className="space-y-4">
+          {courseGroups.map(({ course: c, rows }) => {
+            const ownPlans = (c.paymentPlans || []).filter((p) => p.isActive !== false);
+            const planText = ownPlans.length
+              ? `Custom plans: ${ownPlans.map((p) => `${p.name}${p.discountPercent ? ` −${p.discountPercent}%` : ""}`).join(", ")}`
+              : "Default plans";
+            return (
+              <section key={c._id} className="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+                <header className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-zinc-100 bg-zinc-50/70 px-4 py-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-semibold text-zinc-900">{c.title}</p>
+                    <p className="mt-0.5 flex flex-wrap gap-x-3 text-xs text-zinc-500">
+                      <span>{c.courseType === "one-to-one" ? "One to one" : "Regular course"}</span>
+                      <span className="font-medium text-zinc-700">
+                        Fee {c.courseFee ? `৳${c.courseFee.toLocaleString("en-IN")}` : "not set"}
                       </span>
-                      {!b.isPublished ? <span className="ml-1.5 text-xs text-zinc-500">Draft</span> : null}
-                      {live ? <span className="mt-0.5 block text-[11px] text-emerald-700">On website</span> : null}
-                    </td>
-                    <td className="whitespace-nowrap px-4 py-3 text-right">
-                      {confirmDelete === b._id ? (
-                        <span className="inline-flex items-center gap-2">
-                          <span className="text-xs text-zinc-600">Delete?</span>
-                          <button type="button" onClick={() => remove(b._id)} className="rounded-md bg-red-600 px-2.5 py-1 text-xs font-semibold text-white hover:bg-red-700">
-                            Delete
-                          </button>
-                          <button type="button" onClick={() => setConfirmDelete(null)} className="rounded-md border border-zinc-300 px-2.5 py-1 text-xs font-medium hover:bg-zinc-50">
-                            Cancel
-                          </button>
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1">
-                          {c?.slug ? (
-                            <Link href={`/courses/${c.slug}`} target="_blank" title="View course page" className="rounded-md p-1.5 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900">
-                              <ExternalLink className="h-4 w-4" />
-                            </Link>
-                          ) : null}
-                          <button type="button" onClick={() => duplicate(b)} title="Duplicate as new batch" className="rounded-md p-1.5 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900">
-                            <Copy className="h-4 w-4" />
-                          </button>
-                          <button type="button" onClick={() => openEdit(b)} title="Edit" className="rounded-md p-1.5 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900">
-                            <Pencil className="h-4 w-4" />
-                          </button>
-                          <button type="button" onClick={() => setConfirmDelete(b._id)} title="Delete" className="rounded-md p-1.5 text-zinc-500 hover:bg-red-50 hover:text-red-600">
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        </span>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
-      </div>
+                      <span className={ownPlans.length ? "text-sky-700" : ""}>{planText}</span>
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setPricingCourse(c)}
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium text-zinc-800 hover:border-zinc-400">
+                      <Wallet className="h-4 w-4" /> Fee &amp; plans
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => openCreate({ course: c._id })}
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium text-zinc-800 hover:border-zinc-400">
+                      <CalendarPlus className="h-4 w-4" /> Batch
+                    </button>
+                    {c.slug ? (
+                      <Link
+                        href={`/courses/${c.slug}`}
+                        target="_blank"
+                        title="View course page"
+                        className="rounded-md p-1.5 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900">
+                        <ExternalLink className="h-4 w-4" />
+                      </Link>
+                    ) : null}
+                  </div>
+                </header>
+
+                {rows.length ? (
+                  <div className="overflow-x-auto">
+                    <table className="w-full min-w-[820px] text-sm">
+                      <thead className="text-left text-[11px] uppercase tracking-wide text-zinc-500">
+                        <tr>
+                          <th className="px-4 py-2 font-medium">Mode</th>
+                          <th className="px-4 py-2 font-medium">Start</th>
+                          <th className="px-4 py-2 font-medium">Days &amp; time</th>
+                          <th className="px-4 py-2 text-right font-medium">Fee</th>
+                          <th className="px-4 py-2 font-medium">Seats</th>
+                          <th className="px-4 py-2 font-medium">Status</th>
+                          <th className="px-4 py-2 text-right font-medium">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-zinc-100">
+                        {rows.map((b) => {
+                          const status = STATUSES.find((s) => s.value === b.status);
+                          const live = isLive(b);
+                          return (
+                            <tr key={b._id} className={live ? "" : "bg-zinc-50/60 text-zinc-500"}>
+                              <td className="px-4 py-2.5">
+                                <span className="block font-medium text-zinc-900">{MODES.find((m) => m.value === b.mode)?.label}</span>
+                                <span className="text-xs text-zinc-500">#{b.batchNo}</span>
+                              </td>
+                              <td className="whitespace-nowrap px-4 py-2.5">
+                                {b.startAnytime ? (
+                                  <span className="font-medium text-sky-700">Start anytime</span>
+                                ) : b.startDate ? (
+                                  prettyDate(b.startDate)
+                                ) : (
+                                  <span className="text-zinc-500">To be announced</span>
+                                )}
+                              </td>
+                              <td className="max-w-[220px] px-4 py-2.5">
+                                <span className="block truncate">{b.classDays || "—"}</span>
+                                <span className="block truncate text-xs text-zinc-500">{b.classTime}</span>
+                              </td>
+                              <td className="whitespace-nowrap px-4 py-2.5 text-right font-medium tabular-nums">৳{b.fee?.toLocaleString("en-IN")}</td>
+                              <td className="whitespace-nowrap px-4 py-2.5 tabular-nums">{b.seatsTotal ? `${b.seatsBooked || 0} / ${b.seatsTotal}` : "—"}</td>
+                              <td className="px-4 py-2.5">
+                                <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${status?.className}`}>
+                                  {status?.label.split(" (")[0]}
+                                </span>
+                                {!b.isPublished ? <span className="ml-1.5 text-xs text-zinc-500">Draft</span> : null}
+                                {live ? <span className="mt-0.5 block text-[11px] text-emerald-700">On website</span> : null}
+                              </td>
+                              <td className="whitespace-nowrap px-4 py-2.5 text-right">
+                                {confirmDelete === b._id ? (
+                                  <span className="inline-flex items-center gap-2">
+                                    <span className="text-xs text-zinc-600">Delete?</span>
+                                    <button type="button" onClick={() => remove(b._id)} className="rounded-md bg-red-600 px-2.5 py-1 text-xs font-semibold text-white hover:bg-red-700">
+                                      Delete
+                                    </button>
+                                    <button type="button" onClick={() => setConfirmDelete(null)} className="rounded-md border border-zinc-300 px-2.5 py-1 text-xs font-medium hover:bg-zinc-50">
+                                      Cancel
+                                    </button>
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex items-center gap-1">
+                                    <button type="button" onClick={() => duplicate(b)} title="Duplicate as new batch" className="rounded-md p-1.5 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900">
+                                      <Copy className="h-4 w-4" />
+                                    </button>
+                                    <button type="button" onClick={() => openEdit(b)} title="Edit" className="rounded-md p-1.5 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900">
+                                      <Pencil className="h-4 w-4" />
+                                    </button>
+                                    <button type="button" onClick={() => setConfirmDelete(b._id)} title="Delete" className="rounded-md p-1.5 text-zinc-500 hover:bg-red-50 hover:text-red-600">
+                                      <Trash2 className="h-4 w-4" />
+                                    </button>
+                                  </span>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <p className="px-4 py-3 text-sm text-zinc-500">
+                    No {showHidden ? "" : "open "}batches. Students see &quot;date to be announced&quot;.{" "}
+                    <button type="button" onClick={() => openCreate({ course: c._id })} className="font-medium text-red-600 hover:underline">
+                      Add a batch
+                    </button>
+                  </p>
+                )}
+              </section>
+            );
+          })}
+        </div>
+      )}
+
+      <CoursePricingDialog course={pricingCourse} defaultPlans={defaultPlans} onClose={() => setPricingCourse(null)} />
 
       {/* Create / edit form */}
       <Dialog open={formOpen} onOpenChange={setFormOpen}>
@@ -445,12 +533,43 @@ export default function CourseBatchesPage() {
                   ))}
                 </select>
               </Field>
-              <Field label="Batch number" hint="Unique per course and mode, e.g. OFFLINE-2026-11">
-                <input id="batch-form-no" value={form.batchNo} onChange={(e) => set("batchNo", e.target.value)} className={inputCls} required />
+              <Field label="Batch number (optional)" hint="Leave empty and it is created automatically">
+                <input id="batch-form-no" value={form.batchNo} onChange={(e) => set("batchNo", e.target.value)} placeholder="e.g. OFFLINE-2026-11" className={inputCls} />
               </Field>
-              <Field label="Start date" hint="Leave empty for 'on request' or 'date to be announced'">
-                <input id="batch-form-start" type="date" value={form.startDate} onChange={(e) => set("startDate", e.target.value)} className={inputCls} />
-              </Field>
+              <div className="sm:col-span-2">
+                <span className="mb-1 block text-sm font-medium text-zinc-700">When does it start?</span>
+                <div className="flex flex-wrap items-center gap-2">
+                  {(
+                    [
+                      { value: "date", label: "Fixed date" },
+                      { value: "anytime", label: "Start anytime" },
+                      { value: "tba", label: "Date to be announced" },
+                    ] as const
+                  ).map((o) => (
+                    <button
+                      key={o.value}
+                      type="button"
+                      onClick={() => set("startType", o.value)}
+                      className={`rounded-full border px-3 py-1.5 text-sm font-medium ${
+                        form.startType === o.value ? "border-red-600 bg-red-50 text-red-700" : "border-zinc-300 text-zinc-600 hover:bg-zinc-50"
+                      }`}>
+                      {o.label}
+                    </button>
+                  ))}
+                  {form.startType === "date" ? (
+                    <input id="batch-form-start" type="date" aria-label="Start date" value={form.startDate} onChange={(e) => set("startDate", e.target.value)} className={`${inputCls} w-auto`} />
+                  ) : null}
+                </div>
+                <span className="mt-1 block text-xs text-zinc-500">
+                  {form.startType === "anytime"
+                    ? "Students see “যেকোনো সময় শুরু করা যাবে” and can enrol any day. The batch stays open until you close it."
+                    : form.startType === "tba"
+                      ? form.mode === "corporate"
+                        ? "Students see “আপনার সুবিধামতো সময়ে”."
+                        : "Students see “তারিখ শীঘ্রই ঘোষণা করা হবে” and can still enrol."
+                      : "Upcoming batches stay open for 14 days after the start date."}
+                </span>
+              </div>
               <Field label="Registration deadline">
                 <input id="batch-form-deadline" type="date" value={form.registrationDeadline} onChange={(e) => set("registrationDeadline", e.target.value)} className={inputCls} />
               </Field>

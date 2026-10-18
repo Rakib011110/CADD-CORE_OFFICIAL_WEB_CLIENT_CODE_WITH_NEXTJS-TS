@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { CalendarClock } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/UI/card";
 import {
   ImageUploadField,
@@ -9,9 +11,26 @@ import {
   TextareaField,
 } from "../fields";
 
-export function BasicsTab() {
+export function BasicsTab({ pricingElsewhere = false, courseId }: { pricingElsewhere?: boolean; courseId?: string }) {
   return (
     <div className="space-y-6">
+      {pricingElsewhere ? (
+        <div className="flex flex-wrap items-center gap-3 rounded-lg border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-900">
+          <CalendarClock className="h-5 w-5 shrink-0" />
+          <p className="min-w-0 flex-1">
+            Fee, start dates, batches, payment plans and discounts are set on <b>Dates, Fees &amp; Plans</b>
+            {courseId ? "." : " after you save the course."}
+          </p>
+          {courseId ? (
+            <Link
+              href={`/dashboard/course-batches?course=${courseId}`}
+              target="_blank"
+              className="rounded-md bg-sky-600 px-3 py-1.5 font-medium text-white hover:bg-sky-700">
+              Open Dates, Fees &amp; Plans
+            </Link>
+          ) : null}
+        </div>
+      ) : null}
       <Card>
         <CardHeader>
           <CardTitle className="text-lg">Basic Information</CardTitle>
@@ -42,7 +61,7 @@ export function BasicsTab() {
               description="Comma-separated"
               required
             />
-            <TextField name="courseFee" label="Course Fee" placeholder="e.g. 15000" required />
+            {!pricingElsewhere ? <TextField name="courseFee" label="Course Fee" placeholder="e.g. 15000" required /> : null}
             <TextField name="duration" label="Duration" placeholder="e.g. ৪ মাস" required />
             <TextField name="lessons" label="Lessons" placeholder="e.g. ৩০ টা লাইভ সেশন" required />
             <TextField name="projects" label="Projects" placeholder="e.g. ১০ টি প্রজেক্ট" required />
@@ -87,6 +106,7 @@ export function BasicsTab() {
         </CardContent>
       </Card>
 
+      {!pricingElsewhere ? (
       <Card>
         <CardHeader>
           <CardTitle className="text-lg">Schedule</CardTitle>
@@ -108,6 +128,7 @@ export function BasicsTab() {
           </div>
         </CardContent>
       </Card>
+      ) : null}
 
       <Card>
         <CardHeader>

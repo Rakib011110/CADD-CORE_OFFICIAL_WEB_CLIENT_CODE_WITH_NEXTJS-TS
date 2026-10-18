@@ -23,10 +23,8 @@ export const courseFormSchema = z.object({
     .regex(/^[a-z0-9-]+$/i, "স্পেস ছাড়া শুধু ইংরেজি অক্ষর, সংখ্যা এবং হাইফেন (-) ব্যবহার করুন"),
   courseType: z.enum(["regular", "one-to-one"]),
   categories: z.string().min(1, "কমপক্ষে একটি ক্যাটাগরি দেওয়া আবশ্যক (যেমন: Civil, Electrical)"),
-  courseFee: z
-    .string()
-    .min(1, "কোর্স ফি (Course Fee) দেওয়া আবশ্যক")
-    .regex(/^\d+$/, "কোর্স ফি অবশ্যই একটি বৈধ সংখ্যা হতে হবে (যেমন: ২০০০০)"),
+  // Required for industrial courses only (checked on save); regular courses set it on Dates, Fees & Plans
+  courseFee: z.string().regex(/^\d*$/, "কোর্স ফি অবশ্যই একটি বৈধ সংখ্যা হতে হবে (যেমন: ২০০০০)"),
   duration: z.string().min(1, "কোর্সের সময়সীমা (Duration) দেওয়া আবশ্যক"),
   lessons: z.string().min(1, "ক্লাসের সংখ্যা (Lessons) দেওয়া আবশ্যক"),
   projects: z.string().min(1, "প্রজেক্টের তথ্য (Projects) দেওয়া আবশ্যক"),

@@ -4,7 +4,8 @@ import baseApi from '@/redux/baseApi';
 export const installmentPlanApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getInstallmentPlans: builder.query({
-      query: () => '/installment-plans',
+      // `{ all: true }` also returns inactive plans (dashboard)
+      query: (args?: { all?: boolean }) => (args?.all ? '/installment-plans?all=true' : '/installment-plans'),
       providesTags: ['InstallmentPlans'],
     }),
     createInstallmentPlan: builder.mutation({
@@ -16,16 +17,17 @@ export const installmentPlanApi = baseApi.injectEndpoints({
       invalidatesTags: ['InstallmentPlans'],
     }),
     updateInstallmentPlan: builder.mutation({
-      query: ({ name, ...data }) => ({
-        url: `/installment-plans/${name}`,
+      // `originalName` finds the saved plan; `name` may be a new name
+      query: ({ originalName, name, ...data }) => ({
+        url: `/installment-plans/${encodeURIComponent(originalName ?? name)}`,
         method: 'PUT',
-        body: data,
+        body: originalName ? { name, ...data } : data,
       }),
       invalidatesTags: ['InstallmentPlans'],
     }),
     deleteInstallmentPlan: builder.mutation({
       query: (name) => ({
-        url: `/installment-plans/${name}`,
+        url: `/installment-plans/${encodeURIComponent(name)}`,
         method: 'DELETE',
       }),
       invalidatesTags: ['InstallmentPlans'],

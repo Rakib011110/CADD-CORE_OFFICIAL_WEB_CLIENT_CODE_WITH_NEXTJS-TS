@@ -35,8 +35,8 @@ const navigationSections = [
         color: "",
       },
       {
-        label: "📋 Manage Schedule",
-        href: "/dashboard/course-schedule-mange",
+        label: "🗓️ Dates, Fees & Plans",
+        href: "/dashboard/course-batches",
         color: "",
       },
       {
@@ -47,11 +47,6 @@ const navigationSections = [
       {
         label: "🕒 Add Seminar Time",
         href: "/dashboard/add-seminar-time",
-        color: "",
-      },
-      {
-        label: "💰 Installment Plan",
-        href: "/dashboard/payments/installment-plan",
         color: "",
       },
      

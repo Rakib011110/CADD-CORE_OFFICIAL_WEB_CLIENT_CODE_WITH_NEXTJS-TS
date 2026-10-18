@@ -36,7 +36,7 @@ export default function MobileEnrollBar({
   }, []);
   const full = batch?.status === "full";
   const when = batch
-    ? `${MODE_LABEL[batch.mode]} · ${formatShortDateBn(batch.startDate) || "তারিখ শীঘ্রই"}`
+    ? `${MODE_LABEL[batch.mode]} · ${(batch.startAnytime ? "যেকোনো সময়" : formatShortDateBn(batch.startDate) || "তারিখ শীঘ্রই")}`
     : "পরবর্তী ব্যাচ শীঘ্রই";
 
   return (

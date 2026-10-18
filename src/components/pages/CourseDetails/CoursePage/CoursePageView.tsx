@@ -30,7 +30,10 @@ const HIDE_CAREER_SUPPORT_SLUGS = ["project-management-primavera-p6"];
 function legacyBatches(course?: TCourse): TCourseBatch[] {
   const s = course?.schedule;
   if (!course || !s?.startingDate || isNaN(new Date(s.startingDate).getTime())) return [];
-  const started = new Date(s.startingDate) < new Date(new Date().toDateString());
+  const today = new Date(new Date().toDateString());
+  // Same 14-day admission window as batches; older dates are out of date
+  if (today.getTime() - new Date(s.startingDate).getTime() > 14 * 24 * 60 * 60 * 1000) return [];
+  const started = new Date(s.startingDate) < today;
   return [
     {
       _id: "",

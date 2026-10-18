@@ -52,6 +52,7 @@ export const seatsLeft = (b: TCourseBatch) =>
   b.seatsTotal ? Math.max(0, b.seatsTotal - (b.seatsBooked || 0)) : null;
 
 export const batchDateText = (b: TCourseBatch) => {
+  if (b.startAnytime) return "যেকোনো সময় শুরু করা যাবে";
   const d = formatDateBn(b.startDate);
   if (d) return d;
   if (b.mode === "corporate") return "আপনার সুবিধামতো সময়ে";
@@ -81,7 +82,10 @@ const FULL_PAYMENT_ONLY_MATCHES = [
 ];
 
 /** Active payment plans for a course: its own plans, otherwise the global ones. */
-export const resolvePlans = (course: TCourse, globalPlans: TPaymentPlan[] = []) => {
+export const resolvePlans = (
+  course: Pick<TCourse, "slug" | "title" | "paymentPlans">,
+  globalPlans: TPaymentPlan[] = []
+) => {
   const own = course.paymentPlans || [];
   if (own.length) return own.filter((p) => p.isActive !== false);
   const fullOnly = FULL_PAYMENT_ONLY_MATCHES.some(
@@ -100,7 +104,8 @@ export const priceForPlan = (fee: number, plan?: TPaymentPlan) => {
   const discount = plan?.discountPercent ? (fee * plan.discountPercent) / 100 : 0;
   const total = Math.max(0, fee - discount);
   let payNow = total;
-  if (installments === 2) payNow = fee * 0.5;
+  if (installments > 1 && plan?.payNowPercent) payNow = (total * plan.payNowPercent) / 100;
+  else if (installments === 2) payNow = fee * 0.5;
   else if (installments === 3) payNow = fee * 0.3;
   const remaining = Math.max(0, total - payNow);
   const later = installments > 1 ? installments - 1 : 0;
