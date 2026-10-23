@@ -47,6 +47,7 @@ const COURSE_MODE: Record<string, string> = {
   online: "online",
   offline: "onsite",
   weekend: "onsite",
+  friday: "onsite",
   corporate: "onsite",
   "one-to-one": "onsite",
 };

@@ -84,7 +84,7 @@ export type TIdemoCertificate = {
   photoUrl: string;
 };
 
-export type TDeliveryMode = "online" | "offline" | "weekend" | "corporate" | "one-to-one";
+export type TDeliveryMode = "online" | "offline" | "weekend" | "friday" | "corporate" | "one-to-one";
 export type TBatchStatus = "upcoming" | "running" | "full" | "closed";
 
 export type TCourseBatch = {

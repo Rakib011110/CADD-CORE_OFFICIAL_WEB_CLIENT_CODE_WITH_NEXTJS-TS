@@ -1,19 +1,24 @@
 import { TCourse, TCourseBatch, TDeliveryMode, TPaymentPlan } from "@/lib/courses";
 
-export const MODE_ORDER: TDeliveryMode[] = ["online", "offline", "weekend", "corporate", "one-to-one"];
+export const MODE_ORDER: TDeliveryMode[] = ["online", "offline", "weekend", "friday", "corporate", "one-to-one"];
 
 export const MODE_LABEL: Record<TDeliveryMode, string> = {
   online: "অনলাইন",
   offline: "অফলাইন",
   weekend: "উইকেন্ড",
-  corporate: "কর্পোরেট",
+  friday: "শুক্রবার",
+  corporate: "শুক্রবার (কর্পোরেট)",
   "one-to-one": "ওয়ান-টু-ওয়ান",
 };
+
+// Shorter names for the narrow mode tabs on the enrollment card
+export const MODE_TAB_LABEL: Record<TDeliveryMode, string> = { ...MODE_LABEL, corporate: "কর্পোরেট" };
 
 export const MODE_HINT: Record<TDeliveryMode, string> = {
   online: "লাইভ ক্লাস, যেকোনো জায়গা থেকে",
   offline: "ক্যাম্পাসে সরাসরি ক্লাস",
   weekend: "সাপ্তাহিক ছুটির দিনে ক্লাস",
+  friday: "প্রতি শুক্রবার ক্লাস",
   corporate: "প্রতিষ্ঠানের টিমের জন্য ট্রেনিং",
   "one-to-one": "অফিসে বসে একক প্রশিক্ষণ",
 };

@@ -1,6 +1,6 @@
 import baseApi from "../baseApi";
 
-// Batches (online, offline, weekend, corporate, one-to-one) managed from the dashboard.
+// Batches (online, offline, weekend, friday, corporate, one-to-one) managed from the dashboard.
 // Changes also refresh course pages, which show the published batches.
 const courseBatchApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({

@@ -15,6 +15,7 @@ import {
   FREE_SEMINAR_URL,
   MODE_HINT,
   MODE_LABEL,
+  MODE_TAB_LABEL,
   batchDateText,
   batchStatusText,
   formatDateBn,
@@ -81,7 +82,7 @@ export default function EnrollCard({ course, batches, plans, selectedBatch, onSe
                   className={`rounded-md px-1 py-2 text-xs font-semibold transition-colors sm:text-sm ${
                     active ? "bg-white text-red-600 shadow-sm" : "text-zinc-600 hover:text-zinc-900"
                   }`}>
-                  {MODE_LABEL[m]}
+                  {MODE_TAB_LABEL[m]}
                 </button>
               );
             })}

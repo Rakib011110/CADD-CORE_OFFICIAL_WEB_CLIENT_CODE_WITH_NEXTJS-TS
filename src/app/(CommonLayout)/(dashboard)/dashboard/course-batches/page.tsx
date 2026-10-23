@@ -26,7 +26,8 @@ const MODES: { value: TDeliveryMode; label: string }[] = [
   { value: "online", label: "Online" },
   { value: "offline", label: "Offline" },
   { value: "weekend", label: "Weekend" },
-  { value: "corporate", label: "Corporate (Friday)" },
+  { value: "friday", label: "Friday" },
+  { value: "corporate", label: "Friday (Corporate)" },
   { value: "one-to-one", label: "One to one" },
 ];
 
@@ -73,7 +74,7 @@ const prettyDate = (v?: string | null) =>
 const courseOf = (b: TCourseBatch) => (typeof b.course === "object" ? b.course : null);
 const taka = (n: number) => `৳${Math.round(n).toLocaleString("en-IN")}`;
 // Numbers the server creates by itself; only numbers typed by an admin are worth showing
-const AUTO_BATCH_NO = /^(ONLINE|OFFLINE|WEEKEND|CORPORATE|ONE-TO-ONE)-(\d{4}-\d{2}-\d{2}|ANYTIME|TBA)(-\d+)?$/;
+const AUTO_BATCH_NO = /^(ONLINE|OFFLINE|WEEKEND|FRIDAY|CORPORATE|ONE-TO-ONE)-(\d{4}-\d{2}-\d{2}|ANYTIME|TBA)(-\d+)?$/;
 
 // Same visibility rule as the API: an upcoming batch stays on the website for
 // 14 days after it starts (admission open), unless it is set to running/full.
