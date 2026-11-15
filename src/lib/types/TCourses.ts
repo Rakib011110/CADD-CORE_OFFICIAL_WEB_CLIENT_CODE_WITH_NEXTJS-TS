@@ -41,6 +41,9 @@ export type TCourse = {
     onJobTraining?: string;
     projects?: string;
     experienceLetter?: string;
+    liveSupport?: string;
+    internship?: string;
+    extra?: { label: string; value: string }[];
   };
 
   topicsCovered: { topicTitle: string; topicDescription: string }[];

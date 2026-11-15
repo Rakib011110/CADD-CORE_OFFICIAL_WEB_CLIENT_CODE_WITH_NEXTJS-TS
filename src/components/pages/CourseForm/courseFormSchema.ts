@@ -52,6 +52,9 @@ export const courseFormSchema = z.object({
     onJobTraining: z.string(),
     projects: z.string(),
     experienceLetter: z.string(),
+    liveSupport: z.string(),
+    internship: z.string(),
+    extra: z.array(z.object({ label: z.string(), value: z.string() })),
   }),
 
   // --- Content ---
@@ -120,6 +123,9 @@ export const courseFormDefaults: CourseFormValues = {
     onJobTraining: "",
     projects: "",
     experienceLetter: "",
+    liveSupport: "",
+    internship: "",
+    extra: [],
   },
   topicsCovered: [],
   learningProject: [],
@@ -210,6 +216,12 @@ export function courseToFormValues(course: any): CourseFormValues {
       onJobTraining: asString(course.courseIncludes?.onJobTraining),
       projects: asString(course.courseIncludes?.projects),
       experienceLetter: asString(course.courseIncludes?.experienceLetter),
+      liveSupport: asString(course.courseIncludes?.liveSupport),
+      internship: asString(course.courseIncludes?.internship),
+      extra: asArray<any>(course.courseIncludes?.extra).map((e) => ({
+        label: asString(e.label),
+        value: asString(e.value),
+      })),
     },
     topicsCovered: asArray<any>(course.topicsCovered).map((t) => ({
       topicTitle: asString(t.topicTitle),

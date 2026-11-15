@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Award, Briefcase, CalendarClock, FileBadge, FolderKanban, MonitorPlay } from "lucide-react";
+import { Award, BadgeCheck, Briefcase, CalendarClock, FileBadge, FolderKanban, GraduationCap, Headphones, MonitorPlay } from "lucide-react";
 import { TCourse } from "@/lib/courses";
 import CourseSection from "./CourseSection";
 import { AutoGrid, CARD_STATIC, ICON_TILE } from "./ui";
@@ -13,17 +13,29 @@ const INCLUDE_ITEMS = [
   { key: "projects", label: "প্রজেক্ট", icon: FolderKanban },
   { key: "certificate", label: "সার্টিফিকেট", icon: Award },
   { key: "onJobTraining", label: "অন-জব ট্রেইনিং", icon: Briefcase },
+  { key: "internship", label: "ইন্টার্নশিপ", icon: GraduationCap },
   { key: "experienceLetter", label: "এক্সপেরিয়েন্স লেটার", icon: FileBadge },
+  { key: "liveSupport", label: "লাইভ সাপোর্ট", icon: Headphones },
 ] as const;
 
 export default function OverviewSection({ course }: { course: TCourse }) {
   const [expanded, setExpanded] = useState(false);
   const description = course.overview?.overviewDescription?.trim();
   const videoUrl = toEmbedUrl(course.overview?.videoUrl);
-  const includes = INCLUDE_ITEMS.map((item) => ({
-    ...item,
+  const fixed = INCLUDE_ITEMS.map((item) => ({
+    key: item.key as string,
+    label: item.label as string,
+    icon: item.icon,
     value: (course.courseIncludes as Record<string, string | undefined> | undefined)?.[item.key]?.trim(),
-  })).filter((i) => i.value);
+  }));
+  // Extra tiles added from the dashboard (label + value)
+  const extra = (course.courseIncludes?.extra || []).map((e, i) => ({
+    key: `extra-${i}`,
+    label: e.label?.trim() || "",
+    icon: BadgeCheck,
+    value: e.value?.trim(),
+  }));
+  const includes = [...fixed, ...extra].filter((i) => i.value);
   if (!description && !videoUrl && !includes.length) return null;
 
   const isLong = (description?.length || 0) > 420;

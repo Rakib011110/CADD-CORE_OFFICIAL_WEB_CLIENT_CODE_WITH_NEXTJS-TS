@@ -26,6 +26,9 @@ export type TCourseIncludes = {
     onJobTraining?: string;
     projects?: string;
     experienceLetter?: string;
+    liveSupport?: string;
+    internship?: string;
+    extra?: { label: string; value: string }[];
 };
 
 export type TTopic = {

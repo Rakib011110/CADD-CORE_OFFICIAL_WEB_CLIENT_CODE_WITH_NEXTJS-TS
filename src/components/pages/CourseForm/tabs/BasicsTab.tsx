@@ -139,9 +139,26 @@ export function BasicsTab({ pricingElsewhere = false, courseId }: { pricingElsew
             <TextField name="courseIncludes.duration" label="Duration" placeholder="e.g. ৪৫ দিন" />
             <TextField name="courseIncludes.liveSessions" label="Live Sessions" placeholder="e.g. ৩০ টা" />
             <TextField name="courseIncludes.certificate" label="Certificate" placeholder="e.g. সার্টিফিকেট" />
-            <TextField name="courseIncludes.onJobTraining" label="On Job Training" placeholder="e.g. অন-জব ট্রেইনিং" />
+            <TextField name="courseIncludes.onJobTraining" label="On Job Training" placeholder="e.g. ১ মাস" />
             <TextField name="courseIncludes.projects" label="Projects" placeholder="e.g. ১০ টি প্রজেক্ট" />
             <TextField name="courseIncludes.experienceLetter" label="Experience Letter" placeholder="e.g. অভিজ্ঞতা সনদ" />
+            <TextField name="courseIncludes.liveSupport" label="Live Support (empty = hidden)" placeholder="e.g. আছে" />
+            <TextField name="courseIncludes.internship" label="Internship (empty = hidden)" placeholder="e.g. ৩ মাস (অফলাইন)" />
+          </div>
+          <div className="mt-5">
+            <RepeaterField
+              name="courseIncludes.extra"
+              title="More tiles (shown after the ones above)"
+              addLabel="Add tile"
+              newItem={{ label: "", value: "" }}
+              emptyHint="No extra tiles. Add one to show anything else, e.g. জব প্লেসমেন্ট সাপোর্ট."
+              renderItem={(index) => (
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <TextField name={`courseIncludes.extra.${index}.label`} label="Label" placeholder="e.g. জব সাপোর্ট" />
+                  <TextField name={`courseIncludes.extra.${index}.value`} label="Value" placeholder="e.g. ৬ মাস" />
+                </div>
+              )}
+            />
           </div>
         </CardContent>
       </Card>
